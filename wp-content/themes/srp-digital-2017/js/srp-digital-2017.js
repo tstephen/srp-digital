@@ -273,14 +273,16 @@
   function slideshow() {
     console.log('starting slideshow');
     var slideCount = jQuery('footer .slide').length;
-    for (i==1 ; i < slideCount ; i++) {
-      console.log('for i = '+i);
-      setTimeout(function() {
-        console.log('timeout');
-        //jQuery('footer .slide').slideUp();
-        jQuery('footer .slide:nth-child('+i+')').slideDown();
-      }, 3000);
+    var activeSlide = 1;
+    var updateSlide = function() {
+      console.log('for slide: '+activeSlide);
+      jQuery('footer .slide').hide();
+      jQuery('footer .slide:nth-child('+activeSlide+')').slideDown();
+      activeSlide++;
+      if (activeSlide > slideCount) activeSlide = 1;
+      setTimeout(updateSlide, 3000);
     } 
+    updateSlide();
   }
 
   /*

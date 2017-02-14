@@ -158,7 +158,6 @@ h6 a {
 .search-results .page-title span {
   font-family: Arial, sans-serif;
 }
-
 /*--------------------------------------------------------------
 3.0 Layout
 --------------------------------------------------------------*/
@@ -376,11 +375,26 @@ h6 a {
 }
 
 /*--------------------------------------------------------------
+  Overrides
+--------------------------------------------------------------*/
+/*--------------------------------------------------------------
 Footer widgets
 --------------------------------------------------------------*/
 footer .footer-widget-area {
   display:inline-flex;
   width:100%;
+}
+footer .widget_nav_menu h4 {
+  font-size: 1.2em;
+  margin-bottom: 0px;
+}
+footer .widget_nav_menu ul {
+  border-bottom: 0px;
+  border-top: 1px solid #d9d9d9;
+}
+footer .widget_nav_menu li {
+  border-top: 0px;
+  line-height: 0.8em;
 }
 footer nav.footer-entry {
   width:50%;
@@ -397,13 +411,14 @@ footer nav.footer-entry:nth-child(3) {
   float:right;
   text-align:right;
 }
+footer ul.slideshow {
+  list-style:none;
+}
 footer .slide {
   display:none;
 }
-footer .slide.active {
+footer .slide {
   display: inline;
-}
-@media screen and (min-width: 768px) {
 }
 @media screen and (min-width: 1024px) {
   footer nav.footer-entry {
