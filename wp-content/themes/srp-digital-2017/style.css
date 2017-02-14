@@ -45,16 +45,16 @@ ins,
 .hentry.has-post-thumbnail .entry-link,
 .pace .pace-progress,
 .widget_tag_cloud a {
-  background: #10b0b8;
+  background: #1da1f2;
 }
 .hentry.color-2 {
-  background-color: #0e9ea5;
+  background-color: #0072ce;
 }
 .hentry.color-3 {
-  background-color: #0d8d93;
+  background-color: #004b93;
 }
 .hentry.color-4 {
-  background-color: #0b7b80;
+  background-color: #00266c;
 }
 .hentry.color-5 {
   background-color: #0a6a6e;
@@ -115,7 +115,12 @@ a,
 .widgettitle a:hover,
 .widgettitle a:focus,
 .widgettitle a:active {
-  color: #10b0b8;
+  color: #1da1f2;
+}
+.site-title a,
+a:hover, a:focus, a:active {
+  border-bottom-color: #005eb8;
+  color: #005eb8;
 }
 
 /*--------------------------------------------------------------
