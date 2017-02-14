@@ -76,3 +76,6 @@ require get_stylesheet_directory() . '/inc/jetpack.php';
  * Footer widget area below the featured posts.
  */
 require get_stylesheet_directory() . '/inc/widgets.php';
+
+/* Allow shortcodes in widget areas */
+add_filter('widget_text', 'do_shortcode');
