@@ -57,7 +57,7 @@ ins,
   background-color: #00266c;
 }
 .hentry.color-5 {
-  background-color: #0a6a6e;
+  background-color: #7c2855;
 }
 .hentry.color-1 + .hentry.color-1,
 .hentry.color-2 + .hentry.color-2,
@@ -380,9 +380,6 @@ h6 a {
 }
 
 /*--------------------------------------------------------------
-  Overrides
---------------------------------------------------------------*/
-/*--------------------------------------------------------------
 Footer widgets
 --------------------------------------------------------------*/
 footer .footer-widget-area {
@@ -435,3 +432,73 @@ footer .slide {
   }
 }
 
+/*--------------------------------------------------------------
+  Login area
+--------------------------------------------------------------*/
+.hidden-xs {
+  display: none;
+}
+.visible-xs {
+  display: inline;
+}
+.login,
+.logout {
+  float:right;
+}
+.login {
+  display:inline-flex;
+}
+
+.logout {
+
+}
+
+.login a,
+.logout a {
+  border: 1px solid #d9d9d9;
+  color: white;
+  margin-top: 15px !important;
+  text-align: center;
+  vertical-align: middle;
+}
+.login a {
+  height: 40px !important;
+  padding: 5px 10px !important;
+  width: 90px !important;
+}
+.logout a {
+  font-size:2.7em;
+  height: 46px !important;
+  width: 46px !important;
+}
+.logout img {
+  margin-top: 16px;
+}
+.site-description {
+  display:none;
+}
+
+@media screen and (max-width: 400px) {
+  .site-header {
+    padding-left: 15px;
+  }
+  .has-sidebar .site-header {
+    padding-right: 75px;
+  }
+}
+@media screen and (min-width: 670px) {
+  .hidden-xs {
+    display: inline;
+  }
+  .visible-xs {
+    display: none;
+  }
+}
+@media screen and (min-width: 890px) {
+  .site-description {
+    display:inline;
+  }
+}
+@media screen and (min-width: 1024px) {
+
+}
