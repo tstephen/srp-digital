@@ -38,15 +38,18 @@
     <div class="<?php echo is_user_logged_in() ? 'logout' : 'login' ?>">
       <?php
         $usr = wp_get_current_user();
+/* WP-MEMBERS approach
         if (is_user_logged_in()) { ?> 
-          <a class="logout dashicons dashicons-migrate hentry color-5" href="/?a=logout"></a>
+          <a class="logout dashicons dashicons-migrate color-5" href="/?a=logout"></a>
           <!--a class="" href="/profile"><?php echo get_avatar($usr->ID, 46); ?></a--> <?php
           echo get_avatar($usr->ID, 46);
         } else {
-          ?> <a class="login hentry color-4" href="/login">Login</a> <?php
-          ?> <a class="register hentry color-5" href="/register">Register</a> <?php
-        }
+          ?> <a class="login color-4" href="/login">Login</a> <?php
+          ?> <a class="register color-5" href="/register">Register</a> <?php
+        }*/
       ?>
+      <a class="login color-4" href="https://trakeo.com:8443/login">Login</a>
+      <a class="register color-5" href="https://trakeo.com:8443/register">Register</a>
     </div>
   </header><!-- #masthead -->
 

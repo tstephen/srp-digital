@@ -53,10 +53,10 @@ ins,
 .hentry.color-3 {
   background-color: #004b93;
 }
-.hentry.color-4 {
+.hentry.color-4,.color-4 {
   background-color: #00266c;
 }
-.hentry.color-5 {
+.hentry.color-5,.color-5 {
   background-color: #7c2855;
 }
 .hentry.color-1 + .hentry.color-1,
