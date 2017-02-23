@@ -1,16 +1,15 @@
 <?php
 /*
- * Plugin Name: Omny Link Forms
- * Plugin URI: http://omny.link/omny-link-forms/
+ * Plugin Name: REST Forms
  * Description: Integrates web APIs with your WordPress app.
- * Author: Omny Link
+ * Author: Tim Stephenson
  * Version: 0.13.1
  * License: GPLv2 or later
  */
 
   define("P_ID", 'rest-forms');
   define('P_VERSION', '0.13.1');
-  define("P_NAME", 'Omny Link Forms');
+  define("P_NAME", 'REST Forms');
   define("P_TEXT_DOMAIN", 'p-textdomain');
 
   require_once(dirname(__FILE__)."/includes/options.php");
