@@ -79,3 +79,15 @@ require get_stylesheet_directory() . '/inc/widgets.php';
 
 /* Allow shortcodes in widget areas */
 add_filter('widget_text', 'do_shortcode');
+
+/*
+require_once(plugin_basename(__FILE__));
+add_frontend_route('^([^/]+)/latest$', function($matches) {
+    return array(
+        'post_type'      => $matches[1],
+        'posts_per_page' => 5,
+        'orderby'        => 'date',
+        'order'          => 'desc'
+    );
+});
+*/
