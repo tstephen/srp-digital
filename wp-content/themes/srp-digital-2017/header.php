@@ -49,7 +49,7 @@
         }*/
       ?>
       <a class="login color-4" href="https://trakeo.com:8443/login">Login</a>
-      <a class="register color-5" href="https://trakeo.com:8443/register">Register</a>
+      <a class="register color-5" href="/register">Register</a>
     </div>
   </header><!-- #masthead -->
 

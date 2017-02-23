@@ -91,3 +91,7 @@ add_frontend_route('^([^/]+)/latest$', function($matches) {
     );
 });
 */
+function srp_rewrite() {
+  add_rewrite_rule('^login?', 'https://trakeo.com:8443/', 'top');
+}
+add_action('init', 'srp_rewrite');
