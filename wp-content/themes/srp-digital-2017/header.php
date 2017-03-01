@@ -44,11 +44,11 @@
           <!--a class="" href="/profile"><?php echo get_avatar($usr->ID, 46); ?></a--> <?php
           echo get_avatar($usr->ID, 46);
         } else {
-          ?> <a class="login color-4" href="/login">Login</a> <?php
+          ?> <a class="login color-2" href="/login">Login</a> <?php
           ?> <a class="register color-5" href="/register">Register</a> <?php
         }*/
       ?>
-      <a class="login color-4" href="https://trakeo.com:8443/login">Login</a>
+      <a class="login color-2" href="https://trakeo.com:8443/login">Login</a>
       <a class="register color-5" href="/register">Register</a>
     </div>
   </header><!-- #masthead -->

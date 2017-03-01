@@ -41,23 +41,23 @@ ins,
 .comment #respond h3 small a,
 .comment-reply-title a,
 .filter-on .hentry.has-post-thumbnail:hover .entry-link,
-.hentry.color-1,
+.hentry.color-1, .color-1
 .hentry.has-post-thumbnail .entry-link,
 .pace .pace-progress,
 .widget_tag_cloud a {
   background: #1da1f2;
 }
-.hentry.color-2 {
+.hentry.color-2, .color-2 {
   background-color: #0072ce;
 }
-.hentry.color-3 {
+.hentry.color-3, .color-3 {
   background-color: #004b93;
 }
 .hentry.color-4,.color-4 {
   background-color: #00266c;
 }
 .hentry.color-5,.color-5 {
-  background-color: #7c2855;
+  background-color: #99c344;
 }
 .hentry.color-1 + .hentry.color-1,
 .hentry.color-2 + .hentry.color-2,
@@ -275,6 +275,14 @@ h6 a {
   min-height: initial;
 }
 
+/* Single page overrides */
+body.single .entry-thumbnail {
+  height: 15vh !important;
+}
+body.single .entry-header {
+  width: 674px;
+}
+
 /*--------------------------------------------------------------
 6.0 Jetpack
 --------------------------------------------------------------*/
@@ -376,6 +384,22 @@ h6 a {
   .blog .hentry:nth-of-type(3n+4),
   .search-results .hentry:nth-of-type(3n+4) {
     clear: left;
+  }
+  body.single .entry-header,
+  body.single .entry-content {
+    left: 0 !important;
+    margin-left: 0 !important;
+    text-align: center;
+    width: 874px;
+  }
+}
+@media screen and (min-width: 1200px) {
+  body.single .entry-header,
+  body.single .entry-content {
+    left: 0 !important;
+    margin-left: 0 !important;
+    text-align: center;
+    width: 1124px;
   }
 }
 
@@ -494,7 +518,7 @@ footer .slide {
     display: none;
   }
 }
-@media screen and (min-width: 890px) {
+@media screen and (min-width: 980px) {
   .site-description {
     display:inline;
   }
