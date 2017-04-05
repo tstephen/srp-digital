@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html class="no-js">
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <title>Questionnaire</title>
+  <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+  <link rel="stylesheet" type="text/css" href="../questionnaire/css/questionnaire-0.3.0.css"/>
+</head>
+<body>
+
+  <!--[if lt IE 8]>
+  <div class="alert alert-warning">
+    You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.
+  </div>
+  <![endif]-->
+
+  <nav class="navbar navbar-static-top" style="display:none">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/"></a>
+      </div>
+    </div><!-- /.container -->
+  </nav>
+
+  <div class="container">
+    <div class="row" id="containerSect">
+    </div><!-- /.row -->
+  </div><!-- /.container -->
+
+  <footer class="site-footer">
+  </footer>
+
+  <script id="template" type="text/html">
+    <section id="loginSect" style="display:none">
+      <div class="col-md-offset-1 col-md-10">
+        <div id="messages" style="display:none;width:100%"></div>
+      </div>
+      <div class="col-md-offset-6 col-md-6 col-sm-12" id="loginSect">
+        <form class="form-inline" id="loginForm" name="loginForm" action="http://localhost:8083/auth/login" method="POST">
+          <fieldset>
+            <input class="form-control input-lg" type="text" id="username" name="username" placeholder="Username" required/>
+            <input class="form-control input-lg" type="password" id="password" name="password" placeholder="Password" required/>
+            <!--input type="hidden" id="_csrf" name="_csrf" value="{{csrfToken}}" />
+            <input type="hidden" id="redirect" name="redirect" value="{{context}}/index.html" /-->
+            <input type="button" id="login" value="Login" class="btn btn-primary" />
+          </fieldset>
+        </form>
+      </div>
+      <div id="resetSect" class="col-md-offset-6 col-md-6 col-sm-12" style="display:none">
+        <form id="resetForm" class="form-inline" name="resetForm" action="/reset" method="POST">
+          <fieldset>
+            <input class="form-control input-lg" id="email" name="email" placeholder="Registered email address" required/>
+            <input type="hidden" id="_csrf" name="_csrf" value="{{csrfToken}}" />
+            <input type="hidden" id="redirect" name="redirect" value="index.html" />
+            <input class="btn" type="button" id="reset" on-click="reset()" value="Reset Password"/>
+          </fieldset>
+        </form>
+      </div>
+      <div class="pull-right" style="margin-right:20px">
+        <a href="#" on-click="showReset()">Forgot your password?</a>
+        <a href="http://trakeo.com/register/">Or click here to register a new account</a>
+      </div>
+
+      <section id="main">
+        <h1>Sustainability Resource Planning</h1>
+        <img src="../srp/2.0.0/images/icon/srp-icon-256x256.png"/>
+        <p>For more information see <a href="//srp.digital">srp.digital</a></p>
+      </section>
+    </section>
+
+    {{>questionnaire}}
+  </script>
+
+  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.js"></script>
+  <script src='../questionnaire/js/0.7.3/ractive.min.js'></script>
+  <script src="../questionnaire/js/questionnaire-0.3.0.js"></script>
+
+
+  <script src="2.0.0/js/string-functions-0.1.0.js"></script>
+
+  <script src="2.0.0/js/auth.js"></script>
+  <script src="2.0.0/js/return.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Sustainable Resource Planning</title>
+  <!--link href="/webjars/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet"-->
+  <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+
+  <link href="2.0.0/css/srp.css" rel="stylesheet">
+  <link href="http://localhost:8083/css/sdu-1.0.0.css" rel="stylesheet">
+  <link rel="icon" type="image/png" href="2.0.0/images/icon/srp-icon-32x32.png" />
+    <style>
+    html,body,section#main {
+      height:100%;
+      text-align: center;
+      width: 100%;
+    }
+    a,a:visited {
+      color: #949699;
+    }
+    a:hover,a:active {
+      color: #ec9300;
+    }
+    input {
+      border-style: solid;
+      border-width: 1px;
+    }
+    input#email {
+      margin-right:2px;
+      width: 400px;
+    }
+    section#main {
+      margin: auto;
+      padding-top: 45%;
+    }
+    @media (min-width: 480px) {
+      section#main {
+        padding-top: 30%;
+      }
+    }
+    @media (min-width: 768px) {
+      section#main {
+        padding-top: 20%;
+      }
+    }
+    section#login {
+      padding-top: 0;
+      padding-right: 20px;
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 30%;
+    }
+    /*#container {
+      position: fixed;
+      top: 5px;
+      right: 20px;
+    }
+    #container div {
+      position: relative;
+      margin-top: 5px;
+      }
+      #container form {
+      text-align: right;
+    }
+    #container #messages {
+      margin: 0 auto;
+      width: 100%;
+      top: -5px;
+    }*/
+    .btn {
+      height: 45px;
+    }
+
+    @media (max-width: 480px) {
+      section#main {
+        padding-top: 45%;
+      }
+    }
+    @media (min-width: 481px) {
+      section#main {
+        padding-top: 30%;
+      }
+    }
+    @media (min-width: 769px) {
+      section#main {
+        padding-top: 10%;
+      }
+    }
+  </style>
+<head>
+<body>
+
+  <section id="container" class="container"></section>
+
+  <script id='template' type='text/ractive'>
+    <section id="loginSect" style="display:none">
+      <div class="col-md-offset-1 col-md-10">
+        <div id="messages" style="display:none;width:100%"></div>
+      </div>
+      <div class="col-md-offset-6 col-md-6 col-sm-12" id="loginSect">
+        <form class="form-inline" id="loginForm" name="loginForm" action="http://localhost:8083/auth/login" method="POST">
+          <fieldset>
+            <input class="form-control input-lg" type="text" id="username" name="username" placeholder="Username" required/>
+            <input class="form-control input-lg" type="password" id="password" name="password" placeholder="Password" required/>
+            <!--input type="hidden" id="_csrf" name="_csrf" value="{{csrfToken}}" />
+            <input type="hidden" id="redirect" name="redirect" value="{{context}}/index.html" /-->
+            <input type="button" id="login" on-click="login()" value="Login" class="btn btn-primary" />
+          </fieldset>
+        </form>
+      </div>
+      <div id="resetSect" class="col-md-offset-6 col-md-6 col-sm-12" style="display:none">
+        <form id="resetForm" class="form-inline" name="resetForm" action="/reset" method="POST">
+          <fieldset>
+            <input class="form-control input-lg" id="email" name="email" placeholder="Registered email address" required/>
+            <input type="hidden" id="_csrf" name="_csrf" value="{{csrfToken}}" />
+            <input type="hidden" id="redirect" name="redirect" value="index.html" />
+            <input class="btn" type="button" id="reset" on-click="reset()" value="Reset Password"/>
+          </fieldset>
+        </form>
+      </div>
+      <div class="pull-right" style="margin-right:20px">
+        <a href="#" on-click="showReset()">Forgot your password?</a>
+        <a href="http://trakeo.com/register/">Or click here to register a new account</a>
+      </div>
+
+      <section id="main">
+        <h1>Sustainability Resource Planning</h1>
+        <img src="2.0.0/images/icon/srp-icon-256x256.png"/>
+        <p>For more information see <a href="//srp.digital">srp.digital</a></p>
+      </section>
+    </section>
+
+    {{#if surveyReturn}}
+      <section id="introSect">
+        <h2>Introduction</h2>
+        <p>
+          As an NHS organisation, and as a spender of public funds, we have an
+          obligation to work in a way that has a positive effect on the
+          communities we serve. Sustainability means spending public money well,
+          the smart and efficient use of natural resources and building healthy,
+          resilient communties.  By making the most of by making the most of
+          social, environmental and economic assets we can improve health both
+          in the immediate and long term even in the context of rising cost of
+          natural resources. Demonstrating that we consider the social and
+          environmental impacts ensures that the legal requirements in the
+          Public Services (Social Value) Act (2012) are met.</p>
+
+        {{#if formatAnswer('SDMP_CRMP')}}
+          <p>
+            In order to fulfil our responsibilities for the role we play,
+            {{#if formatAnswer('ORG_NICKNAME')}}
+              {{formatAnswer('ORG_NICKNAME')}}
+            {{else}}
+              {{formatAnswer('ORG_NAME')}}
+            {{/if}}
+            has the following sustainability mission statement located in our
+            sustainable development management plan (SDMP):</p>
+        {{else}}
+          <p>
+            We acknowledge this responsibility to our patients, local
+            communities and the environment by working hard to minimise our footprint.</p>
+        {{/if}}
+
+        {{#if formatAnswer('SDMP_MISSION_STATEMENT')}}<h5>{{formatAnswer('SDMP_MISSION_STATEMENT')}}</h5>{{/if}}
+
+        <p>
+          As a part of the NHS, public health and social care system, it is our
+          duty to contribute towards the level of ambition set in 2014 of
+          reducing the carbon footprint of the NHS, public health and social
+          care system by 34% (from a 1990 baseline) equivalent to a 28%
+          reduction from a 2013 baseline by 2020. It is our aim to
+          {{#if formatAnswer('CARBON_REDUCTION_TARGET')}}supercede{{else}}meet{{/if}}
+          this target by reducing our carbon emissions
+          {{#if formatAnswer('CARBON_REDUCTION_TARGET')}}28%{{else}}{{formatAnswer('CARBON_REDUCTION_TARGET_PCT')}}%{{/if}}
+          by {{#if formatAnswer('CARBON_REDUCTION_TARGET')}}{{formatAnswer('CARBON_REDUCTION_DEADLINE_YEAR')}}{{else}}2020{{/if}}
+          using {{#if formatAnswer('CARBON_REDUCTION_TARGET')}}{{formatAnswer('CARBON_REDUCTION_BASE_YEAR')}}{{else}}2013{{/if}}
+          as the baseline year.</p>
+      </section>
+
+      <section id="policiesSect">
+        <h2>Policies</h2>
+        <p>In order to embed sustainability within our business it is important to explain where in our process and procedures sustainability features.</p>
+        <table class="table table-striped">
+          <thead>
+            <tr><th>Area</th><th>Is sustainability considered?</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Travel</td><td>{{formatAnswer('HEALTHY_TRANSPORT_PLAN')}}</td></tr>
+            <tr><td>Procurement (environmental)</td><td>{{formatAnswer('PROC_ENV_ASSESSMENT')}}</td></tr>
+            <tr><td>Procurement (social impact)</td><td>{{formatAnswer('PROC_ENV_ASSESSMENT')}}</td></tr>
+            <tr><td>Suppliers' impact</td><td>{{formatAnswer('PROC_SUPPLIER_SUSTAINABILITY')}}</td></tr>
+          </tbody>
+        </table>
+        <p>One of the ways in which an organisation can embed sustainability is
+          through the use of
+          {{#if formatAnswer('SDMP_CRMP')}}
+            {{#if formatAnswer('SDMP_BOARD_REVIEW_WITHIN_12_MONTHS')}}
+              an SDMP. The board approved our SDMP in the last 12 months so our plans for a sustainable future are well known within the organisation and clearly laid out.
+            {{else}}
+              an SDMP. An update to our SDMP is required because it has not been approved by the board in the last 12 months.
+            {{/if}}
+          {{else}}
+            a Sustainable Development Management Plan (SDMP). We will be putting together an SDMP in the near future for consideration by the board.
+          {{/if}}
+        </p>
+        <p>
+          {{#if formatAnswer('GCC_USER')}}
+            One of the ways in which we measure our impact as an organisation on corporate social responsibility is through the use of the Good Corporate Citizenship (GCC) tool.
+            {{#if formatAnswer('LAST_GCC_DATE')!=undefined}}
+              The last time we used the GCC self assessment was in {{formatAnswer('LAST_GCC_DATE')}}
+              scoring {{formatAnswer('LAST_GCC_SCORE')}}.
+            {{/if}}
+            {{#if formatAnswer('promoteSustainabilityToStaff')}}
+              As an organisation that acknowledges its responsibility towards creating a sustainable future, we help acheive that goal by running awareness campaigns that promote the benefits of sustainability to our staff.
+            {{/if}}
+          {{else}}
+            We do not currently use the Good Corporate Citizenship (GCC) tool or run awareness campaigns promoting sustainability.
+          {{/if}}
+
+        <p>
+          Climate change brings new challenges to our business both in direct
+          effects to the healthcare estates, but also to patient health.
+          Examples of recent years include the effects of heat waves, extreme
+          temperatures and prolonged periods of cold, floods, droughts etc.
+          {{#if formatAnswer('ADAPTATION_PLAN_INC')}}
+            Our board approved plans address the potential need to adapt the
+            delivery the organisation's activities and infrastructure to climate
+            change and adverse weather events
+          {{else}}
+            The organisation has identified the need for the development of a
+            board approved plan for future climate change risks affecting our
+            area.
+          {{/if}}
+
+        <p>
+          {{#if formatAnswer('QUANT_ES_IMPACTS')}}
+            {{formatAnswer('QUANT_ES_IMPACTS')}}
+          {{else}}
+            We have not assessed the social and environmental impacts for the trust.
+          {{/if}}
+
+        <p>
+          {{#if formatAnswer('MOD_SLAVERY')}}
+            {{formatAnswer('MOD_SLAVERY')}}
+          {{else}}
+            We have not currently issued a statement on Modern Slavery.
+          {{/if}}
+
+      </section>
+
+      <section id="partnershipsSect">
+        <h2>Partnerships</h2>
+        <p>
+          The NHS policy framework already sets the scene for commissioners and providers to operate in a sustainable manner. Crucially for us as a provider, evidence of this commitment will need to be provided in part through contracting mechanisms.</p>
+
+        {{#if formatAnswer('STRATEGIC_SUSTAINABILITY_PARTNERSHIPS')}}
+          Strategic partnerships are already established with the following
+          organisations: {{formatAnswer('STRATEGIC_SUSTAINABILITY_PARTNERS')}}.
+        {{else}}
+          We have not currently established any strategic partnerships.
+        {{/if}}
+
+        <p>
+          For commissioned services here is the sustainability comparitor for our CCGs:
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Organisation Name</th><th>SDMP</th>
+                <th>GCC</th><th>Adaptation</th><th>SD Reporting score</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{# ccgs:i}}
+                <tr>
+                  <td>{{sdmp}}</td><td>{{gcc}}</td><td>{{adaptation}}</td><td>{{sduScore}}</td>
+                </tr>
+              {{/}}
+              {{^ccgs}}
+                <tr><td colspan="5">TODO lookup CCG scores</td></tr>
+              {{/}}
+            </tbody>
+          </table>
+          More information on these measures is available here: http://www.sduhealth.org.uk/policy-strategy/reporting/sdmp-annual-reporting.aspx
+      </section>
+
+      <section id="performanceSect">
+        <h2>Performance</h2>
+        <h3>Organisation</h3>
+        <p>Since the 2007 baseline year, the NHS has undergone a significant restructuring process and one which is still on-going. Therefore in order to provide some organisational context, the following table may help explain how both the organisation and its performance on sustainablity has changed over time.</p>
+
+
+        <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/org.html"></div>
+
+        <p>
+          In 2014 the Sustainable Development Strategy outlined an ambition to reduce the carbon footprint of the NHS by 28% (from a 2013 baseline) by 2020. We have supported this ambition as follows:
+
+        <h3>Energy</h3>
+        <p>
+          <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/energy-co2e.csv"
+               class="rpt stacked" id="energyGraph" width="600" height="400"></svg>
+        </p>
+
+        <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/energy.html"></div>
+        <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/energy-co2e.html"></div>
+
+        <p>{{formatAnswer('ENERGY_PERF')}}</p>
+        <p>
+          {{! to calculate, perhaps server side }}
+          {{#if formatAnswer('ELEC_USED_3RD_PTY_PCT')}}
+            {{formatAnswer('ELEC_USED_3RD_PTY_PCT')}}
+          {{else}}
+            0
+          {{/if}}
+          % of our electricity use comes from renewable sources.
+        </p>
+        <p>{{formatAnswer('energyContext')}}</p>
+      </section>
+
+      <section id="travelSect">
+        <h3>Travel</h3>
+        <p>We can improve local air quality and improve the health of our community by promoting active travel – to our staff and to the patients and public that use our services.
+
+        <p>Every action counts and we are a lean organisation trying to realise efficiencies across the board for cost and carbon (CO<sub>2</sub>e) reductions. We support a culture for active travel to improve staff wellbeing and reduce sickness. Air pollution, accidents and noise all cause health problems for our local population, patients, staff and visitors and are caused by cars, as well as other forms of transport.</p>
+
+        <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/travel.html"></div>
+        <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/travel-co2e.html"></div>
+        <p>{{formatAnswer('travelPerf')}}</p>
+      </section>
+
+      <section id="wasteSect">
+        <h3>Waste</h3>
+        <p>
+          <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/waste-co2e.csv"
+               class="rpt stacked" id="wasteGraph" width="600" height="400"></svg>
+        </p>
+        <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/waste.html"></div>
+        <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/waste-co2e.html"></div>
+        <p>
+          {{formatAnswer('WASTE_PERF')}}
+        <p>
+          {{formatAnswer('WASTE_CONTEXT')}}
+      </section>
+
+      <section id="waterSect">
+        <h3>Finite resource use - Water</h3>
+        <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/water.html"></div>
+        <p>
+          {{formatAnswer('WATER_PERF')}}
+        <p>
+          {{formatAnswer('WATER_CONTEXT')}}
+      </section>
+
+      <section id="carbonFootprintSect">
+        <h3>Modelled Carbon Footprint</h3>
+        <p>
+          The information provided in the previous sections of this sustainability report uses the ERIC returns as its data source. However, we are aware that this does not reflect our entire carbon footprint. Therefore, the following information uses a scaled model based on work performed by the Sustainable Development Unit (SDU) in 2009/10. More information available here: http://www.sduhealth.org.uk/policy-strategy/reporting/nhs-carbon-footprint.aspx
+        </p>
+        <p>
+          Resulting in an estimated total carbon footprint of
+          {{! "&TEXT(ROUND($'Output - Report (provider)'.D186,0),"#,##0")&" }}
+          TODO
+          tonnes of carbon dioxide equivalent emissions (tCO<sub>2</sub>e). Our carbon
+          intensity per pound is
+          {{! "&TEXT(ROUND($'Benchmarking - Hotspots profile'.K64,0),"#,##0")&" }}
+          TODO
+          grams of carbon dioxide equivalent emissions per pound of operating
+          expenditure (gCO<sub>2</sub>e/&pound;). Average emissions for
+          {{! "&IF($Input.B20=1,LOWER($Input.B19)&" services","our service mix")&" }}
+          TODO
+          is
+          {{! "&TEXT($'Benchmarking - Hotspots profile'.K69,"#,##0")&" }}
+          TODO
+          grams per pound.
+        </p>
+        <p>
+          <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-footprint.csv"
+               class="rpt pie" id="carbonFootprintPieChart" width="600" height="400"></svg>
+        </p>
+        <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-footprint.html"></div>
+        <p>
+          <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-emissions-profile.csv"
+               class="rpt stacked" id="emissionsProfileGraph" width="600" height="400"></svg>
+        </p>
+        <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-emissions-profile.html"></div>
+      </section>
+
+      <!--section id="trajectorySect">
+        <h3>Modelled trajectory</h3>
+        <p>{{formatAnswer('trajectoryPerf')}}</p>
+        <p>TODO
+          <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-trajectory.csv"
+               class="rpt stacked" id="carbonTrajectoryGraph" width="600" height="400"></svg>
+        </p>
+        <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-trajectory.html"></div>
+      </section-->
+
+      <section id="benchmarkSect">
+        <h3>Benchmarking</h3>
+        <p>{{formatAnswer('BENCHMARK_PERF')}}</p>
+        <p>
+          <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-by-expenditure.csv"
+               class="rpt stacked" id="carbonByExpenditureGraph" width="600" height="400"></svg>
+        </p>
+        <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-by-expenditure.html"></div>
+      </section>
+
+      <section id="adaptationSect">
+        <h3>Adaptation</h3>
+        <p>Events such as heatwaves, cold snaps and flooding are expected to increase as a result of climate change. To ensure that our services continue to meet the needs of our local population during such events we have developed and implemented a number of policies and protocols in partnership with other local agencies these include:</p>
+        <p>{{formatAnswer('ADAPTATION_PERF')}}</p>
+      </section>
+    {{else}}
+      NO RETURN :-(
+      <button on-click="fetch()">Load it now</button>
+    {{/if}}
+  </script>
+
+  <!--
+  <script src="/webjars/jquery/1.11.1/jquery.min.js"></script>
+  <script src="/webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <script src="/webjars/Bootstrap-3-Typeahead/3.1.1/bootstrap3-typeahead.js"></script>
+  <script src="/webjars/ractive/0.7.3/ractive.min.js"></script>
+  -->
+  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.js"></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/ractive/0.7.3/ractive.min.js'></script>
+  <script src="2.0.0/js/string-functions-0.1.0.js"></script>
+
+  <script src="2.0.0/js/base.js"></script>
+  <script src="2.0.0/js/report.js"></script>
+  <script src="2.0.0/js/auth.js"></script>
+
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="2.0.0/js/stacked.js"></script>
+<script src="2.0.0/js/pie.js"></script>
+
+
+</body>
+
+</html>
