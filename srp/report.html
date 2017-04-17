@@ -132,6 +132,7 @@
 
     {{#if surveyReturn}}
       <section id="introSect">
+        <h1>Sustainability Report for {{formatAnswer('ORG_NAME')}} ({{formatAnswer('ORG_CODE')}})</h1>
         <h2>Introduction</h2>
         <p>
           As an NHS organisation, and as a spender of public funds, we have an
@@ -187,7 +188,7 @@
           <tbody>
             <tr><td>Travel</td><td>{{formatAnswer('HEALTHY_TRANSPORT_PLAN')}}</td></tr>
             <tr><td>Procurement (environmental)</td><td>{{formatAnswer('PROC_ENV_ASSESSMENT')}}</td></tr>
-            <tr><td>Procurement (social impact)</td><td>{{formatAnswer('PROC_ENV_ASSESSMENT')}}</td></tr>
+            <tr><td>Procurement (social impact)</td><td>{{formatAnswer('PROC_SOC_ASSESSMENT')}}</td></tr>
             <tr><td>Suppliers' impact</td><td>{{formatAnswer('PROC_SUPPLIER_SUSTAINABILITY')}}</td></tr>
           </tbody>
         </table>
@@ -250,18 +251,41 @@
 
       <section id="partnershipsSect">
         <h2>Partnerships</h2>
-        <p>
-          The NHS policy framework already sets the scene for commissioners and providers to operate in a sustainable manner. Crucially for us as a provider, evidence of this commitment will need to be provided in part through contracting mechanisms.</p>
-
-        {{#if formatAnswer('STRATEGIC_SUSTAINABILITY_PARTNERSHIPS')}}
-          Strategic partnerships are already established with the following
-          organisations: {{formatAnswer('STRATEGIC_SUSTAINABILITY_PARTNERS')}}.
+        {{#if isCcg()}}
+          <p>As a commissioning and contracting organisation, we will need effective contract mechanisms to deliver our ambitions for sustainable healthcare delivery. The NHS policy framework already sets the scene for commissioners and providers to operate in a sustainable manner. Crucially for us as a CCG, evidence of this commitment will need to be provided in part through contracting mechanisms.</p>
         {{else}}
-          We have not currently established any strategic partnerships.
+          <p>The NHS policy framework already sets the scene for commissioners and providers to operate in a sustainable manner. Crucially for us as a provider, evidence of this commitment will need to be provided in part through contracting mechanisms.</p>
         {{/if}}
 
-        <p>
-          For commissioned services here is the sustainability comparitor for our CCGs:
+        {{#if formatAnswer('STRATEGIC_SUSTAINABILITY_PARTNERSHIPS')}}
+          <p>Strategic partnerships are already established with the following
+          organisations: {{formatAnswer('STRATEGIC_SUSTAINABILITY_PARTNERS')}}.</p>
+        {{else}}
+          <p>We have not currently established any strategic partnerships.</p>
+        {{/if}}
+
+        {{#if isCcg()}}
+          <p>For commissioned services here is the sustainability comparitor for our providers:</p>
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Organisation Name</th><th>SDMP</th><th>on track for 34% reduction</th>
+                <th>GCC</th><th>Healthy travel plan</th><th>Adaptation</th><th>SD Reporting score</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{# providers:i}}
+                <tr>
+                  <td>{{sdmp}}</td><td>{{onTrack}}</td><td>{{gcc}}</td><td>{{healthyTravelPlan}}</td><td>{{adaptation}}</td><td>{{sduScore}}</td>
+                </tr>
+              {{/}}
+              {{^providers}}
+                <tr><td colspan="5">TODO lookup provider scores</td></tr>
+              {{/}}
+            </tbody>
+          </table>
+        {{else}}
+          <p>For commissioned services here is the sustainability comparitor for our CCGs:</p>
           <table class="table table-striped">
             <thead>
               <tr>
@@ -280,137 +304,203 @@
               {{/}}
             </tbody>
           </table>
-          More information on these measures is available here: http://www.sduhealth.org.uk/policy-strategy/reporting/sdmp-annual-reporting.aspx
+        {{/if}}
+        <p>More information on these measures is available here:
+          <a href="http://www.sduhealth.org.uk/policy-strategy/reporting/sdmp-annual-reporting.aspx">
+            http://www.sduhealth.org.uk/policy-strategy/reporting/sdmp-annual-reporting.aspx</a>
+        </p>
       </section>
 
       <section id="performanceSect">
         <h2>Performance</h2>
-        <h3>Organisation</h3>
-        <p>Since the 2007 baseline year, the NHS has undergone a significant restructuring process and one which is still on-going. Therefore in order to provide some organisational context, the following table may help explain how both the organisation and its performance on sustainablity has changed over time.</p>
 
-
-        <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/org.html"></div>
-
-        <p>
-          In 2014 the Sustainable Development Strategy outlined an ambition to reduce the carbon footprint of the NHS by 28% (from a 2013 baseline) by 2020. We have supported this ambition as follows:
-
-        <h3>Energy</h3>
-        <p>
-          <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/energy-co2e.csv"
-               class="rpt stacked" id="energyGraph" width="600" height="400"></svg>
-        </p>
-
-        <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/energy.html"></div>
-        <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/energy-co2e.html"></div>
-
-        <p>{{formatAnswer('ENERGY_PERF')}}</p>
-        <p>
-          {{! to calculate, perhaps server side }}
-          {{#if formatAnswer('ELEC_USED_3RD_PTY_PCT')}}
-            {{formatAnswer('ELEC_USED_3RD_PTY_PCT')}}
+        <section id="orgPerformanceSect">
+          <h3>Organisation</h3>
+          {{#if isCcg()}}
+            <p>As a part of the NHS, public health and social care system, it is
+            our duty to contribute towards the level of ambition set in 2014 of
+            reducing the carbon footprint of the NHS, public health and social
+            care system by 34% (from a 1990 baseline) equivalent to a 28%
+            reduction from a 2013 baseline by 2020. It is our aim to
+            {{#if formatAnswer('CARBON_REDUCTION_TARGET')=='Yes'}}supercede{{else}}meet{{/if}}
+            this target by reducing our carbon emissions
+            {{#if formatAnswer('CARBON_REDUCTION_TARGET')=='No'}}10%{{else}}{{formatAnswer('CARBON_REDUCTION_TARGET_PCT')}}%{{/if}}
+            by
+            {{#if formatAnswer('CARBON_REDUCTION_TARGET')=='No'}}2015{{else}}{{formatAnswer('CARBON_REDUCTION_DEADLINE_YEAR')}}{{/if}}
+            using
+            {{#if formatAnswer('CARBON_REDUCTION_TARGET')=='No'}}2007{{else}}{{formatAnswer('CARBON_REDUCTION_BASE_YEAR')}}{{/if}}
+            as the baseline year. Here is how we have done:</p>
           {{else}}
-            0
+            <p>Since the 2007 baseline year, the NHS has undergone a significant
+            restructuring process and one which is still on-going. Therefore in
+            order to provide some organisational context, the following table may
+            help explain how both the organisation and its performance on
+            sustainability has changed over time.</p>
+
+            <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/org.html"></div>
+
+            <p>
+              In 2014 the Sustainable Development Strategy outlined an ambition to
+              reduce the carbon footprint of the NHS by 28% (from a 2013 baseline)
+              by 2020. We have supported this ambition as follows:</p>
           {{/if}}
-          % of our electricity use comes from renewable sources.
-        </p>
-        <p>{{formatAnswer('energyContext')}}</p>
-      </section>
+        </section>
 
-      <section id="travelSect">
-        <h3>Travel</h3>
-        <p>We can improve local air quality and improve the health of our community by promoting active travel – to our staff and to the patients and public that use our services.
+        {{#if isCcg()}}
+          <section id="commissionedActivitySect">
+            <h3>Commissioned Activity</h3>
 
-        <p>Every action counts and we are a lean organisation trying to realise efficiencies across the board for cost and carbon (CO<sub>2</sub>e) reductions. We support a culture for active travel to improve staff wellbeing and reduce sickness. Air pollution, accidents and noise all cause health problems for our local population, patients, staff and visitors and are caused by cars, as well as other forms of transport.</p>
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Organisation Name</th>
+                  <th>Building energy use</th>
+                  <th>Building energy use per FTE</th>
+                  <th>Water</th>
+                  <th>Water use per FTE</th>
+                  <th>Percent high cost waste</th>
+                  <th>Waste cost increase</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{# providers:i}}
+                  <tr>
+                    <td>{{orgName}}</td>
+                    <td>{{buildingEnergyUse}}</td>
+                    <td>{{buildingEnergyUsePerFte}}</td>
+                    <td>{{water}}</td>
+                    <td>{{waterUsePerFte}}</td>
+                    <td>{{percentHighCostWaste}}</td>
+                    <td>{{wasteCostIncrease}}</td>
+                  </tr>
+                {{/}}
+                {{^providers}}
+                  <tr><td colspan="8">TODO lookup provider scores</td></tr>
+                {{/}}
+              </tbody>
+            </table>
+          </section>
+        {{/if}}
 
-        <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/travel.html"></div>
-        <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/travel-co2e.html"></div>
-        <p>{{formatAnswer('travelPerf')}}</p>
-      </section>
+        <section id="energySect">
+          <h3>Energy</h3>
+          <p>
+            <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/energy-co2e.csv"
+                 class="rpt stacked" id="energyGraph" width="600" height="400"></svg>
+          </p>
 
-      <section id="wasteSect">
-        <h3>Waste</h3>
-        <p>
-          <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/waste-co2e.csv"
-               class="rpt stacked" id="wasteGraph" width="600" height="400"></svg>
-        </p>
-        <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/waste.html"></div>
-        <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/waste-co2e.html"></div>
-        <p>
-          {{formatAnswer('WASTE_PERF')}}
-        <p>
-          {{formatAnswer('WASTE_CONTEXT')}}
-      </section>
+          <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/energy.html"></div>
+          <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/energy-co2e.html"></div>
 
-      <section id="waterSect">
-        <h3>Finite resource use - Water</h3>
-        <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/water.html"></div>
-        <p>
-          {{formatAnswer('WATER_PERF')}}
-        <p>
-          {{formatAnswer('WATER_CONTEXT')}}
-      </section>
+          <p>{{formatAnswer('ENERGY_PERF')}}</p>
+          <p>
+            {{! to calculate, perhaps server side }}
+            {{#if formatAnswer('ELEC_USED_3RD_PTY_PCT')}}
+              {{formatAnswer('ELEC_USED_3RD_PTY_PCT')}}
+            {{else}}
+              0
+            {{/if}}
+            % of our electricity use comes from renewable sources.
+          </p>
+          <p>{{formatAnswer('energyContext')}}</p>
+        </section>
 
-      <section id="carbonFootprintSect">
-        <h3>Modelled Carbon Footprint</h3>
-        <p>
-          The information provided in the previous sections of this sustainability report uses the ERIC returns as its data source. However, we are aware that this does not reflect our entire carbon footprint. Therefore, the following information uses a scaled model based on work performed by the Sustainable Development Unit (SDU) in 2009/10. More information available here: http://www.sduhealth.org.uk/policy-strategy/reporting/nhs-carbon-footprint.aspx
-        </p>
-        <p>
-          Resulting in an estimated total carbon footprint of
-          {{! "&TEXT(ROUND($'Output - Report (provider)'.D186,0),"#,##0")&" }}
-          TODO
-          tonnes of carbon dioxide equivalent emissions (tCO<sub>2</sub>e). Our carbon
-          intensity per pound is
-          {{! "&TEXT(ROUND($'Benchmarking - Hotspots profile'.K64,0),"#,##0")&" }}
-          TODO
-          grams of carbon dioxide equivalent emissions per pound of operating
-          expenditure (gCO<sub>2</sub>e/&pound;). Average emissions for
-          {{! "&IF($Input.B20=1,LOWER($Input.B19)&" services","our service mix")&" }}
-          TODO
-          is
-          {{! "&TEXT($'Benchmarking - Hotspots profile'.K69,"#,##0")&" }}
-          TODO
-          grams per pound.
-        </p>
-        <p>
-          <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-footprint.csv"
-               class="rpt pie" id="carbonFootprintPieChart" width="600" height="400"></svg>
-        </p>
-        <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-footprint.html"></div>
-        <p>
-          <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-emissions-profile.csv"
-               class="rpt stacked" id="emissionsProfileGraph" width="600" height="400"></svg>
-        </p>
-        <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-emissions-profile.html"></div>
-      </section>
+        <section id="travelSect">
+          <h3>Travel</h3>
+          <p>We can improve local air quality and improve the health of our community by promoting active travel to our staff and to the patients and public that use our services.
 
-      <!--section id="trajectorySect">
-        <h3>Modelled trajectory</h3>
-        <p>{{formatAnswer('trajectoryPerf')}}</p>
-        <p>TODO
-          <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-trajectory.csv"
-               class="rpt stacked" id="carbonTrajectoryGraph" width="600" height="400"></svg>
-        </p>
-        <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-trajectory.html"></div>
-      </section-->
+          <p>Every action counts and we are a lean organisation trying to realise efficiencies across the board for cost and carbon (CO<sub>2</sub>e) reductions. We support a culture for active travel to improve staff wellbeing and reduce sickness. Air pollution, accidents and noise all cause health problems for our local population, patients, staff and visitors and are caused by cars, as well as other forms of transport.</p>
 
-      <section id="benchmarkSect">
-        <h3>Benchmarking</h3>
-        <p>{{formatAnswer('BENCHMARK_PERF')}}</p>
-        <p>
-          <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-by-expenditure.csv"
-               class="rpt stacked" id="carbonByExpenditureGraph" width="600" height="400"></svg>
-        </p>
-        <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-by-expenditure.html"></div>
+          <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/travel.html"></div>
+          <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/travel-co2e.html"></div>
+          <p>{{formatAnswer('travelPerf')}}</p>
+        </section>
+
+        <section id="wasteSect">
+          <h3>Waste</h3>
+          <p>
+            <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/waste-co2e.csv"
+                 class="rpt stacked" id="wasteGraph" width="600" height="400"></svg>
+          </p>
+          <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/waste.html"></div>
+          <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/waste-co2e.html"></div>
+          <p>
+            {{formatAnswer('WASTE_PERF')}}
+          <p>
+            {{formatAnswer('WASTE_CONTEXT')}}
+        </section>
+
+        <section id="waterSect">
+          <h3>Finite resource use - Water</h3>
+          <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/water.html"></div>
+          <p>
+            {{formatAnswer('WATER_PERF')}}
+          <p>
+            {{formatAnswer('WATER_CONTEXT')}}
+        </section>
+
+        <section id="carbonFootprintSect">
+          <h3>Modelled Carbon Footprint</h3>
+          <p>
+            The information provided in the previous sections of this sustainability report uses the ERIC returns as its data source. However, we are aware that this does not reflect our entire carbon footprint. Therefore, the following information uses a scaled model based on work performed by the Sustainable Development Unit (SDU) in 2009/10. More information available here: http://www.sduhealth.org.uk/policy-strategy/reporting/nhs-carbon-footprint.aspx
+          </p>
+          <p>
+            Resulting in an estimated total carbon footprint of
+            {{! "&TEXT(ROUND($'Output - Report (provider)'.D186,0),"#,##0")&" }}
+            TODO
+            tonnes of carbon dioxide equivalent emissions (tCO<sub>2</sub>e). Our carbon
+            intensity per pound is
+            {{! "&TEXT(ROUND($'Benchmarking - Hotspots profile'.K64,0),"#,##0")&" }}
+            TODO
+            grams of carbon dioxide equivalent emissions per pound of operating
+            expenditure (gCO<sub>2</sub>e/&pound;). Average emissions for
+            {{! "&IF($Input.B20=1,LOWER($Input.B19)&" services","our service mix")&" }}
+            TODO
+            is
+            {{! "&TEXT($'Benchmarking - Hotspots profile'.K69,"#,##0")&" }}
+            TODO
+            grams per pound.
+          </p>
+          <p>
+            <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-footprint.csv"
+                 class="rpt pie" id="carbonFootprintPieChart" width="600" height="400"></svg>
+          </p>
+          <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-footprint.html"></div>
+          <p>
+            <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-emissions-profile.csv"
+                 class="rpt stacked" id="emissionsProfileGraph" width="600" height="400"></svg>
+          </p>
+          <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-emissions-profile.html"></div>
+        </section>
+
+        <!--section id="trajectorySect">
+          <h3>Modelled trajectory</h3>
+          <p>{{formatAnswer('trajectoryPerf')}}</p>
+          <p>TODO
+            <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-trajectory.csv"
+                 class="rpt stacked" id="carbonTrajectoryGraph" width="600" height="400"></svg>
+          </p>
+          <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-trajectory.html"></div>
+        </section-->
+
+        <section id="benchmarkSect">
+          <h3>Benchmarking</h3>
+          <p>{{formatAnswer('BENCHMARK_PERF')}}</p>
+          <p>
+            <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-by-expenditure.csv"
+                 class="rpt stacked" id="carbonByExpenditureGraph" width="600" height="400"></svg>
+          </p>
+          <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-by-expenditure.html"></div>
+        </section>
       </section>
 
       <section id="adaptationSect">
-        <h3>Adaptation</h3>
+        <h2>Adaptation</h2>
         <p>Events such as heatwaves, cold snaps and flooding are expected to increase as a result of climate change. To ensure that our services continue to meet the needs of our local population during such events we have developed and implemented a number of policies and protocols in partnership with other local agencies these include:</p>
         <p>{{formatAnswer('ADAPTATION_PERF')}}</p>
       </section>
     {{else}}
-      NO RETURN :-(
+      <span class="loading">Your report should load automatically in the next few moments.</span>
       <button on-click="fetch()">Load it now</button>
     {{/if}}
   </script>

@@ -19,23 +19,19 @@ var ractive = new BaseRactive({
   template: '#template',
   data: {
     // org: 'RDR',
-    server: 'http://trakeo.com:8090',
+    server: 'http://localhost:8083', /* trakeo.com:8090 */
     survey: 'Sdu-201617',
     stdPartials: [],
     tenant: { id: 'sdu' },
     username: localStorage['username'],
     formatAnswer: function(qName) {
       if (qName==undefined || ractive.get('surveyReturn')==undefined) return '';
-      for (idx in ractive.get('surveyReturn.answers')) {
-        var a = ractive.get('surveyReturn.answers.'+idx);
-        if (a.question.name == qName && a.response=='true') {
-          return true;
-        } else if (a.question.name == qName && a.response=='false') {
-          return false;
-        } else if (a.question.name == qName) {
-          return a.response;
-        }
-      }
+      return ractive.getAnswer(qName);
+    },
+    isCcg: function() {
+      if (ractive.get('surveyReturn')==undefined) return '';
+      if (ractive.getAnswer('ORG_TYPE')=='CCG') return true;
+      else return false;
     }
   },
   enter: function () {
@@ -109,6 +105,19 @@ var ractive = new BaseRactive({
         ractive.set('saveObserver', true);
       }
     });
+  },
+  getAnswer: function(qName) {
+    for (idx in ractive.get('surveyReturn.answers')) {
+      var a = ractive.get('surveyReturn.answers.'+idx);
+      if (a.question.name == qName && a.response=='true') {
+        return true;
+      } else if (a.question.name == qName && a.response=='false') {
+        return false;
+      } else if (a.question.name == qName) {
+        return a.response;
+      }
+    }
+    return undefined;
   },
   reset: function() {
     console.info('reset');

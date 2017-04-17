@@ -53,27 +53,27 @@
 
     {{#if surveyReturn}}
       <section id="introSect">
-        <h2>Treasury Report for {{formatAnswer('ORG_NAME')}}</h2>
+        <h1>Treasury Report for {{formatAnswer('ORG_NAME')}} ({{formatAnswer('ORG_CODE')}})</h1>
       </section>
 
       <section id="overallSect">
-        <h3>Overall Progress</h3>
+        <h2>Overall Progress</h2>
         <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/scope-summary.html"></div>
       </section>
       <section id="scope1Sect">
-        <h3>Scope 1 - Direct</h3>
+        <h2>Scope 1 - Direct</h2>
         <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/scope-1.html"></div>
       </section>
       <section id="scope2Sect">
-        <h3>Scope 2 - Indirect</h3>
+        <h2>Scope 2 - Indirect</h2>
         <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/scope-2.html"></div>
       </section>
       <section id="scope3Sect">
-        <h3>Scope 3 - Indirect</h3>
+        <h2>Scope 3 - Indirect</h2>
         <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/scope-3.html"></div>
       </section>
     {{else}}
-      NO RETURN :-(
+      <span class="loading">Your report should load automatically in the next few moments.</span>
       <button on-click="fetch()">Load it now</button>
     {{/if}}
   </script>

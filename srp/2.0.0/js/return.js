@@ -4,6 +4,8 @@ var $r = (function ($, ractive, $auth) {
     rtn: undefined
   };
   // var _org = 'RDR';
+  var _isCcg = false;
+  var _server = 'http://localhost:8083'; /* trakeo.com:8090 */
   var _survey;
   var _now = new Date();
   var _period = getSearchParameters()['p'] == undefined
@@ -14,11 +16,11 @@ var $r = (function ($, ractive, $auth) {
       : getSearchParameters()['s'];
 
   // set and load questionnaire
-  ractive.set('questionnaireDef','http://trakeo.com:8090/surveys/findByName/'+_surveyName);
+  ractive.set('questionnaireDef',_server+'/surveys/findByName/'+_surveyName);
   ractive.fetch();
 
   // load return (fetching blank if needed)
-  $.getJSON('http://trakeo.com:8090/returns/findCurrentBySurveyNameAndOrg/'+_surveyName+'/'+$auth.getClaim('org'),function(data) {
+  $.getJSON(_server+'/returns/findCurrentBySurveyNameAndOrg/'+_surveyName+'/'+$auth.getClaim('org'),function(data) {
     me.rtn = data;
     if (_survey!=undefined) _fill(_survey);
   });
@@ -32,15 +34,26 @@ var $r = (function ($, ractive, $auth) {
   function _fill(survey) {
     _survey = survey;
     for(i in survey.categories) {
+
       for(j in survey.categories[i].questions) {
         console.log('  fill: '+survey.categories[i].questions[j].name);
         for (k in me.rtn.answers) {
           if (me.rtn.answers[k].question.name==survey.categories[i].questions[j].name) {
             switch (me.rtn.answers[k].question.name) {
+            // special handling for organisation ...
             case 'ORG_CODE':
-              // special handling for organisation ...
               ractive.set('q.categories.'+i+'.questions.'+j+'.response', $auth.getClaim('org'));
               $('#ORG_CODE').attr('readonly','readonly').attr('disabled','disabled');
+              break;
+            case 'ORG_NAME':
+              ractive.set('q.categories.'+i+'.questions.'+j+'.response', me.rtn.answers[k].response);
+              if (me.rtn.answers[k].response != undefined) {
+                $('#ORG_NAME').attr('readonly','readonly').attr('disabled','disabled');
+              }
+              break;
+            case 'ORG_TYPE':
+              ractive.set('q.categories.'+i+'.questions.'+j+'.response', me.rtn.answers[k].response);
+              if (me.rtn.answers[k].response == 'CCG') _isCcg = true;
               break;
             default:
               // update ractive model with value
@@ -60,6 +73,22 @@ var $r = (function ($, ractive, $auth) {
    */
   function _hideCalcs() {
     ractive.splice('q.categories', ractive.get('q.categories').length-1, 1);
+  }
+
+  /**
+   * Adapt questions according to whether CCG or provider.
+   */
+  function _hideNotApplicable() {
+    if (_isCcg) {
+      $('#CCGS_SERVED,#NO_PATIENT_CONTACTS,#PATIENT_CONTACT_MEASURE,#DESFLURANE,#ISOFLURANE,#SEVOFLURANE,#NITROUS_OXIDE,#PORTABLE_NITROUS_OXIDE_MIX,#PORTABLE_NITROUS_OXIDE_MIX_MATERNITY,#CHP_ELECTRICAL_OUTPUT,#EXPORTED_THERMAL_ENERGY,#WOOD_LOGS_OWNED_RENEWABLE_CONSUMPTION,#WOOD_CHIPS_OWNED_RENEWABLE_CONSUMPTION,#WOOD_PELLETS_OWNED_RENEWABLE_CONSUMPTION,#ELEC_OWNED_RENEWABLE_CONSUMPTION').parent().parent().hide();
+      for (var idx in ractive.get('q.categories')) {
+        if (ractive.get('q.categories.'+idx+'.name')=='Gases') {
+          ractive.splice('q.categories', idx, 1);
+        }
+      }
+    } else {
+      $('#PROVIDERS_COMMISSIONED').parent().parent().hide();
+    }
   }
 
   me.fill = function(survey) {
@@ -101,7 +130,8 @@ var $r = (function ($, ractive, $auth) {
     $.each(me.rtn.links, function (i,d) {
       if (d.rel=='self') me.rtn.selfRef = d.href;
     });
-    me.rtn.selfRef = me.rtn.selfRef.replace(/localhost/, 'trakeo.com');
+    // TODO
+    //me.rtn.selfRef = me.rtn.selfRef.replace(/localhost/, 'trakeo.com');
     return $.ajax({
         url: me.rtn.selfRef,
         type: 'PUT',
@@ -116,6 +146,12 @@ var $r = (function ($, ractive, $auth) {
 // prep question for subsequent save
             //me.rtn.answers[k].question = '/me.rtn.answers[k].question.id;
   };
+
+  ractive.observe('q.activeCategory', function (newValue, oldValue, keypath) {
+    if (newValue!=oldValue) {
+      _hideNotApplicable();
+    }
+  });
 
   setInterval(me.submit, 5000);
 
