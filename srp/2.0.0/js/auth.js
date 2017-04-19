@@ -150,6 +150,7 @@ var $auth = (function ($, ractive) {
   }
 
   me.getClaim = function(claim) {
+    if (localStorage['token']==undefined) return _showLogin();
     return JSON.parse(atob(localStorage['token'].split('.')[1]))[claim];
   }
 

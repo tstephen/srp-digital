@@ -6,7 +6,6 @@
   <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
 
   <link href="2.0.0/css/srp.css" rel="stylesheet">
-  <link href="http://localhost:8083/css/sdu-1.0.0.css" rel="stylesheet">
   <link rel="icon" type="image/png" href="2.0.0/images/icon/srp-icon-32x32.png" />
     <style>
     html,body,section#main {
@@ -93,42 +92,7 @@
   <section id="container" class="container"></section>
 
   <script id='template' type='text/ractive'>
-    <section id="loginSect" style="display:none">
-      <div class="col-md-offset-1 col-md-10">
-        <div id="messages" style="display:none;width:100%"></div>
-      </div>
-      <div class="col-md-offset-6 col-md-6 col-sm-12" id="loginSect">
-        <form class="form-inline" id="loginForm" name="loginForm" action="http://localhost:8083/auth/login" method="POST">
-          <fieldset>
-            <input class="form-control input-lg" type="text" id="username" name="username" placeholder="Username" required/>
-            <input class="form-control input-lg" type="password" id="password" name="password" placeholder="Password" required/>
-            <!--input type="hidden" id="_csrf" name="_csrf" value="{{csrfToken}}" />
-            <input type="hidden" id="redirect" name="redirect" value="{{context}}/index.html" /-->
-            <input type="button" id="login" on-click="login()" value="Login" class="btn btn-primary" />
-          </fieldset>
-        </form>
-      </div>
-      <div id="resetSect" class="col-md-offset-6 col-md-6 col-sm-12" style="display:none">
-        <form id="resetForm" class="form-inline" name="resetForm" action="/reset" method="POST">
-          <fieldset>
-            <input class="form-control input-lg" id="email" name="email" placeholder="Registered email address" required/>
-            <input type="hidden" id="_csrf" name="_csrf" value="{{csrfToken}}" />
-            <input type="hidden" id="redirect" name="redirect" value="index.html" />
-            <input class="btn" type="button" id="reset" on-click="reset()" value="Reset Password"/>
-          </fieldset>
-        </form>
-      </div>
-      <div class="pull-right" style="margin-right:20px">
-        <a href="#" on-click="showReset()">Forgot your password?</a>
-        <a href="http://trakeo.com/register/">Or click here to register a new account</a>
-      </div>
-
-      <section id="main">
-        <h1>Sustainability Resource Planning</h1>
-        <img src="2.0.0/images/icon/srp-icon-256x256.png"/>
-        <p>For more information see <a href="//srp.digital">srp.digital</a></p>
-      </section>
-    </section>
+    {{>loginSect}}
 
     {{#if surveyReturn}}
       <section id="introSect">
@@ -500,8 +464,10 @@
         <p>{{formatAnswer('ADAPTATION_PERF')}}</p>
       </section>
     {{else}}
-      <span class="loading">Your report should load automatically in the next few moments.</span>
-      <button on-click="fetch()">Load it now</button>
+      <section class="loading" id="loadingSect">
+        <span class="loading">Your report should load automatically in the next few moments.</span>
+        <button on-click="fetch()">Load it now</button>
+      </section>
     {{/if}}
   </script>
 
@@ -515,17 +481,15 @@
   <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.js"></script>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/ractive/0.7.3/ractive.min.js'></script>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+
   <script src="2.0.0/js/string-functions-0.1.0.js"></script>
 
   <script src="2.0.0/js/base.js"></script>
   <script src="2.0.0/js/report.js"></script>
   <script src="2.0.0/js/auth.js"></script>
 
-<script src="https://d3js.org/d3.v4.min.js"></script>
-<script src="2.0.0/js/stacked.js"></script>
-<script src="2.0.0/js/pie.js"></script>
-
-
+  <script src="2.0.0/js/stacked.js"></script>
+  <script src="2.0.0/js/pie.js"></script>
 </body>
-
 </html>

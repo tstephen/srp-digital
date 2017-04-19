@@ -122,10 +122,10 @@ var BaseRactive = Ractive.extend({
     var parts = value.split("; " + name + "=");
     if (parts.length == 2) return parts.pop().split(";").shift();
   },
-  getProfile: function() {
+  /*getProfile: function() {
     console.log('getProfile: '+this.get('username'));
     $auth.getProfile(this.get('username'));
-  },
+  },*/
   /*handleError: function(jqXHR, textStatus, errorThrown) {
     switch (jqXHR.status) {
     case 400:

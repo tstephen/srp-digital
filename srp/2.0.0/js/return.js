@@ -153,6 +153,7 @@ var $r = (function ($, ractive, $auth) {
     }
   });
 
+  $('head').append('<link href="'+_server+'/css/sdu-1.0.0.css" rel="stylesheet">');
   setInterval(me.submit, 5000);
 
   ractive.fetch();

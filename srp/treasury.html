@@ -6,7 +6,6 @@
   <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
 
   <link href="2.0.0/css/srp.css" rel="stylesheet">
-  <link href="2.0.0/css/sdu-1.0.0.css" rel="stylesheet">
   <link rel="icon" type="image/png" href="2.0.0/images/icon/srp-icon-32x32.png" />
 <head>
 <body>
@@ -71,10 +70,37 @@
       <section id="scope3Sect">
         <h2>Scope 3 - Indirect</h2>
         <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/scope-3.html"></div>
+
+        <section id="scope3TravelSect">
+          <h3>Scope 3 Breakdown - Travel</h3>
+          <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/travel-co2e.html"></div>
+        </section>
+
+        <section id="scope3WaterSect">
+          <h3>Scope 3 Breakdown - Water</h3>
+          <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/water-co2e.html"></div>
+        </section>
+
+        <section id="scope3WasteSect">
+          <h3>Scope 3 Breakdown - Waste</h3>
+          <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/waste-co2e.html"></div>
+        </section>
+
+        <section id="scope3BiomassSect">
+          <h3>Scope 3 Breakdown - Biomass (well to tank)</h3>
+          <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/biomass-co2e-wtt.html"></div>
+        </section>
+      </section>
+
+      <section id="outsideScopesSect">
+        <h3>Outside Scopes - Biomass (total)</h3>
+        <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/biomass-co2e-noscope.html"></div>
       </section>
     {{else}}
-      <span class="loading">Your report should load automatically in the next few moments.</span>
-      <button on-click="fetch()">Load it now</button>
+      <section class="loading" id="loadingSect">
+        <span class="loading">Your report should load automatically in the next few moments.</span>
+        <button on-click="fetch()">Load it now</button>
+      </section>
     {{/if}}
   </script>
 

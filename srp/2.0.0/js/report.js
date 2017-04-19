@@ -21,7 +21,6 @@ var ractive = new BaseRactive({
     // org: 'RDR',
     server: 'http://localhost:8083', /* trakeo.com:8090 */
     survey: 'Sdu-201617',
-    stdPartials: [],
     tenant: { id: 'sdu' },
     username: localStorage['username'],
     formatAnswer: function(qName) {
@@ -32,7 +31,10 @@ var ractive = new BaseRactive({
       if (ractive.get('surveyReturn')==undefined) return '';
       if (ractive.getAnswer('ORG_TYPE')=='CCG') return true;
       else return false;
-    }
+    },
+    stdPartials: [
+      { "name": "loginSect", "url": "/srp/2.0.0/partials/login-sect.html"}
+    ],
   },
   enter: function () {
     console.log('enter...');
@@ -145,6 +147,8 @@ var ractive = new BaseRactive({
 });
 
 $(document).ready(function() {
+  $('head').append('<link href="'+ractive.getServer()+'/css/sdu-1.0.0.css" rel="stylesheet">');
+
   if (Object.keys(getSearchParameters()).indexOf('error')!=-1) {
     ractive.showError('The username and password provided do not match a valid account');
   } else if (Object.keys(getSearchParameters()).indexOf('logout')!=-1) {
