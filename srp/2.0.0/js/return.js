@@ -15,21 +15,13 @@ var $r = (function ($, ractive, $auth) {
       ? 'Sdu-'+_period
       : getSearchParameters()['s'];
 
-  // set and load questionnaire
-  ractive.set('questionnaireDef',_server+'/surveys/findByName/'+_surveyName);
-  ractive.fetch();
-
   // load return (fetching blank if needed)
-  $.getJSON(_server+'/returns/findCurrentBySurveyNameAndOrg/'+_surveyName+'/'+$auth.getClaim('org'),function(data) {
-    me.rtn = data;
-    if (_survey!=undefined) _fill(_survey);
-  });
-
-  // Correct std partial paths
-  ractive.set('stdPartials', [
-      { "name": "questionnaire", "url": "/questionnaire/partials/questionnaire.html"}
-    ])
-  ractive.loadStandardPartials(ractive.get('stdPartials'));
+  function _fetchReturn() {
+    $.getJSON(_server+'/returns/findCurrentBySurveyNameAndOrg/'+_surveyName+'/'+$auth.getClaim('org'),function(data) {
+      me.rtn = data;
+      if (_survey!=undefined) _fill(_survey);
+    });
+  }
 
   function _fill(survey) {
     _survey = survey;
@@ -89,6 +81,11 @@ var $r = (function ($, ractive, $auth) {
     } else {
       $('#PROVIDERS_COMMISSIONED').parent().parent().hide();
     }
+  }
+
+  function _showQuestionnaire() {
+    if (_survey == undefined) _fetchReturn();
+    $('section.questionnaire').slideDown();
   }
 
   me.fill = function(survey) {
@@ -153,15 +150,28 @@ var $r = (function ($, ractive, $auth) {
     }
   });
 
+  // Correct std partial paths
+  ractive.set('stdPartials', [
+      { "name": "loginSect", "url": "/srp/2.0.0/partials/login-sect.html"},
+      { "name": "questionnaire", "url": "/questionnaire/partials/questionnaire.html"}
+    ])
+  ractive.loadStandardPartials(ractive.get('stdPartials'));
+
   $('head').append('<link href="'+_server+'/css/sdu-1.0.0.css" rel="stylesheet">');
+
   setInterval(me.submit, 5000);
 
+  // set and load questionnaire
+  ractive.set('questionnaireDef',_server+'/surveys/findByName/'+_surveyName);
   ractive.fetch();
+  _fetchReturn();
   $auth.addLoginCallback(ractive.fetch);
+  $auth.addLoginCallback(_fetchReturn);
 
   if (ractive['fetchCallbacks']==undefined) ractive.fetchCallbacks = $.Callbacks();
   ractive.fetchCallbacks.add(_hideCalcs);
   ractive.fetchCallbacks.add(me.fill);
+  ractive.fetchCallbacks.add(_showQuestionnaire);
 
   return me;
 }($, ractive, $auth));
