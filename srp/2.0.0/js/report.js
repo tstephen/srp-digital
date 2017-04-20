@@ -19,7 +19,8 @@ var ractive = new BaseRactive({
   template: '#template',
   data: {
     // org: 'RDR',
-    server: 'http://localhost:8083', /* trakeo.com:8090 */
+    //server: 'http://localhost:8083', /* trakeo.com:8090 */
+    server: 'https://api.srp.digital', /* trakeo.com:8090 */
     survey: 'Sdu-201617',
     tenant: { id: 'sdu' },
     username: localStorage['username'],

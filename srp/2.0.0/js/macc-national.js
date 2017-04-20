@@ -25,7 +25,7 @@ var ractive = new BaseRactive({
     filter: { },
     //saveObserver:false,
     // username: localStorage['username'],
-    server: 'http://localhost:8083', /* trakeo.com:8090 */
+    server: 'https://api.srp.digital',
     age: function(timeString) {
       return i18n.getAgeString(new Date(timeString))
     },

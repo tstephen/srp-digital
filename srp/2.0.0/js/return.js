@@ -5,7 +5,8 @@ var $r = (function ($, ractive, $auth) {
   };
   // var _org = 'RDR';
   var _isCcg = false;
-  var _server = 'http://localhost:8083'; /* trakeo.com:8090 */
+  /*var _server = 'https://api.srp.digital'; /*localhost:8083'; / * trakeo.com:8090 */
+  var _server = 'https://api.srp.digital';/* 403,no JWt header */
   var _survey;
   var _now = new Date();
   var _period = getSearchParameters()['p'] == undefined
@@ -128,7 +129,7 @@ var $r = (function ($, ractive, $auth) {
       if (d.rel=='self') me.rtn.selfRef = d.href;
     });
     // TODO
-    //me.rtn.selfRef = me.rtn.selfRef.replace(/localhost/, 'trakeo.com');
+    me.rtn.selfRef = me.rtn.selfRef.replace(/localhost/, 'api.srp.digital');
     return $.ajax({
         url: me.rtn.selfRef,
         type: 'PUT',

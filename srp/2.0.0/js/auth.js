@@ -1,6 +1,6 @@
 var $auth = (function ($, ractive) {
   var me = {};
-  var _server = 'http://localhost:8083';
+  var _server = 'https://api.srp.digital';
   var _loginCallbacks = $.Callbacks();
 
   function _getServer() {
