@@ -154,7 +154,8 @@ var $r = (function ($, ractive, $auth) {
   // Correct std partial paths
   ractive.set('stdPartials', [
       { "name": "loginSect", "url": "/srp/2.0.0/partials/login-sect.html"},
-      { "name": "questionnaire", "url": "/questionnaire/partials/questionnaire.html"}
+      { "name": "questionnaire", "url": "/questionnaire/partials/questionnaire.html"},
+      { "name": "questionnaireContact", "url": "/questionnaire/partials/questionnaire-contact.html"}
     ])
   ractive.loadStandardPartials(ractive.get('stdPartials'));
 
