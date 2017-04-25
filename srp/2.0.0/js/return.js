@@ -5,8 +5,8 @@ var $r = (function ($, ractive, $auth) {
   };
   // var _org = 'RDR';
   var _isCcg = false;
-  /*var _server = 'https://api.srp.digital'; /*localhost:8083'; / * trakeo.com:8090 */
-  var _server = 'https://api.srp.digital';/* 403,no JWt header */
+  //var _server = 'http://localhost:8083';
+  var _server = 'https://api.srp.digital';
   var _survey;
   var _now = new Date();
   var _period = getSearchParameters()['p'] == undefined
@@ -15,6 +15,23 @@ var $r = (function ($, ractive, $auth) {
   var _surveyName = getSearchParameters()['s'] == undefined
       ? 'Sdu-'+_period
       : getSearchParameters()['s'];
+
+  function _bindLists() {
+    if ($('#ORG_NAME[list]').length!=0) $('#ORG_NAME').attr('list','orgs');
+    if ($('#ORG_TYPE option').length==0) ractive.addSelectOptions('#ORG_TYPE', ractive.get('orgTypes'));
+  }
+
+  function _fetchLists() {
+    $.getJSON(_server+'/sdu/accounts/', function(data) {
+      ractive.set('orgs', data);
+      ractive.addDataList({ name: 'orgs' },data);
+      if (_survey != undefined) $('#ORG_NAME').attr('list','orgs');
+    });
+    $.getJSON(_server+'/sdu/organisation-types/', function(data) {
+      ractive.set('orgTypes', data);
+      if (_survey != undefined) ractive.addSelectOptions('#ORG_TYPE', data);
+    });
+  }
 
   // load return (fetching blank if needed)
   function _fetchReturn() {
@@ -47,6 +64,7 @@ var $r = (function ($, ractive, $auth) {
             case 'ORG_TYPE':
               ractive.set('q.categories.'+i+'.questions.'+j+'.response', me.rtn.answers[k].response);
               if (me.rtn.answers[k].response == 'CCG') _isCcg = true;
+              $('#ORG_TYPE').attr('list','orgTypes');
               break;
             default:
               // update ractive model with value
@@ -59,6 +77,7 @@ var $r = (function ($, ractive, $auth) {
         }
       }
     }
+    _bindLists();
   }
 
   /**
@@ -167,8 +186,10 @@ var $r = (function ($, ractive, $auth) {
   ractive.set('questionnaireDef',_server+'/surveys/findByName/'+_surveyName);
   ractive.fetch();
   _fetchReturn();
+  _fetchLists();
   $auth.addLoginCallback(ractive.fetch);
   $auth.addLoginCallback(_fetchReturn);
+  $auth.addLoginCallback(_fetchLists());
 
   if (ractive['fetchCallbacks']==undefined) ractive.fetchCallbacks = $.Callbacks();
   ractive.fetchCallbacks.add(_hideCalcs);

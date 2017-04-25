@@ -31,15 +31,13 @@ var newLineRegEx = /\n/g;
  */
 var BaseRactive = Ractive.extend({
   CSRF_TOKEN: 'XSRF-TOKEN',
-  /*ajaxSetup: function() {
-    console.log('ajaxSetup: '+this);
-    $.ajaxSetup({
-      username: localStorage['username'],
-      password: localStorage['password'],
-      headers: { 'X-CSRF-TOKEN': this.getCookie(CSRF_COOKIE) },
-      error: this.handleError
+  addDataList: function(d, data) {
+    $('datalist#'+d.name).remove();
+    $('body').append('<datalist id="'+d.name+'">');
+    $.each(data, function (i,e) {
+      $('datalist#'+d.name).append('<option value="'+e.name+'">'+e.name+'</option>');
     });
-  },*/
+  },
   applyAccessControl: function() {
     console.info('applyAccessControl');
     if (location.href.indexOf('public')==-1 && ractive.get('tenant.access.readonly')) {
@@ -193,9 +191,11 @@ var BaseRactive = Ractive.extend({
         //console.log('binding ' +d.url+' to typeahead control: '+d.selector);
         if (d.url==undefined) {
           ractive.initAutoCompletePart2(d,d.values);
+          ractive.addDataList(d,d.values);
         } else {
           $.get(ractive.getServer()+d.url, function(data){
             ractive.initAutoCompletePart2(d,data);
+            ractive.addDataList(d,d.values);
           },'json');
         }
       });
