@@ -2,8 +2,8 @@
 Contributors: cbutlerjr
 Tags: access, authentication, content, login, member, membership, password, protect, register, registration, restriction, subscriber
 Requires at least: 3.6
-Tested up to: 4.7.0
-Stable tag: 3.1.6.3
+Tested up to: 4.7.3
+Stable tag: 3.1.7
 License: GPLv2
 
 WP-Members&trade; is a free membership management framework for WordPress&reg; that restricts content to registered users.
@@ -112,8 +112,7 @@ Premium priority support is available at the plugin's site [RocketGeek.com](http
 
 == Upgrade Notice ==
 
-WP-Members 3.1.6.3 fixes some invalid characters in certain files in the wordpress.org repo version.
-WP-Members 3.1.6 is primarily a settings update. See changelog for important details. Minimum WP version is 3.6.
+WP-Members 3.1.7 is a major update. There are no database changes (rollback is possible). See changelog for important details. Minimum WP version is 3.6.
 
 == Screenshots ==
 
@@ -136,20 +135,35 @@ WP-Members 3.1.6 is primarily a settings update. See changelog for important det
 
 == Changelog ==
 
-= 3.1.6.3 =
+= 3.1.7 =
 
-* Fixes some invalid characters in the wordpress.org repo version of the plugin that seem to have crept in during the 3.1.6.2 commit.
-* Applies some admin strings for translation.
-* Notes WordPress 4.7 compatibility.
-
-= 3.1.6.2 =
-
-* Applies style properties for the remember me checkbox label to the default stylesheets. The label tag was added to this text in 3.1.6 (see below).
-
-= 3.1.6.1 =
-
-* Fixes issue with displaying checkbox state on the admin user profile screen.
-* Fixes issue with auto excerpt when excerpts are displayed on single posts/pages.
+* API updates: added wpmem_is_user_activated().
+* API updates: wpmem_is_reg_page() added default of current page ID.
+* API updates: wpmem_current_url() added check for query string.
+* API updates: Added wpmem_fields filter to wpmem_fields().
+* API updates: Added wpmem_current_post_id() and wpmem_form_label() functions.
+* API updates: Added new [wpmem_avatar], [wpmem_login_link], and [wpmem_register_link] shortcodes.
+* API updates: Added filter option in user export to decode html entities in user fields.
+* API updates: Added wpmem_get_action action hook when wpmem_a is loaded.
+* All admin dependencies and actions/filters loaded in admin api object.
+* Corrected issue in forms function were RS Captcha had empty div wrapper variable.
+* Removed deprecated functions wpmem_load_admin_js(), wpmem_test_shortcode(), and wpmem_generatePassword().
+* Moved remaining deprecated functions to new inc/deprecated.php.
+* Added successful registration message on page if nonce validates (for reg redirects).
+* Added User object class, handling login, logout, register.
+* Added buffering to login form and widget to allow do_login action results to be displayed (such as 3rd party login captcha).
+* Added support for WP's login_redirect filter (loads before wpmem_login_redirect).
+* Added a div wrapper for post restricted message.
+* Added initial form support for HTML5 number input, & min, max, title, and pattern attributes (placeholder support was added in 3.1.6).
+* Updated wpmem_admin_update() to exit if there is no user ID.
+* Updated admin notification email to translate field labels.
+* Updated login form links and filters to a single process (was one for each).
+* Updated WP Registration finalize process.
+* Moved form building functions to forms object class.
+* Deprecated wpmem_register_fields_arr filter (Use wpmem_fields instead).
+* Removing the wpautop() function is now optional rather than default.
+* Fixed load fields error checking, install function now correctly returns defaults.
+* Changed password reset and password change to use wp_set_password() for improved performance with caching.
 
 = 3.1.6 =
 
@@ -174,6 +188,10 @@ WP-Members 3.1.6 is primarily a settings update. See changelog for important det
 * Custom field term "Option Name" changed to "Meta Key" for clarity.
 * Marked required custom field properties as required in Add/Edit Field dialogs.
 * Changed redirect_to process to escape the url with esc_url_raw rather than esc_url, otherwise query string variables do not get handled correctly.
+* Fixes issue with displaying checkbox state on the admin user profile screen.
+* Fixes issue with auto excerpt when excerpts are displayed on single posts/pages.
+* Applies style properties for the remember me checkbox label to the default stylesheets. The label tag was added to this text in 3.1.6 (see below).
+* Applies some admin strings for translation.
 
 = 3.1.5 =
 

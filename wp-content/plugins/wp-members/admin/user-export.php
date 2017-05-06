@@ -6,12 +6,12 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at http://rocketgeek.com
- * Copyright (c) 2006-2016  Chad Butler
+ * Copyright (c) 2006-2017  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @author Chad Butler
- * @copyright 2006-20165
+ * @copyright 2006-2017
  */
 
 
@@ -35,6 +35,7 @@ function wpmem_export_users( $args, $users = null ) {
 		'filename'       => 'wp-members-user-export-' . $today . '.csv',
 		'export_fields'  => wpmem_fields(), //array(),
 		'exclude_fields' => array( 'password', 'confirm_password', 'confirm_email' ),
+		'entity_decode'  => false,
 	);
 
 	// Merge $args with defaults.
@@ -97,10 +98,12 @@ function wpmem_export_users( $args, $users = null ) {
 		foreach ( $args['export_fields'] as $meta => $field ) {
 			if ( ! in_array( $meta, $args['exclude_fields'] ) ) {
 				// @todo Research using fputcsv to escape fields for export.
-				if ( in_array( $meta, $wp_user_fields ) ){
+				if ( in_array( $meta, $wp_user_fields ) ) {
 					$data .= '"' . $user_info->{$meta} . '",';	
 				} else {
-					$data .= '"' . get_user_meta( $user, $meta, true ) . '",';
+					$raw_data  = get_user_meta( $user, $meta, true );
+					$formatted = ( $args['entity_decode'] ) ? html_entity_decode( $raw_data ) : $raw_data;
+					$data .= '"' . $formatted . '",';
 				}
 			}
 		}

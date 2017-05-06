@@ -6,12 +6,12 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at http://rocketgeek.com
- * Copyright (c) 2006-2016  Chad Butler
+ * Copyright (c) 2006-2017  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @author Chad Butler
- * @copyright 2006-2016
+ * @copyright 2006-2017
  *
  * Functions included:
  * - wpmem_a_build_options
@@ -394,12 +394,12 @@ function wpmem_update_options() {
 
 	$wpmem_newsettings = array(
 		'version' => WPMEM_VERSION,
-		'notify'    => wpmem_get( 'wpmem_settings_notify', 0 ),//( isset( $_POST['wpmem_settings_notify']          ) ) ? $_POST['wpmem_settings_notify']          : 0,
-		'mod_reg'   => wpmem_get( 'wpmem_settings_moderate', 0 ),//( isset( $_POST['wpmem_settings_moderate']        ) ) ? $_POST['wpmem_settings_moderate']        : 0,
-		'captcha'   => wpmem_get( 'wpmem_settings_captcha', 0 ),//( isset( $_POST['wpmem_settings_captcha']         ) ) ? $_POST['wpmem_settings_captcha']         : 0,
-		'use_exp'   => wpmem_get( 'wpmem_settings_time_exp', 0 ),//( isset( $_POST['wpmem_settings_time_exp']        ) ) ? $_POST['wpmem_settings_time_exp']        : 0,
-		'use_trial' => wpmem_get( 'wpmem_settings_trial', 0 ),//( isset( $_POST['wpmem_settings_trial']           ) ) ? $_POST['wpmem_settings_trial']           : 0,
-		'warnings'  => wpmem_get( 'wpmem_settings_ignore_warnings', 0 ),//( isset( $_POST['wpmem_settings_ignore_warnings'] ) ) ? $_POST['wpmem_settings_ignore_warnings'] : 0,
+		'notify'    => wpmem_get( 'wpmem_settings_notify', 0 ),
+		'mod_reg'   => wpmem_get( 'wpmem_settings_moderate', 0 ),
+		'captcha'   => wpmem_get( 'wpmem_settings_captcha', 0 ),
+		'use_exp'   => wpmem_get( 'wpmem_settings_time_exp', 0 ),
+		'use_trial' => wpmem_get( 'wpmem_settings_trial', 0 ),
+		'warnings'  => wpmem_get( 'wpmem_settings_ignore_warnings', 0 ),
 		'user_pages' => array(
 			'profile'  => ( $msurl  ) ? $msurl  : '',
 			'register' => ( $regurl ) ? $regurl : '',
@@ -407,7 +407,7 @@ function wpmem_update_options() {
 		),
 		'cssurl'    => ( $cssurl ) ? $cssurl : '',
 		'style'     => $wpmem_settings_style,
-		'attrib'    =>  wpmem_get( 'attribution', 0 ),//( isset( $_POST['attribution'] ) ) ? $_POST['attribution'] : 0,
+		'attrib'    => wpmem_get( 'attribution', 0 ),
 	);
 
 	// Build an array of post types
