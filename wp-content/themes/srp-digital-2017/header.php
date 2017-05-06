@@ -48,8 +48,9 @@
           ?> <a class="register color-5" href="/register">Register</a> <?php
         }*/
       ?>
+<!-- TRAKEO pre-JWT approach
       <a class="login color-2" href="https://trakeo.com:8443/login">Login</a>
-      <a class="register color-5" href="/register">Register</a>
+      <a class="register color-5" href="/register">Register</a>-->
     </div>
   </header><!-- #masthead -->
 
