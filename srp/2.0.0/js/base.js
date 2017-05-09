@@ -433,6 +433,15 @@ var BaseRactive = Ractive.extend({
       });
     }
   },
+  showDisconnected: function(msg) {
+    console.log('showDisconnected: '+msg);
+    if ($('#connectivityMessages.alert-info').length>0) {
+      ; // Due to ordering of methods, actually reconnected now
+    } else {
+      $('#connectivityMessages').remove();
+      $('body').append('<div id="connectivityMessages" class="alert-warning">'+msg+'</div>').show();
+    }
+  },
   showError: function(msg) {
     this.showMessage(msg, 'alert-danger');
   },

@@ -1,6 +1,6 @@
 var $auth = (function ($, ractive) {
   var me = {};
-  var _server = 'https://api.srp.digital';
+  var _server = $env.server;
   var _loginCallbacks = $.Callbacks();
 
   function _getServer() {
@@ -79,6 +79,16 @@ var $auth = (function ($, ractive) {
     });
   }
 
+  function _showDisconnected(msg) {
+    console.log('showDisconnected: '+msg);
+    if ($('#connectivityMessages.alert-info').length>0) {
+      ; // Due to ordering of methods, actually reconnected now
+    } else {
+      $('#connectivityMessages').remove();
+      $('body').append('<div id="connectivityMessages" class="alert-warning">'+msg+'</div>').show();
+    }
+  }
+
   function _showLogin() {
     console.info('showLogin');
     $('#loginSect').slideDown();
@@ -101,7 +111,7 @@ var $auth = (function ($, ractive) {
       if (settings['retryIn']==undefined) settings.retryIn = 4000;
       else settings.retryIn = settings.retryIn * 2;
       var msg = 'Unable to connect, retrying in '+(settings.retryIn/1000)+' secs ...';
-      ractive.showDisconnected(msg);
+      _showDisconnected(msg);
       setTimeout(function() {
         $.ajax(settings);
       }, settings.retryIn);

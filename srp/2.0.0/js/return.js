@@ -5,20 +5,21 @@ var $r = (function ($, ractive, $auth) {
   };
   // var _org = 'RDR';
   var _isCcg = false;
-  //var _server = 'http://localhost:8083';
-  var _server = 'https://api.srp.digital';
+  var _server = $env.server;
   var _survey;
   var _now = new Date();
   var _period = getSearchParameters()['p'] == undefined
-      ? (_now.getFullYear()-1)+''+(_now.getFullYear()-2000)
+      ? (_now.getFullYear()-1)+'-'+(_now.getFullYear()-2000)
       : getSearchParameters()['p'];
   var _surveyName = getSearchParameters()['s'] == undefined
-      ? 'Sdu-'+_period
+      ? 'SDU-'+_period
       : getSearchParameters()['s'];
 
   function _bindLists() {
-    if ($('#ORG_NAME[list]').length!=0) $('#ORG_NAME').attr('list','orgs');
-    if ($('#ORG_TYPE option').length==0) ractive.addSelectOptions('#ORG_TYPE', ractive.get('orgTypes'));
+    if ($('#ORG_NAME')!=undefined && $('#ORG_NAME[list]').length!=0) $('#ORG_NAME').attr('list','orgs');
+    if ($('#ORG_TYPE option')!=undefined && $('#ORG_TYPE option').length==0 && ractive.get('orgTypes')!=undefined) {
+      ractive.addSelectOptions('#ORG_TYPE', ractive.get('orgTypes'));
+    }
   }
 
   function _fetchLists() {
@@ -48,6 +49,7 @@ var $r = (function ($, ractive, $auth) {
       for(j in survey.categories[i].questions) {
         console.log('  fill: '+survey.categories[i].questions[j].name);
         for (k in me.rtn.answers) {
+          if (_period != me.rtn.answers[k].applicablePeriod) continue;
           if (me.rtn.answers[k].question.name==survey.categories[i].questions[j].name) {
             switch (me.rtn.answers[k].question.name) {
             // special handling for organisation ...
@@ -67,17 +69,27 @@ var $r = (function ($, ractive, $auth) {
               $('#ORG_TYPE').attr('list','orgTypes');
               break;
             default:
+              if ('Submitted'==me.rtn.answers[k].status || 'Published'==me.rtn.answers[k].status) {
+                $('#'+me.rtn.answers[k].question.name).attr('readonly','readonly').attr('disabled','disabled');
+              } else {
+                $('#'+me.rtn.answers[k].question.name).removeAttr('readonly').removeAttr('disabled');
+              }
               // update ractive model with value
               ractive.set('q.categories.'+i+'.questions.'+j+'.response', me.rtn.answers[k].response);
             }
             // store answer that needs to receive updates
-            ractive.set('q.categories.'+i+'.questions.'+j+'.answer', me.rtn.answers[k]);
+            //ractive.set('q.categories.'+i+'.questions.'+j+'.answer', me.rtn.answers[k]);
             break;
           }
         }
       }
     }
     _bindLists();
+
+    // Set questionnaire details specific to SDU return
+    ractive.set('q.about.title', 'SDU return '+_period);
+    ractive.set('q.about.options.previous', '$r.movePrevious()');
+    ractive.set('q.about.options.next', '$r.moveNext()');
   }
 
   /**
@@ -110,32 +122,61 @@ var $r = (function ($, ractive, $auth) {
 
   me.fill = function(survey) {
     console.info('fill survey');
+    // Don't know if we'll get survey or return first
     if (me.rtn==undefined) _survey = survey;
     else _fill(survey);
 
     ractive.observe('q.categories.*.questions.*.response', function(newValue, oldValue, keypath) {
+      if (newValue === oldValue) return;
       console.log('change '+keypath+' from '+oldValue+' to '+newValue);
       if (newValue==null) return; // loading form
       var q = ractive.get(keypath.substring(0, keypath.indexOf('.response')));
-      if (q['answer']!=undefined) {
-        q.answer.response=newValue;
-        $r.dirty = true;
-      }
+      // if (q['answer']!=undefined) {
+      //   q.answer.response=newValue;
+      //   $r.dirty = true;
+      // }
       if ($r.rtn!=undefined && newValue!='') {
         var found = false;
         for (idx in $r.rtn.answers) {
-          if ($r.rtn.answers[idx].question.name == q.name) {
+          if (found) break;
+          if ($r.rtn.answers[idx].question.name == q.name && $r.rtn.answers[idx].applicablePeriod == _period) {
             $r.rtn.answers[idx].response = newValue;
             found = true;
           }
         }
         if (!found) {
-          $r.rtn.answers.push( { question: q, response: newValue } );
+          $r.rtn.answers.push( { question: q, response: newValue, applicablePeriod: _period, status: 'Draft', revision: 1 } );
         }
         $r.dirty = true;
       }
     });
   };
+
+  me.getAnswer = function(qName,period) {
+    if ($r.rtn!=undefined) {
+      for (idx in $r.rtn.answers) {
+        if ($r.rtn.answers[idx].question.name == qName && $r.rtn.answers[idx].applicablePeriod == period) {
+          return $r.rtn.answers[idx];
+        }
+      }
+    }
+  }
+
+  me.moveNext = function() {
+    console.info('_moveNext');
+    var currentYear = parseInt(_period.substring(0,4));
+    _period = (currentYear+1)+'-'+(currentYear+2-2000);
+    ractive.set('q.about.title', 'SDU return '+_period);
+    _fill(_survey);
+  }
+
+  me.movePrevious = function() {
+    console.info('_movePrevious');
+    var currentYear = _period.substring(0,4);
+    _period = (currentYear-1)+'-'+(currentYear-2000);
+    ractive.set('q.about.title', 'SDU return '+_period);
+    _fill(_survey);
+  }
 
   me.submit = function() {
     //console.info('submit return');
@@ -147,21 +188,22 @@ var $r = (function ($, ractive, $auth) {
     $.each(me.rtn.links, function (i,d) {
       if (d.rel=='self') me.rtn.selfRef = d.href;
     });
-    // TODO
-    me.rtn.selfRef = me.rtn.selfRef.replace(/localhost/, 'api.srp.digital');
+    if (_server.indexOf('api.srp.digital')!=-1) {
+      me.rtn.selfRef = me.rtn.selfRef.replace(/localhost/, 'api.srp.digital');
+    }
     return $.ajax({
         url: me.rtn.selfRef,
         type: 'PUT',
         contentType: 'application/json',
         data: JSON.stringify(me.rtn),
         dataType:'text',
-        success: completeHandler = function(data, textStatus, jqXHR) {
+        success: function(data, textStatus, jqXHR) {
           console.log('updated ok, data: '+ data);
           $r.dirty = false;
         }
       });
 // prep question for subsequent save
-            //me.rtn.answers[k].question = '/me.rtn.answers[k].question.id;
+            //me.rtn.answers[k].question = '/me.rtn.answers[kNext].question.id;
   };
 
   ractive.observe('q.activeCategory', function (newValue, oldValue, keypath) {

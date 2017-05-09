@@ -25,7 +25,7 @@ var ractive = new BaseRactive({
     filter: { },
     //saveObserver:false,
     // username: localStorage['username'],
-    server: 'https://api.srp.digital',
+    server: $env.server,
     age: function(timeString) {
       return i18n.getAgeString(new Date(timeString))
     },

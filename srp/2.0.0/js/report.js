@@ -18,10 +18,9 @@ var ractive = new BaseRactive({
   lazy: true,
   template: '#template',
   data: {
-    // org: 'RDR',
-    //server: 'http://localhost:8083', /* trakeo.com:8090 */
-    server: 'https://api.srp.digital', /* trakeo.com:8090 */
-    survey: 'Sdu-201617',
+    org: 'RDR',
+    server: $env.server,
+    survey: 'SDU-2016-17',
     tenant: { id: 'sdu' },
     username: localStorage['username'],
     formatAnswer: function(qName) {

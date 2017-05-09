@@ -23,8 +23,7 @@ var ractive = new BaseRactive({
   template: '#template',
   data: {
     filter: { },
-    //server: 'http://localhost:8090', /* trakeo.com:8090 */
-    server: 'https://api.srp.digital', /* trakeo.com:8090 */
+    server: $env.server,
     age: function(timeString) {
       return i18n.getAgeString(new Date(timeString))
     },
