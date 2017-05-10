@@ -6,13 +6,13 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at http://rocketgeek.com
- * Copyright (c) 2006-2016 Chad Butler
+ * Copyright (c) 2006-2017 Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @subpackage WP-Members Email Functions
  * @author Chad Butler
- * @copyright 2006-2016
+ * @copyright 2006-2017
  *
  * Functions Included:
  * - wpmem_inc_regemail
@@ -47,7 +47,7 @@ function wpmem_inc_regemail( $user_id, $password, $toggle, $wpmem_fields = null,
 	global $wpmem;
 
 	// Handle backward compatibility for customizations that may call the email function directly.
-	$wpmem_fields = wpmem_fields();
+	$wpmem_fields = wpmem_fields( $toggle );
 
 	/*
 	 * Determine which email is being sent.
@@ -273,12 +273,14 @@ function wpmem_inc_regemail( $user_id, $password, $toggle, $wpmem_fields = null,
 		// Append footer if needed.
 		$arr['body'] = ( $arr['add_footer'] ) ? $arr['body'] . "\r\n" . $foot : $arr['body'];
 		
-		// Apply from and from name email filters.
+		// @todo The remainder is slated to be moved to an "email send" function.
+		// Apply WP's "from" and "from name" email filters.
 		add_filter( 'wp_mail_from',      'wpmem_mail_from' );
 		add_filter( 'wp_mail_from_name', 'wpmem_mail_from_name' );
 
 		// Send the message.
 		wp_mail( $arr['user_email'], stripslashes( $arr['subj'] ), stripslashes( $arr['body'] ), $arr['headers'] );
+		// @todo End of slated for move.
 
 	}
 
@@ -306,7 +308,7 @@ function wpmem_notify_admin( $user_id, $wpmem_fields = null, $field_data = null 
 	global $wpmem;
 	
 	// Handle backward compatibility for customizations that may call the email function directly.
-	$wpmem_fields = wpmem_fields();
+	$wpmem_fields = wpmem_fields( 'admin_notify' );
 
 	// WP default user fields.
 	$wp_user_fields = array(
@@ -357,7 +359,8 @@ function wpmem_notify_admin( $user_id, $wpmem_fields = null, $field_data = null 
 					} else {
 						$val = ( is_array( $field_data ) ) ? esc_html( $field_data[ $meta_key ] ) : esc_html( get_user_meta( $user_id, $meta_key, true ) );
 					}
-					$field_arr[ $field['label'] ] = $val;
+					// $field_arr[ $field['label'] ] = $val; // @todo Consider (1) if this should be implemented, and (2) if it should be done here or location "B".
+					$field_arr[ __( $field['label'], 'wp-members' ) ] = $val;
 				}
 			}
 		}
@@ -369,11 +372,6 @@ function wpmem_notify_admin( $user_id, $wpmem_fields = null, $field_data = null 
 
 	/** This filter is documented in email.php */
 	$arr['headers'] = apply_filters( 'wpmem_email_headers', $default_header, 'admin' );
-
-	// Handle backward compatibility for customizations that may call the email function directly.
-	if ( ! $wpmem_fields ) {
-		$wpmem_fields = wpmem_fields();
-	}
 
 	/**
 	 * Filters the address the admin notification is sent to.
@@ -407,7 +405,9 @@ function wpmem_notify_admin( $user_id, $wpmem_fields = null, $field_data = null 
 		// Split field_arr into field_str.
 		$field_str = '';
 		foreach ( $arr['field_arr'] as $key => $val ) {
-			$field_str.= $key . ': ' . $val . "\r\n";
+			$field_str.= $key . ': ' . $val . "\r\n"; 
+			// @todo Location "B" to to label translation. Could be as follows:
+			// $field_str.= __( $key, 'wp-members' ) . ": " . $val . "\r\n";
 		}
 
 		// Get the email footer if needed.
@@ -472,18 +472,26 @@ function wpmem_notify_admin( $user_id, $wpmem_fields = null, $field_data = null 
 		/**
 		 * Filters the admin notification email.
 		 *
+		 * This is the last chance to filter the message body. At this point
+		 * it is just the text that will be in the message.
+		 * @todo Consider deprecating this filter as it could be accomplished
+		 *       by the wp_mail filter, or a universal filter could be added
+		 *       to the new email send function.
+		 *
 		 * @since 2.8.2
 		 *
 		 * @param string $arr['body'] The admin notification email body.
 		 */
 		$arr['body'] = apply_filters( 'wpmem_email_notify', $arr['body'] );
 		
+		// @todo The remainder is slated to be moved to an "email send" function.
 		// Apply from and from name email filters.
 		add_filter( 'wp_mail_from',      'wpmem_mail_from' );
 		add_filter( 'wp_mail_from_name', 'wpmem_mail_from_name' );
 
 		// Send the message.
 		wp_mail( $arr['admin_email'], stripslashes( $arr['subj'] ), stripslashes( $arr['body'] ), $arr['headers'] );
+		// @todo End of slated to be moved.
 	}
 }
 endif;

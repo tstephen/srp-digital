@@ -7,12 +7,12 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at http://rocketgeek.com
- * Copyright (c) 2006-2016  Chad Butler
+ * Copyright (c) 2006-2017  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @author Chad Butler 
- * @copyright 2006-2016
+ * @copyright 2006-2017
  */
 
 
@@ -38,7 +38,7 @@ function wpmem_user_profile() {
 	<table class="form-table">
 		<?php
 		// Get fields.
-		$wpmem_fields = wpmem_fields();
+		$wpmem_fields = wpmem_fields( 'dashboard_profile' );
 		// Get excluded meta.
 		$exclude = wpmem_get_excluded_meta( 'user-profile' );
 
@@ -167,7 +167,7 @@ function wpmem_profile_update() {
 
 	global $wpmem, $user_id;
 	// Get the fields.
-	$wpmem_fields = wpmem_fields();
+	$wpmem_fields = wpmem_fields( 'dashboard_profile_update' );
 	// Get any excluded meta fields.
 	$exclude = wpmem_get_excluded_meta( 'user-profile' );
 	foreach ( $wpmem_fields as $meta => $field ) {

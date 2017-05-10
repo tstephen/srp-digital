@@ -8,12 +8,12 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at http://rocketgeek.com
- * Copyright (c) 2006-2016 Chad Butler
+ * Copyright (c) 2006-2017 Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @author Chad Butler
- * @copyright 2006-2016
+ * @copyright 2006-2017
  *
  * Functions Included:
  * - wpmem_do_wp_register_form
@@ -31,7 +31,7 @@
 function wpmem_do_wp_register_form() {
 
 	global $wpmem;
-	$wpmem_fields = wpmem_fields();
+	$wpmem_fields = wpmem_fields( 'wp' );
 	
 	// Check if this is WooCommerce account page.
 	$is_woo = false;
@@ -194,7 +194,7 @@ function wpmem_do_wp_newuser_form() {
 	global $wpmem;
 	echo '<table class="form-table"><tbody>';
 
-	$wpmem_fields = wpmem_fields();
+	$wpmem_fields = wpmem_fields( 'add_new' );
 	$exclude = wpmem_get_excluded_meta( 'register' );
 
 	foreach ( $wpmem_fields as $meta_key => $field ) {

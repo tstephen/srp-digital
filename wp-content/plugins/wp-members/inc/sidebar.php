@@ -6,12 +6,12 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at http://rocketgeek.com
- * Copyright (c) 2006-2016 Chad Butler
+ * Copyright (c) 2006-2017 Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @author Chad Butler
- * @copyright 2006-2016
+ * @copyright 2006-2017
  *
  * Functions Included:
  * - wpmem_inc_status
@@ -112,6 +112,7 @@ function wpmem_do_sidebar( $redirect_to = null ) {
 			'wrap_inputs'     => true,
 			'n'               => "\n",
 			't'               => "\t",
+			'login_form_action' => true,
 		);
 
 		/**
@@ -141,6 +142,15 @@ function wpmem_do_sidebar( $redirect_to = null ) {
 		$row2  = $label . $args['n'] . $input . $args['n'];
 
 		$form = $row1 . $row2;
+		
+		// Handle outside elements added to the login form (currently ONLY for login).
+		if ( $args['login_form_action'] ) {
+			ob_start();
+			do_action( 'login_form' );
+			$add_to_form = ob_get_contents();
+			ob_end_clean();
+			$form.= $add_to_form;
+		}
 
 		$hidden = '<input type="hidden" name="rememberme" value="forever" />' . $args['n'] .
 				'<input type="hidden" name="redirect_to" value="' . ( ( $redirect_to ) ? $redirect_to : $post_to ) . '" />' . $args['n'] .

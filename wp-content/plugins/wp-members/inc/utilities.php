@@ -7,23 +7,19 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at http://rocketgeek.com
- * Copyright (c) 2006-2016  Chad Butler
+ * Copyright (c) 2006-2017  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @subpackage WP-Members Utility Functions
  * @author Chad Butler 
- * @copyright 2006-2016
+ * @copyright 2006-2017
  *
  * Functions included:
  * - wpmem_create_formfield
- * - wpmem_selected @deprecated 3.1.0 Use selected() or checked() instead.
- * - wpmem_chk_qstr @deprecated 3.1.0 Use add_query_arg() instead.
- * - wpmem_generatePassword @deprecated Unknown Use wp_generate_password() instead.
  * - wpmem_texturize
  * - wpmem_enqueue_style
  * - wpmem_do_excerpt
- * - wpmem_test_shortcode @deprecated 3.1.2 Use has_shortcode() instead.
  * - wpmem_get_excluded_meta
  * - wpmem_use_ssl
  * - wpmem_wp_reserved_terms
@@ -62,67 +58,6 @@ function wpmem_create_formfield( $name, $type, $value, $valtochk=null, $class='t
 endif;
 
 
-if ( ! function_exists( 'wpmem_selected' ) ):
-/**
- * Determines if a form field is selected (i.e. lists & checkboxes).
- *
- * @since 0.1.0
- * @deprecated 3.1.0 Use selected() or checked() instead.
- *
- * @param  string $value
- * @param  string $valtochk
- * @param  string $type
- * @return string $issame
- */
-function wpmem_selected( $value, $valtochk, $type = null ) {
-	wpmem_write_log( "wpmem_selected() is deprecated as of WP-Members 3.1.0. Use selected() or checked() instead" );
-	$issame = ( $type == 'select' ) ? ' selected' : ' checked';
-	return ( $value == $valtochk ) ? $issame : '';
-}
-endif;
-
-
-if ( ! function_exists( 'wpmem_chk_qstr' ) ):
-/**
- * Checks querystrings.
- *
- * @since 2.0.0
- * @deprecated 3.1.0 Use add_query_arg() instead.
- *
- * @param  string $url
- * @return string $return_url
- */
-function wpmem_chk_qstr( $url = null ) {
-	wpmem_write_log( "wpmem_chk_qstr() is deprecated as of WP-Members 3.1.0. Use add_query_arg() instead" );
-	$permalink = get_option( 'permalink_structure' );
-	if ( ! $permalink ) {
-		$url = ( ! $url ) ? get_option( 'home' ) . "/?" . $_SERVER['QUERY_STRING'] : $url;
-		$return_url = $url . "&";
-	} else {
-		$url = ( ! $url ) ? get_permalink() : $url;
-		$return_url = $url . "?";
-	}
-	return $return_url;
-}
-endif;
-
-
-if ( ! function_exists( 'wpmem_generatePassword' ) ):
-/**
- * Generates a random password.
- *
- * @since 2.0.0
- * @deprecated Unknown Use wp_generate_password() instead.
- *
- * @return string The random password.
- */
-function wpmem_generatePassword() {
-	wpmem_write_log( "WP-Members function wpmem_generatePassword() is deprecated. Use wp_generate_password() instead" );
-	return substr( md5( uniqid( microtime() ) ), 0, 7 );
-}
-endif;
-
-
 if ( ! function_exists( 'wpmem_texturize' ) ):
 /**
  * Overrides the wptexturize filter.
@@ -130,6 +65,8 @@ if ( ! function_exists( 'wpmem_texturize' ) ):
  * Currently only used for the login form to remove the <br> tag that WP puts in after the "Remember Me".
  *
  * @since 2.6.4
+ *
+ * @todo Possibly deprecate or severely alter this process as its need may be obsolete.
  *
  * @param  string $content
  * @return string $new_content
@@ -287,39 +224,6 @@ function wpmem_do_excerpt( $content ) {
 endif;
 
 
-if ( ! function_exists( 'wpmem_test_shortcode' ) ):
-/**
- * Tests $content for the presence of the [wp-members] shortcode.
- *
- * @since 2.6.0
- * @deprecated 3.1.2 Use has_shortcode() instead.
- *
- * @global string $shortcode_tags
- * @return bool
- *
- * @example http://codex.wordpress.org/Function_Reference/get_shortcode_regex
- */
-function wpmem_test_shortcode( $content, $tag ) {
-
-	wpmem_write_log( "wpmem_test_shortcode() is deprecated as of WP-Members 3.1.2. Use has_shortcode() instead." );
-	global $shortcode_tags;
-	if ( array_key_exists( $tag, $shortcode_tags ) ) {
-		preg_match_all( '/' . get_shortcode_regex() . '/s', $content, $matches, PREG_SET_ORDER );
-		if ( empty( $matches ) ) {
-			return false;
-		}
-
-		foreach ( $matches as $shortcode ) {
-			if ( $tag === $shortcode[2] ) {
-				return true;
-			}
-		}
-	}
-	return false;
-}
-endif;
-
-
 /**
  * Sets an array of user meta fields to be excluded from update/insert.
  *
@@ -383,6 +287,45 @@ function wpmem_write_log ( $log ) {
 	} else {
 		error_log( $log );
 	}
+}
+
+/**
+ * Convert form tag.
+ *
+ * @todo This is temporary to handle form tag conversion.
+ *
+ * @since 3.1.7
+ *
+ * @param  string $tag
+ * @return string $tag
+ */
+function wpmem_convert_tag( $tag ) {
+	switch ( $tag ) {
+		case 'new':
+			return 'register';
+			break;
+		case 'edit':
+		case 'update':
+			return 'profile';
+			break;
+		case 'wp':
+		case 'wp_validate':
+		case 'wp_finalize':
+			return 'register_wp';
+			break;
+		case 'dashboard_profile':
+		case 'dashboard_profile_update':
+			return 'profile_dashboard';
+			break;
+		case 'admin_profile':
+		case 'admin_profile_update':
+			return 'profile_admin';
+			break;
+		default:
+			return $tag;
+			break;
+	}
+	return $tag;
 }
 
 // End of file.

@@ -6,12 +6,12 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at http://rocketgeek.com
- * Copyright (c) 2006-2016  Chad Butler
+ * Copyright (c) 2006-2017  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @author Chad Butler
- * @copyright 2006-2016
+ * @copyright 2006-2017
  *
  * Functions included:
  * - wpmem_admin_fields
@@ -20,13 +20,6 @@
  * - wpmem_profile_show_expiration
  * - wpmem_profile_show_ip
  */
-
- 
-/** Actions */
-add_action( 'show_user_profile', 'wpmem_admin_fields' );
-add_action( 'edit_user_profile', 'wpmem_admin_fields' );
-add_action( 'profile_update',    'wpmem_admin_update' );
-
 
 /**
  * Add WP-Members fields to the WP user profile screen.
@@ -53,7 +46,7 @@ function wpmem_admin_fields() {
  	<table class="form-table">
 		<?php
 		// Get fields.
-		$wpmem_fields = wpmem_fields();
+		$wpmem_fields = wpmem_fields( 'admin_profile' );
 		// Get excluded meta.
 		$exclude = wpmem_get_excluded_meta( 'admin-profile' );
 
@@ -199,13 +192,20 @@ function wpmem_admin_fields() {
  * Updates WP-Members fields from the WP user profile screen.
  *
  * @since 2.1
+ *
+ * @global object $wpmem
  */
 function wpmem_admin_update() {
 
+	$user_id = wpmem_get( 'user_id', false, 'request' ); //$_REQUEST['user_id'];
+	
+	if ( ! $user_id ) {
+		// With no user id, no user can be updated.
+		return;
+	}
+	
 	global $wpmem;
-
-	$user_id = $_REQUEST['user_id'];
-	$wpmem_fields = wpmem_fields();
+	$wpmem_fields = wpmem_fields( 'admin_profile_update' );
 
 	/**
 	 * Fires before the user profile is updated.

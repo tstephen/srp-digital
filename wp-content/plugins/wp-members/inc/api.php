@@ -4,13 +4,13 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at http://rocketgeek.com
- * Copyright (c) 2006-2016  Chad Butler
+ * Copyright (c) 2006-2017  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @subpackage WP-Members API Functions
  * @author Chad Butler 
- * @copyright 2006-2016
+ * @copyright 2006-2017
  *
  * Functions included:
  * - wpmem_redirect_to_login
@@ -19,6 +19,8 @@
  * - wpmem_register_url
  * - wpmem_profile_url
  * - wpmem_current_url
+ * - wpmem_form_field
+ * - wpmem_form_label
  * - wpmem_fields
  * - wpmem_gettext
  * - wpmem_use_custom_dialog
@@ -30,6 +32,8 @@
  * - wpmem_load_dropins
  * - wpmem_loginout
  * - wpmem_array_insert
+ * - wpmem_is_user_activated
+ * - wpmem_current_post_id
  */
 
 /**
@@ -141,15 +145,19 @@ function wpmem_user_pages() {
  * Returns the current full url.
  *
  * @since 3.1.1
+ * @since 3.1.7 Added check for query string.
  * 
  * @global object  $wp
  * @param  boolean $slash Trailing slash the end of the url (default:true).
+ * @param  boolean $getq  Toggles getting the query string (default:true).
  * @return string  $url   The current page full url path.
  */
-function wpmem_current_url( $slash = true ) {
+function wpmem_current_url( $slash = true, $getq = true ) {
 	global $wp;
 	$url = home_url( add_query_arg( array(), $wp->request ) );
-	return ( $slash ) ? trailingslashit( $url ) : $url;
+	$url = ( $slash ) ? trailingslashit( $url ) : $url;
+	$url = ( $getq && count( $_GET ) > 0 ) ? $url . '?' . $_SERVER['QUERY_STRING'] : $url;
+	return $url;
 }
 
 /**
@@ -158,13 +166,18 @@ function wpmem_current_url( $slash = true ) {
  * @since 3.1.2
  *
  * @param array  $args {
- *     @type string  $name      (required) The field meta key.
- *     @type string  $type      (required) The field HTML type (url, email, image, file, checkbox, text, textarea, password, hidden, select, multiselect, multicheckbox, radio).
- *     @type string  $value     (required) The field's value (can be a null value).
- *     @type string  $compare   (required) Compare value.
- *     @type string  $class     (optional) Class identifier for the field.
- *     @type boolean $required  (optional) If a value is required default: true).
- *     @type string  $delimiter (optional) The field delimiter (pipe or comma, default: | ).
+ *     @type string  $name        (required) The field meta key.
+ *     @type string  $type        (required) The field HTML type (url, email, image, file, checkbox, text, textarea, password, hidden, select, multiselect, multicheckbox, radio).
+ *     @type string  $value       (required) The field's value (can be a null value).
+ *     @type string  $compare     (required) Compare value.
+ *     @type string  $class       (optional) Class identifier for the field.
+ *     @type boolean $required    (optional) If a value is required default: true).
+ *     @type string  $delimiter   (optional) The field delimiter (pipe or comma, default: | ).
+ *     @type string  $placeholder (optional) Defines the placeholder attribute.
+ *     @type string  $pattern     (optional) Adds a regex pattern to the field (HTML5).
+ *     @type string  $title       (optional) Defines the title attribute.
+ *     @type string  $min         (optional) Adds a min attribute (HTML5).
+ *     @type string  $max         (optional) Adds a max attribute (HTML5).
  * }
  * @return string The HTML of the form field.
  */
@@ -174,21 +187,57 @@ function wpmem_form_field( $args ) {
 }
 
 /**
+ * Wrapper for $wpmem->create_form_label().
+ *
+ * @since 3.1.7
+ *
+ * @global object $wpmem
+ * @param array  $args {
+ *     @type string $meta_key
+ *     @type string $label_text
+ *     @type string $type
+ *     @type string $class      (optional)
+ *     @type string $required   (optional)
+ *     @type string $req_mark   (optional)
+ * }
+ * @return string The HTML of the form label.
+ */
+function wpmem_form_label( $args ) {
+	global $wpmem;
+	return $wpmem->forms->create_form_label( $args );
+}
+
+/**
  * Wrapper to get form fields.
  *
  * @since 3.1.1
  * @since 3.1.5 Checks if fields array is set or empty before returning.
+ * @since 3.1.7 Added wpmem_form_fields filter.
  *
  * @global object $wpmem  The WP_Members object.
+ * @param  string $tag    The action being used (default: null).
  * @param  string $form   The form being generated.
  * @return array  $fields The form fields.
  */
-function wpmem_fields( $form = 'default' ) {
+function wpmem_fields( $tag = '', $form = 'default' ) {
 	global $wpmem;
+	// Load fields if none are loaded.
 	if ( ! isset( $wpmem->fields ) || empty( $wpmem->fields ) ) {
 		$wpmem->load_fields( $form );
 	}
-	return $wpmem->fields;
+	
+	// @todo Convert tag.
+	$tag = wpmem_convert_tag( $tag );
+	
+	/**
+	 * Filters the fields array.
+	 *
+	 * @since 3.1.7
+	 *
+	 * @param  array  $wpmem->fields
+	 * @param  string $tag (optional)
+	 */
+	return apply_filters( 'wpmem_fields', $wpmem->fields, $tag );
 }
 
 /**
@@ -331,16 +380,21 @@ function wpmem_get( $tag, $default = '', $type = 'post' ) {
  * Compares wpmem_reg_page value with the register page URL. 
  *
  * @since 3.1.4
+ * @since 3.1.7 Added default of current page ID.
  *
  * @param  string|int $check_page
  * @return bool
  */
-function wpmem_is_reg_page( $check ) {
-	if ( ! is_int( $check ) ) {
-		global $wpdb;
-		$sql   = "SELECT ID FROM $wpdb->posts WHERE post_name = '$check' AND post_status = 'publish' LIMIT 1";	
-		$arr   = $wpdb->get_results( $sql, ARRAY_A  ); 
-		$check = $arr[0]['ID'];
+function wpmem_is_reg_page( $check = false ) {
+	if ( ! $check ) {
+		$check = get_the_ID();
+	} else {
+		if ( ! is_int( $check ) ) {
+			global $wpdb;
+			$sql   = "SELECT ID FROM $wpdb->posts WHERE post_name = '$check' AND post_status = 'publish' LIMIT 1";	
+			$arr   = $wpdb->get_results( $sql, ARRAY_A  ); 
+			$check = $arr[0]['ID'];
+		}
 	}
 	$reg_page = wpmem_get( 'wpmem_reg_page' );
 	$check_page = get_permalink( $check );
@@ -415,6 +469,31 @@ function wpmem_array_insert( array $array, array $new, $key, $loc = 'after' ) {
 		$pos = ( false === $index ) ? count( $array ) : $index + 1;
 	}
 	return array_merge( array_slice( $array, 0, $pos ), $new, array_slice( $array, $pos ) );
+}
+
+/**
+ * Checks if a user is activated.
+ *
+ * @since 3.1.7
+ *
+ * @param  int  $user_id
+ * @return bool
+ */
+function wpmem_is_user_activated( $user_id = false ) {
+	$user_id = ( ! $user_id ) ? get_current_user_id() : $user_id;
+	$active  = get_user_meta( $user_id, 'active', true );
+	return ( $active != 1 ) ? false : true;
+}
+
+/**
+ * Gets post ID of current URL.
+ *
+ * @since 3.1.7
+ *
+ * @return int Post ID.
+ */
+function wpmem_current_post_id() {
+	return url_to_postid( wpmem_current_url() );
 }
 
 // End of file.

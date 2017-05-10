@@ -6,12 +6,12 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at http://rocketgeek.com
- * Copyright (c) 2006-2016 Chad Butler
+ * Copyright (c) 2006-2017 Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @author Chad Butler
- * @copyright 2006-2016
+ * @copyright 2006-2017
  *
  * Functions included:
  * - wpmem_bulk_posts_action
@@ -24,17 +24,6 @@
  * - wpmem_post_columns_content
  * - wpmem_load_tinymce
  */
-
-
-/**
- * Actions
- */
-add_action( 'admin_footer-edit.php', 'wpmem_bulk_posts_action'   );
-add_action( 'load-edit.php',         'wpmem_posts_page_load'     );
-add_action( 'admin_notices',         'wpmem_posts_admin_notices' );
-add_action( 'load-post.php',         'wpmem_load_tinymce'        );
-add_action( 'load-post-new.php',     'wpmem_load_tinymce'        );
-
 
 /**
  * Function to add block/unblock to the bulk dropdown list.
