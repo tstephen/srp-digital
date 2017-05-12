@@ -224,6 +224,9 @@ h6 a {
   height: 72px;
 }
 
+a { 
+  border-bottom: 1px solid #99c344
+}
 /*--------------------------------------------------------------
 5.0 Content
 --------------------------------------------------------------*/
@@ -275,9 +278,11 @@ h6 a {
   min-height: initial;
 }
 
-/* Single page overrides */
+/* Single & page overrides */
+body.page .entry-thumbnail,
 body.single .entry-thumbnail {
-  height: 15vh !important;
+  height: 25vh !important;
+  margin-top: 50px;
 }
 body.single .entry-header {
   width: 674px;
@@ -340,6 +345,9 @@ body.single .entry-header {
   .search-results .site-footer {
     position: inherit;
   }
+  .entry-content, .entry-footer {
+    width: 100%;
+  }
 
   /* Jetpack */
   #infinite-handle:before {
@@ -365,7 +373,7 @@ body.single .entry-header {
 }
 
 /*--------------------------------------------------------------
-7.3 x <= 1024px
+7.3 x >= 1024px
 --------------------------------------------------------------*/
 @media screen and (min-width: 1024px) {
   /* Content */
@@ -389,8 +397,7 @@ body.single .entry-header {
   body.single .entry-content {
     left: 0 !important;
     margin-left: 0 !important;
-    text-align: center;
-    width: 874px;
+    width: 95%;
   }
 }
 @media screen and (min-width: 1200px) {
@@ -398,8 +405,7 @@ body.single .entry-header {
   body.single .entry-content {
     left: 0 !important;
     margin-left: 0 !important;
-    text-align: center;
-    width: 1124px;
+    width: 90%;
   }
 }
 
