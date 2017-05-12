@@ -74,8 +74,12 @@ var $r = (function ($, ractive, $auth) {
               } else {
                 $('#'+me.rtn.answers[k].question.name).removeAttr('readonly').removeAttr('disabled');
               }
-              // update ractive model with value
-              ractive.set('q.categories.'+i+'.questions.'+j+'.response', me.rtn.answers[k].response);
+              // update ractive model with current value or default
+              if (me.rtn.answers[k].response!=undefined && me.rtn.answers[k].response!='') {
+                ractive.set('q.categories.'+i+'.questions.'+j+'.response', me.rtn.answers[k].response);
+              } else if (ractive.get('q.categories.'+i+'.questions.'+j+'.defaultValue')!=undefined) {
+                ractive.set('q.categories.'+i+'.questions.'+j+'.response', ractive.get('q.categories.'+i+'.questions.'+j+'.defaultValue'));
+              }
             }
             // store answer that needs to receive updates
             //ractive.set('q.categories.'+i+'.questions.'+j+'.answer', me.rtn.answers[k]);
