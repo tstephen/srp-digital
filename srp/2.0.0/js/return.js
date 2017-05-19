@@ -26,11 +26,13 @@ var $r = (function ($, ractive, $auth) {
     $.getJSON(_server+'/sdu/accounts/', function(data) {
       ractive.set('orgs', data);
       ractive.addDataList({ name: 'orgs' },data);
-      if (_survey != undefined) $('#ORG_NAME').attr('list','orgs');
+      // if (_survey != undefined) $('#ORG_NAME').attr('list','orgs');
+      _bindLists();
     });
     $.getJSON(_server+'/sdu/organisation-types/', function(data) {
       ractive.set('orgTypes', data);
-      if (_survey != undefined) ractive.addSelectOptions('#ORG_TYPE', data);
+      //if (_survey != undefined) ractive.addSelectOptions('#ORG_TYPE', data);
+      _bindLists();
     });
   }
 
@@ -48,6 +50,12 @@ var $r = (function ($, ractive, $auth) {
 
       for(j in survey.categories[i].questions) {
         console.log('  fill: '+survey.categories[i].questions[j].name);
+
+        // reset question
+        ractive.set('q.categories.'+i+'.questions.'+j+'.response', undefined);
+        $('#'+survey.categories[i].questions[j].name).removeAttr('readonly').removeAttr('disabled');
+
+        // fill answer
         for (k in me.rtn.answers) {
           if (_period != me.rtn.answers[k].applicablePeriod) continue;
           if (me.rtn.answers[k].question.name==survey.categories[i].questions[j].name) {
@@ -122,6 +130,9 @@ var $r = (function ($, ractive, $auth) {
   function _showQuestionnaire() {
     if (_survey == undefined) _fetchReturn();
     $('section.questionnaire').slideDown();
+    // Add ERIC import button
+    $('h1 .importEric').remove();
+    $('h1').append('<span class="btn glyphicon glyphicon-import pull-right importEric" onclick="$r.importEric()">Import ERIC data</span>');
   }
 
   me.fill = function(survey) {
@@ -164,6 +175,19 @@ var $r = (function ($, ractive, $auth) {
         }
       }
     }
+  }
+
+  me.importEric = function() {
+    return $.ajax({
+        url: _server+'/returns/importEric/'+_surveyName+'/'+$auth.getClaim('org'),
+        type: 'GET',
+        contentType: 'application/json',
+        success: function(data, textStatus, jqXHR) {
+          console.log('imported ERIC data ok, data: '+ data);
+          me.rtn = data;
+          if (_survey!=undefined) _fill(_survey);
+        }
+      });
   }
 
   me.moveNext = function() {
@@ -236,6 +260,7 @@ var $r = (function ($, ractive, $auth) {
   $auth.addLoginCallback(ractive.fetch);
   $auth.addLoginCallback(_fetchReturn);
   $auth.addLoginCallback(_fetchLists());
+  $auth.addLoginCallback(_bindLists());
 
   if (ractive['fetchCallbacks']==undefined) ractive.fetchCallbacks = $.Callbacks();
   ractive.fetchCallbacks.add(_hideCalcs);
