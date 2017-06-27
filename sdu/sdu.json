@@ -6,6 +6,7 @@
     "activityAnalysis":true, "addressAccount":true,
     "catalog": false,
     "documents": true, "documentsOnStockItem": true, "documentsOnStockCategory": true,
+    "enquiryType": false,
     "marketing": false, "poweredBy":false,
     "stage":true, "stockCategory": true,
     "stockCategoryImages":false, "stockItemImages":false
@@ -109,7 +110,14 @@
     { "name": "WelcomeNewUser", "ref": "WelcomeNewUser" }
   ],
   "typeaheadControls": [
-    { "name": "accountTypes", "ref": "#curAccountType", "values": [
+    { "name": "accountStages", "ref": "#curStage", "values": [
+        {  "idx":0, "id": "No contact", "name": "No contact"  },
+        {  "idx":1, "id": "Registered", "name": "Registered"  },
+        {  "idx":2, "id": "Partial data entered", "name": "Partial data entered"  },
+        {  "idx":3, "id": "Data submitted", "name": "Data submitted"  },
+        {  "idx":-1, "id": "Defunct", "name": "Defunct"  }
+      ]
+    },{ "name": "accountTypes", "ref": "#curAccountType", "values": [
         {  "id": "AcuteTrust", "name": "Acute Trust"  },
         {  "id": "AdultSocialCare", "name": "Adult Social Care"  },
         {  "id": "Ambulance", "name": "Ambulance"  },
@@ -224,12 +232,6 @@
           {  "idx":2, "name": "Excellent"  },
           {  "idx":-1, "name": "Data not available"  }
         ]
-    },{ "name": "stages", "ref": "#curStage", "values": [
-        {  "idx":0, "name": "New Lead"  },
-        {  "idx":1, "name": "Registered"  },
-        {  "idx":2, "name": "Plan Submitted"  },
-        {  "idx":-1, "name": "Cold"  }
-      ]
     },{ "name": "status", "ref": "#curStatus", "values": [
         {  "id": "Green", "name": "Green"  },
         {  "id": "Amber", "name": "Amber"  },
