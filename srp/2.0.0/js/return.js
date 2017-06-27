@@ -208,9 +208,12 @@ var $r = (function ($, ractive, $auth) {
 
   me.submit = function() {
     //console.info('submit return');
-    if ($r.dirty == false || me.rtn == undefined) {
+    if ($r.dirty == false) {
       //console.debug('skip save, not dirty');
       return;
+    } else if (me.rtn == undefined) {
+      ractive.fetch();
+      _fetchReturn();
     }
     // _fill(_survey);
     $.each(me.rtn.links, function (i,d) {
@@ -230,8 +233,6 @@ var $r = (function ($, ractive, $auth) {
           $r.dirty = false;
         }
       });
-// prep question for subsequent save
-            //me.rtn.answers[k].question = '/me.rtn.answers[kNext].question.id;
   };
 
   ractive.observe('q.activeCategory', function (newValue, oldValue, keypath) {
@@ -242,7 +243,7 @@ var $r = (function ($, ractive, $auth) {
 
   // Correct std partial paths
   ractive.set('stdPartials', [
-      { "name": "loginSect", "url": "/srp/2.0.0/partials/login-sect.html"},
+      { "name": "loginSect", "url": $env.server+"/webjars/auth/1.0.0/partials/login-sect.html"},
       { "name": "questionnaire", "url": "/questionnaire/partials/questionnaire.html"},
       { "name": "questionnaireContact", "url": "/questionnaire/partials/questionnaire-contact.html"}
     ])
@@ -257,10 +258,10 @@ var $r = (function ($, ractive, $auth) {
   ractive.fetch();
   _fetchReturn();
   _fetchLists();
-  $auth.addLoginCallback(ractive.fetch);
-  $auth.addLoginCallback(_fetchReturn);
-  $auth.addLoginCallback(_fetchLists());
-  $auth.addLoginCallback(_bindLists());
+  // $auth.addLoginCallback(ractive.fetch);
+  // $auth.addLoginCallback(_fetchReturn);
+  // $auth.addLoginCallback(_fetchLists());
+  // $auth.addLoginCallback(_bindLists());
 
   if (ractive['fetchCallbacks']==undefined) ractive.fetchCallbacks = $.Callbacks();
   ractive.fetchCallbacks.add(_hideCalcs);

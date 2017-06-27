@@ -9,6 +9,8 @@
 .htaccess
 .maintenance
 
+node_modules
+
 wp-config.php
 sitemap.xml
 sitemap.xml.gz

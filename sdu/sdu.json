@@ -1,0 +1,258 @@
+{
+  "id": "sdu",
+  "name": "SDU Health",
+  "show": {
+    "account":true, "accountCode": true, "accountCompanyDetails": false,
+    "activityAnalysis":true, "addressAccount":true,
+    "catalog": false,
+    "documents": true, "documentsOnStockItem": true, "documentsOnStockCategory": true,
+    "marketing": false, "poweredBy":false,
+    "stage":true, "stockCategory": true,
+    "stockCategoryImages":false, "stockItemImages":false
+  },
+  "theme": {
+    "logoUrl": "/srp/images/sdu-logo.png",
+    "iconUrl": "/srp/images/icon/sdu-icon-16x16.png",
+    "headingColor":"#0078c1",
+    "subHeadingColor":"#666",
+    "bodyColor":"#666",
+    "accentColor":"#99c344",
+    "iconColor":"#99c344"
+  },
+  "accountFields": [
+    { "hint": "", "label": "Organisation Code", "name": "orgCode" },
+    { "hint": "", "label": "NHS England Area", "name": "nhsEnglandArea", "type": "list" },
+    { "hint": "", "label": "PHE Centre", "name": "pheCentre", "type": "list" },
+    { "hint": "", "label": "Region", "name": "region", "type": "list" },
+    { "hint": "", "label": "SDMP", "name": "sdmp", "type": "list" },
+    { "hint": "", "label": "Adaptation Plan", "name": "adaptation", "type": "list" },
+    { "hint": "", "label": "On track for 34%", "name": "onTrack34Pct", "type": "list" },
+    { "hint": "", "label": "Healthy Trans. Plan", "name": "healthyTP", "type": "list" },
+    { "hint": "", "label": "GCC Score", "name": "gcc" },
+    { "hint": "", "label": "Sust. Reporting Level", "name": "srScore", "type": "list" },
+    { "hint": "", "label": "Sust. Reporting %", "name": "srPct" },
+    { "hint": "", "label": "Energy Use", "name": "energy", "type": "list" },
+    { "hint": "", "label": "Energy Use / WTE", "name": "energyFte", "type": "list" },
+    { "hint": "", "label": "Water Use", "name": "water", "type": "list" },
+    { "hint": "", "label": "Water Use / WTE", "name": "waterFte", "type": "list" },
+    { "hint": "", "label": "High Cost Waste %", "name": "waste", "type": "list" },
+    { "hint": "", "label": "Waste Cost", "name": "wasteChange", "type": "list" },
+
+    { "label": "Existing Int'ns", "name": "existingInterventions" },
+    { "label": "Characteristics", "name": "characteristics" },
+    { "label": "Interventions", "name": "interventions" }
+  ],
+  "contactFields": [
+    { "label": "License Agreed", "key": "licenseAgreed"}
+  ],
+  "contactActions": [
+  ],
+  "toolbar": [
+    { "url": "/srp/public/macc-national.html", "icon": "tr-icon-england", "title": "National carbon cost benefit curve", "description": "Latest findings for the Health and Social Care sector in England" },
+    { "url": "/srp/public/macc-segmented.html", "icon": "tr-icon-acute-trust", "title": "National organisation type carbon and cost benefit curve", "description": "Latest findings broken down by organisation type" },
+    { "url": "/srp/public/planner.html", "icon": "tr-icon-organization", "title": "Your carbon and cost benefit curve", "description": "A tool to identify the most suitable interventions for individual organisations" },
+    { "url": "/srp/intervention-types.html", "icon": "glyphicon-flash", "role": "analyst", "title": "Intervention Types", "description": "Manage the available intervention types affecting Carbon footprint" },
+    { "url": "/srp/interventions.html", "icon": "glyphicon-flash", "role": "analyst", "title": "Interventions", "description": "Manage the impact data for interventions on each organisation type" },
+    { "url": "/srp/organisation-types.html", "icon": "glyphicon-flash", "role": "analyst", "title": "Organisation Types", "description": "Manage the different types of organisations applying interventions" },
+    { "url": "/srp/parameters.html", "icon": "glyphicon-flash", "role": "analyst", "title": "Parameters", "description": "Manage the parameters that change over time to keep calculations up to date" },
+    { "url": "/srp/accounts.html", "icon": "omny-icon-address-book", "role": "analyst", "description": "Find a particular health or social care provider", "name": "Organisations" },
+    { "url": "/srp/memo.html", "icon": "glyphicon-envelope", "role": "admin", "name": "Templates", "description": "Create and edit your message templates"  },
+    { "url": "/srp/definitions.html", "icon": "omny-icon-process-model", "role": "admin", "description": "View your process definitions here", "name": "Process Definitions" },
+    { "url": "/srp/admin/users.html", "icon": "omny-icon-user", "name": "User Management", "role": "super_admin", "description": "View and manage user accounts and access" },
+    { "url": "/srp/status.html", "icon": "glyphicon-thumbs-up", "role": "admin", "name": "Status", "description": "Check on the status of the system configuration" }
+  ],
+  "partials": [
+    { "name": "sduContactExtension", "url": "/srp/2.0.0/partials/contact-extension.html"},
+    { "name": "sduAcute TrustExtension", "url": "https://api.srp.digital/partials/account-extension.html"},
+    { "name": "sduAdult Social CareExtension", "url": "https://api.srp.digital/partials/account-extension.html"},
+    { "name": "sduAmbulanceExtension", "url": "https://api.srp.digital/partials/account-extension.html"},
+    { "name": "sduClinical Commissioning GroupExtension", "url": "https://api.srp.digital/partials/account-extension.html"},
+    { "name": "sduCommunityExtension", "url": "https://api.srp.digital/partials/account-extension.html"},
+    { "name": "sduDentistExtension", "url": "https://api.srp.digital/partials/account-extension.html"},
+    { "name": "sduDept and ALBsExtension", "url": "https://api.srp.digital/partials/account-extension.html"},
+    { "name": "sduGP SurgeryExtension", "url": "https://api.srp.digital/partials/account-extension.html"},
+    { "name": "sduMental HealthExtension", "url": "https://api.srp.digital/partials/account-extension.html"},
+    { "name": "sduPublic HealthExtension", "url": "https://api.srp.digital/partials/account-extension.html"},
+    { "name": "sduSpecialistExtension", "url": "https://api.srp.digital/partials/account-extension.html"}
+  ],
+  "processes": [
+    { "name": "Add Activity To Contact", "ref": "AddActivityToContact", "url": "processes/link/omny/custmgmt/AddActivityToContact.bpmn" },
+    { "name": "Add Note To Contact", "ref": "AddNoteToContact", "url": "processes/link/omny/custmgmt/AddNoteToContact.bpmn" },
+    { "name": "Create Contact and Account", "ref": "CreateContactAndAccount", "url": "processes/link/omny/custmgmt/CreateContactAndAccount.bpmn" },
+    { "name": "Record an enquiry", "ref": "RecordEnquiry", "url": "processes/link/omny/website/RecordEnquiry.bpmn" },
+    { "name": "Register a new user", "ref": "RegisterOmnyContact", "url": "processes/link/omny/website/RegisterOmnyContact.bpmn" },
+    { "name": "Reset user's password", "ref": "ResetPassword", "url": "processes/link/omny/support/ResetPassword.bpmn" },
+    { "name": "Select enquiry response", "ref": "SelectEnquiryResponse", "url": "processes/link/omny/mail/SelectDefaultEnquiryResponse.bpmn" },
+    { "name": "Send Memo", "ref": "SendMemo", "url": "processes/link/omny/mail/SendMemo.bpmn" },
+    { "name": "Send alert", "ref": "SendAlert", "url": "processes/link/omny/alerts/SendAlertMemo.bpmn" },
+    { "name": "Update contact", "ref": "UpdateContact", "url": "processes/link/omny/custmgmt/UpdateContact.bpmn" },
+    { "name": "Record abatement plan", "ref": "RecordAbatementPlan", "url": "processes/digital/srp/macc/RecordAbatementPlan.bpmn" },
+    { "name": "Catch All", "ref": "CatchAllProcess", "url": "processes/digital/srp/support/CatchAllProcess.bpmn" }
+  ],
+  "strings": {
+    "account": "Organisation",
+    "accountCode": "Code",
+    "accountExtTitle": "Latest Summary",
+    "accountType": "Organisation Type",
+    "accountDescriptionHint": "For example, Chief Exec's name etc.",
+    "AccountManagement": "Organisations",
+    "accounts": "Organisations",
+    "accountType": "Organisation Type",
+    "contact": "Contact",
+    "contactDescription": "Summary",
+    "contactDescriptionHint": "For example, the Head's name etc.",
+    "contacts": "Contacts",
+    "phone1": "Phone",
+    "stage": "Status"
+  },
+  "templates": [
+    { "name": "WelcomeNewUser", "ref": "WelcomeNewUser" }
+  ],
+  "typeaheadControls": [
+    { "name": "accountTypes", "ref": "#curAccountType", "values": [
+        {  "id": "AcuteTrust", "name": "Acute Trust"  },
+        {  "id": "AdultSocialCare", "name": "Adult Social Care"  },
+        {  "id": "Ambulance", "name": "Ambulance"  },
+        {  "id": "CCG", "name": "Clinical Commissioning Group"  },
+        {  "id": "Community", "name": "Community"  },
+        {  "id": "Dentist", "name": "Dentist"  },
+        {  "id": "DeptAndALBs", "name": "Dept and ALBs"  },
+        {  "id": "GPSurgery", "name": "GP Surgery"  },
+        {  "id": "MentalHealth", "name": "Mental Health"  },
+        {  "id": "ProjectTeam", "name": "Project Team"  },
+        {  "id": "PublicHealth", "name": "Public Health"  },
+        {  "id": "Specialist", "name": "Specialist"  },
+        {  "id": "Supplier", "name": "Supplier"  }
+      ]
+    },{ "name": "adaptations", "ref": "#curAdaptation", "values": [
+        {  "name": "Yes"  },
+        {  "name": "No"  },
+        {  "name": "Data not available"  }
+      ]
+    },{ "name":"classifications", "ref": "#curClassification", "values": [
+        {  "name": "Buildings and Energy"  },
+        {  "name": "General"  },
+        {  "name": "Models of Care"  },
+        {  "name": "Procurement"  },
+        {  "name": "Travel"  }
+      ]
+    },{ "ref": "#curEnquiryType", "values": [
+        {  "id": "StakeholderShortList", "name": "Stakeholder Short List"  },
+        {  "id": "StakeholderLongList", "name": "Stakeholder Long List"  },
+        {  "id": "ProjectTeam", "name": "Project Team"  },
+        {  "id": "User", "name": "User"  }
+      ]
+    },{ "name": "energys", "ref": "#curEnergy", "values": [
+        {  "name": ">10% increase"  },
+        {  "name": "0-10% increase"  },
+        {  "name": "0-10% decrease"  },
+        {  "name": ">10% decrease"  },
+        {  "name": "Data not available"  }
+      ]
+    },{ "name": "healthyTPs", "ref": "#curHealthyTP", "values": [
+        {  "name": "Yes"  },
+        {  "name": "No"  },
+        {  "name": "Data not available"  }
+      ]
+    },{ "name": "media", "ref": "#curMedium", "values": [
+        {  "name": "CPC"  },
+        {  "name": "Direct"  },
+        {  "name": "Organic"  },
+        {  "name": "Referral"  }
+      ]
+    },{ "ref": "#curOwner", "values": [
+        {  "name": "derek@trakeo.com"  },
+        {  "name": "tim@trakeo.com"  }
+      ]
+    },{ "name": "nhsEnglandAreas", "ref": "#curNhsEnglandArea", "values": [
+        {  "name": "NHS England London"  },
+        {  "name": "NHS England North (Cumbria and North East)"  },
+        {  "name": "NHS England North (Cheshire and Merseyside)"  },
+        {  "name": "NHS England North (Greater Manchester)"  },
+        {  "name": "NHS England North (Lancashire)"  },
+        {  "name": "NHS England North (Yorkshire and Humber)"  },
+        {  "name": "NHS England Midlands and East (Central Midlands)"  },
+        {  "name": "NHS England Midlands and East (East)"  },
+        {  "name": "NHS England Midlands and East (North Midlands)"  },
+        {  "name": "NHS England Midlands and East (West Midlands)"  },
+        {  "name": "NHS England South (South Central)"  },
+        {  "name": "NHS England South (South East)"  },
+        {  "name": "NHS England South (South West)"  },
+        {  "name": "NHS England South (Wessex)"  }
+      ]
+    },{ "name": "onTrack34Pcts", "ref": "#curOnTrack34Pct", "values": [
+        {  "name": "1. On track to meet target"  },
+        {  "name": "2. Target included but not on track to be met"  },
+        {  "name": "3. No target included in plan"  },
+        {  "name": "4. No Sustainable Development Management Plan or Carbon reduction Plan"  }
+      ]
+    },{ "name": "pheCentres", "ref": "#curPheCentre", "values": [
+        {  "name": "East of England"  },
+        {  "name": "London"  },
+        {  "name": "North West"  },
+        {  "name": "East Midlands"  },
+        {  "name": "West Midlands"  },
+        {  "name": "South East"  },
+        {  "name": "South West"  },
+        {  "name": "Yorkshire and Humber"  }
+      ]
+    },{ "ref": "#curSector", "values": [
+        {  "name": "NHS"  },
+        {  "name": "Public Health"  },
+        {  "name": "Social Care"  }
+      ]
+    },{ "name": "regions", "ref": "#curRegion", "values": [
+        {  "name": "London"  },
+        {  "name": "Midlands and East"  },
+        {  "name": "North"  },
+        {  "name": "South"  }
+      ]
+    },{ "name": "sdmps", "ref": "#curSdmp", "values": [
+        {  "name": "Yes"  },
+        {  "name": "No"  },
+        {  "name": "Data not available"  }
+      ]
+    },{ "name": "sources", "ref": "#curSource", "values": [
+        {  "name": "Bing"  },
+        {  "name": "Google"  },
+        {  "name": "Facebook"  }
+      ]
+    },{ "name": "srScores", "ref": "#curSrScore", "values": [
+          {  "idx":0, "name": "Minimum"  },
+          {  "idx":1, "name": "Poor"  },
+          {  "idx":2, "name": "Good"  },
+          {  "idx":2, "name": "Excellent"  },
+          {  "idx":-1, "name": "Data not available"  }
+        ]
+    },{ "name": "stages", "ref": "#curStage", "values": [
+        {  "idx":0, "name": "New Lead"  },
+        {  "idx":1, "name": "Registered"  },
+        {  "idx":2, "name": "Plan Submitted"  },
+        {  "idx":-1, "name": "Cold"  }
+      ]
+    },{ "name": "status", "ref": "#curStatus", "values": [
+        {  "id": "Green", "name": "Green"  },
+        {  "id": "Amber", "name": "Amber"  },
+        {  "id": "Red", "name": "Red"  }
+      ]
+    },{ "name": "wastes", "ref": "#curWasteChange", "values": [
+        {  "name": ">97% high cost"  },
+        {  "name": "90-97% high cost"  },
+        {  "name": "75-89% high cost"  },
+        {  "name": "<=75% high cost" }
+      ]
+    },{ "name": "wasteChanges", "ref": "#curWasteChange", "values": [
+        {  "name": ">20% increase"  },
+        {  "name": "0-20% increase"  },
+        {  "name": "Data not available"  }
+      ]
+    },{ "name": "waters", "ref": "#curWater", "values": [
+        {  "name": ">20% increase"  },
+        {  "name": "0-20% increase"  },
+        {  "name": "0-20% decrease"  },
+        {  "name": ">20% decrease"  },
+        {  "name": "Data not available"  }
+      ]
+    }
+  ]
+}

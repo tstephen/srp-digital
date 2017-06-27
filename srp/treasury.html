@@ -13,43 +13,9 @@
   <section id="container" class="container"></section>
 
   <script id='template' type='text/ractive'>
-    <section id="loginSect" style="display:none">
-      <div class="col-md-offset-1 col-md-10">
-        <div id="messages" style="display:none;width:100%"></div>
-      </div>
-      <div class="col-md-offset-6 col-md-6 col-sm-12" id="loginSect">
-        <form class="form-inline" id="loginForm" name="loginForm" action="http://localhost:8083/auth/login" method="POST">
-          <fieldset>
-            <input class="form-control input-lg" type="text" id="username" name="username" placeholder="Username" required/>
-            <input class="form-control input-lg" type="password" id="password" name="password" placeholder="Password" required/>
-            <!--input type="hidden" id="_csrf" name="_csrf" value="{{csrfToken}}" />
-            <input type="hidden" id="redirect" name="redirect" value="{{context}}/index.html" /-->
-            <input type="button" id="login" on-click="login()" value="Login" class="btn btn-primary" />
-          </fieldset>
-        </form>
-      </div>
-      <div id="resetSect" class="col-md-offset-6 col-md-6 col-sm-12" style="display:none">
-        <form id="resetForm" class="form-inline" name="resetForm" action="/reset" method="POST">
-          <fieldset>
-            <input class="form-control input-lg" id="email" name="email" placeholder="Registered email address" required/>
-            <input type="hidden" id="_csrf" name="_csrf" value="{{csrfToken}}" />
-            <input type="hidden" id="redirect" name="redirect" value="index.html" />
-            <input class="btn" type="button" id="reset" on-click="reset()" value="Reset Password"/>
-          </fieldset>
-        </form>
-      </div>
-      <div class="pull-right" style="margin-right:20px">
-        <a href="#" on-click="showReset()">Forgot your password?</a>
-        <a href="http://trakeo.com/register/">Or click here to register a new account</a>
-      </div>
+    {{>loginSect}}
 
-      <section id="main">
-        <h1>Sustainability Resource Planning</h1>
-        <img src="2.0.0/images/icon/srp-icon-256x256.png"/>
-        <p>For more information see <a href="//srp.digital">srp.digital</a></p>
-      </section>
-    </section>
-
+    <section id="currentSect">
     {{#if surveyReturn}}
       <section id="introSect">
         <h1>Treasury Report for {{formatAnswer('ORG_NAME')}} ({{formatAnswer('ORG_CODE')}})</h1>
@@ -102,6 +68,7 @@
         <button on-click="fetch()">Load it now</button>
       </section>
     {{/if}}
+    </section>
   </script>
 
   <!--
@@ -112,14 +79,17 @@
   -->
   <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
   <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="https://api.srp.digital/webjars/Bootstrap-3-Typeahead/3.1.1/bootstrap3-typeahead.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.js"></script>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/ractive/0.7.3/ractive.min.js'></script>
+  <script src="https://api.srp.digital/js/md5.min.js"></script>
   <script src="2.0.0/js/string-functions-0.1.0.js"></script>
 
-  <script src="2.0.0/js/env.js"></script>
+  <script src="https://api.srp.digital/workmgmt/2.2.0/js/i18n.js"></script>
+  <script src="https://api.srp.digital/js/env.js"></script>
   <script src="2.0.0/js/base.js"></script>
   <script src="2.0.0/js/report.js"></script>
-  <script src="2.0.0/js/auth.js"></script>
+  <script src="https://api.srp.digital/webjars/auth/1.0.0/js/auth.js"></script>
 
   <script src="https://d3js.org/d3.v4.min.js"></script>
   <script src="2.0.0/js/stacked.js"></script>

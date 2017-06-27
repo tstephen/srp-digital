@@ -94,6 +94,7 @@
   <script id='template' type='text/ractive'>
     {{>loginSect}}
 
+    <section id="currentSect">
     {{#if surveyReturn}}
       <section id="introSect">
         <h1>Sustainability Report for {{formatAnswer('ORG_NAME')}} ({{formatAnswer('ORG_CODE')}})</h1>
@@ -469,26 +470,24 @@
         <button on-click="fetch()">Load it now</button>
       </section>
     {{/if}}
+    </section>
   </script>
 
-  <!--
-  <script src="/webjars/jquery/1.11.1/jquery.min.js"></script>
-  <script src="/webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-  <script src="/webjars/Bootstrap-3-Typeahead/3.1.1/bootstrap3-typeahead.js"></script>
-  <script src="/webjars/ractive/0.7.3/ractive.min.js"></script>
-  -->
   <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
   <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="https://api.srp.digital/webjars/Bootstrap-3-Typeahead/3.1.1/bootstrap3-typeahead.js"></script>  
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.js"></script>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/ractive/0.7.3/ractive.min.js'></script>
   <script src="https://d3js.org/d3.v4.min.js"></script>
 
+  <script src="https://api.srp.digital/js/md5.min.js"></script>
   <script src="2.0.0/js/string-functions-0.1.0.js"></script>
+  <script src="https://api.srp.digital/workmgmt/2.2.0/js/i18n.js"></script>
 
-  <script src="2.0.0/js/env.js"></script>
+  <script src="https://api.srp.digital/js/env.js"></script>
   <script src="2.0.0/js/base.js"></script>
   <script src="2.0.0/js/report.js"></script>
-  <script src="2.0.0/js/auth.js"></script>
+  <script src="https://api.srp.digital/webjars/auth/1.0.0/js/auth.js"></script>
 
   <script src="2.0.0/js/stacked.js"></script>
   <script src="2.0.0/js/pie.js"></script>

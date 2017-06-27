@@ -33,7 +33,7 @@ var ractive = new BaseRactive({
       else return false;
     },
     stdPartials: [
-      { "name": "loginSect", "url": "/srp/2.0.0/partials/login-sect.html"}
+      { "name": "loginSect", "url": $env.server+"/webjars/auth/1.0.0/partials/login-sect.html"}
     ],
   },
   enter: function () {

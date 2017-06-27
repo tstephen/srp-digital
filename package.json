@@ -1,0 +1,30 @@
+{
+  "name": "srp-digital",
+  "version": "2.0.0",
+  "description": "Sustainable Resource Planning",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tstephen/srp-digital.git"
+  },
+  "author": "Tim Stephenson",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/tstephen/srp-digital/issues"
+  },
+  "homepage": "https://github.com/tstephen/srp-digital#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^4.0.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-jshint": "^2.0.4",
+    "gulp-less": "^3.3.2",
+    "gulp-minify-css": "^1.2.4",
+    "gulp-replace": "^0.6.1",
+    "gulp-uglify": "^3.0.0",
+    "jshint": "^2.9.5"
+  }
+}

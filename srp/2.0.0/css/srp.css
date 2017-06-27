@@ -1,10 +1,8 @@
-@import url('omny-1.0.0.css');
-
 /* FONTS */
 @import url('//fonts.googleapis.com/css?family=Roboto:400italic,400,700');
 @import url('//fonts.googleapis.com/css?family=Ubuntu:400italic,400,700');
 
-@import url('icon-font/style.css');
+@import url('/srp/2.0.0/css/icon-font/style.css');
 /* END FONTS */
 
 /*
@@ -72,6 +70,10 @@ small {
   padding-left: 20px !imp ortant;
   font-style: italic;
 }
+.btn.importEric {
+  font-family: Arial, sans-serif;
+
+}
 .navbar-brand {
 	padding-top: 0;
 	position: relative;
@@ -110,6 +112,7 @@ th {
 }
 .navbar-brand img {
   height: 80px;
+  margin-top: 10px;
 }
 .scorecardicon {
 	font-size: 3em;
@@ -163,6 +166,10 @@ h2 a.glyphicon:hover {
 .form.create-form {
   padding-bottom: 2px;
 }
+.navbar-sticky {
+  position:fixed;
+  top: 0;
+}
 .navbar-sticky .profile {
 	top: -32px;
 }
@@ -187,7 +194,6 @@ h2 a.glyphicon:hover {
 }
 .omny-burger {
   margin: 4px 5px;
-  z-index: 1000;
 }
 .tr-large-icon {
   font-size: 96px;

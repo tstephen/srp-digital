@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang='en-GB'>
+<head>
+  <meta http-equiv="x-ua-compatible" content="IE=Edge"/>
+  <!-- as the **very** first line just after head-->
+  <meta charset='utf-8'>
+  <title>SRP</title>
+  <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+
+  <link href="2.0.0/css/srp.css" rel="stylesheet">
+  <link rel="icon" type="image/png" href="2.0.0/images/icon/srp-icon-32x32.png" />
+</head>
+<body>
+  <div class="clearfix" id="messages"></div>
+  <div class="container" id="container"></div>
+
+  <script id='template' type='text/ractive'>
+    {{>profileArea}}
+    {{>sidebar { active: 'index.html' }}}
+    {{>titleArea}}
+    {{>loginSect}}
+
+    <section>
+      <p>&nbsp;</p>
+      <h2>Welcome!</h2>
+      <p>Let&apos;s get started right away by introducing the toolbar icons:</p>
+      <ul style="list-style:none;">
+        {{#tenant.toolbar}}
+          {{#if matchRole(role) }}
+            <li>
+              <a href="{{context}}{{url}}">
+                <span class="glyphicon {{role}} {{icon}}" style="display:inline-block" title="{{title}}"></span>
+                <span>{{title}}</span>
+              </a>
+              <span>{{description}}</span>
+            </li>
+          {{/if}}
+        {{/}}
+      </ul>
+    </section>
+  </script>
+
+  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ractive/0.7.3/ractive.min.js"></script>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+
+  <script src="2.0.0/js/string-functions-0.1.0.js"></script>
+
+  <script src="2.0.0/js/env.js"></script>
+  <script src="2.0.0/js/base.js"></script>
+  <script src="2.0.0/js/index.js"></script>
+  <script src="2.0.0/js/auth.js"></script>
+  <script src="2.0.0/js/md5.min.js"></script>
+
+</body>
+</html>

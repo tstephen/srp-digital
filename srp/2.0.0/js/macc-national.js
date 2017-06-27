@@ -89,7 +89,6 @@ var ractive = new BaseRactive({
       else return 'hidden';
     },
     stdPartials: [
-      { "name": "loginSect", "url": "../2.0.0/partials/login-sect.html"},
       { "name": "maccIntroSect", "url": "../2.0.0/partials/macc-intro-sect.html"},
       { "name": "maccOptionsSect", "url": "../2.0.0/partials/macc-options-sect.html"},
       { "name": "maccDisplaySect", "url": "../2.0.0/partials/macc-display-sect.html"},

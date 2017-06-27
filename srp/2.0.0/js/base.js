@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-var CSRF_COOKIE = 'XSRF-TOKEN';
 var EASING_DURATION = 500;
 fadeOutMessages = true;
 var newLineRegEx = /\n/g;
@@ -34,9 +33,13 @@ var BaseRactive = Ractive.extend({
   addDataList: function(d, data) {
     $('datalist#'+d.name).remove();
     $('body').append('<datalist id="'+d.name+'">');
-    $.each(data, function (i,e) {
-      $('datalist#'+d.name).append('<option value="'+e.name+'">'+e.name+'</option>');
-    });
+    if (data == null) {
+      console.error('No data for datalist: '+d.name+', please fix configuration');
+    } else {
+      $.each(data, function (i,e) {
+        $('datalist#'+d.name).append('<option value="'+e.name+'">'+e.name+'</option>');
+      });
+    }
   },
   applyAccessControl: function() {
     console.info('applyAccessControl');
@@ -50,7 +53,7 @@ var BaseRactive = Ractive.extend({
     if (ractive.get('tenant')==undefined) return ;
     var tenant = ractive.get('tenant.id');
     if (tenant != undefined) {
-      $('head').append('<link href="/css/'+tenant+'-1.0.0.css" rel="stylesheet">');
+      $('head').append('<link href="'+ractive.getServer()+'/css/'+tenant+'-1.0.0.css" rel="stylesheet">');
       if (ractive.get('tenant.theme.logoUrl')!=undefined) {
         $('.navbar-brand').empty().append('<img src="'+ractive.get('tenant.theme.logoUrl')+'" alt="logo"/>');
       }
@@ -58,7 +61,7 @@ var BaseRactive = Ractive.extend({
           $('link[rel="icon"]').attr('href',ractive.get('tenant.theme.iconUrl'));
       }
       // ajax loader
-      $('body').append('<div id="ajax-loader"><span>Loading</span></div>');
+      if ($('#ajax-loader').length==0) $('body').append('<div id="ajax-loader"><img class="ajax-loader" src="'+ractive.getServer()+'/images/ajax-loader.gif" style="width:10%" alt="Loading..."/></div>');
       $( document ).ajaxStart(function() {
         $( "#ajax-loader" ).show();
       });
@@ -156,6 +159,7 @@ var BaseRactive = Ractive.extend({
     return ractive.get('server')==undefined ? '' : ractive.get('server');
   },
   hash: function(email) {
+    if (email==undefined) return;
     return hex_md5(email.trim().toLowerCase());
   },
   hasRole: function(role) {
@@ -266,7 +270,9 @@ var BaseRactive = Ractive.extend({
 
     if ($(".tag-ctrl").is(":ui-tagit")) $(".tag-ctrl").tagit('destroy');
     $(".tag-ctrl").tagit({
+      allowSpaces: true,
       placeholderText: "Comma separated tags",
+      showAutocompleteOnFocus: true,
       afterTagAdded: function(event, ui) {
         ractive.set($(event.target).data('bind'),$(event.target).val());
       },
@@ -284,93 +290,23 @@ var BaseRactive = Ractive.extend({
           try {
             ractive.resetPartial(name,response);
           } catch (e) {
-            console.error('Unable to reset partial '+name+': '+e);
+            console.warn('Unable to reset partial '+name+': '+e);
           }
         }
       });
     },
   loadStandardPartials: function(stdPartials) {
     console.info('loadStandardPartials');
+    if (ractive == undefined || stdPartials == undefined) return;
     $.each(stdPartials, function(i,d) {
-      //console.log('loading...: '+d.name)
-      $.get(d.url, function(response){
-        //console.log('... loaded: '+d.name)
-        //console.log('response: '+response)
-        if (ractive != undefined) {
-          try {
-            ractive.resetPartial(d.name,response);
-          } catch (e) {
-            console.error('Unable to reset partial '+d.name+': '+e);
-          }
-        }
-      });
+      ractive.loadStandardPartial(d.name, d.url);
     });
-  },
-  login: function() {
-    console.info('login');
-    if (!document.forms['loginForm'].checkValidity()) {
-      ractive.showMessage('Please provide both username and password');
-      return false;
-    }
-    $('#username').val($('#username').val().toLowerCase());
-    //localStorage['username'] = $('#username').val();
-    //localStorage['password'] = $('#password').val();
-    //document.forms['loginForm'].submit();
-    $.ajax({
-      url: document.forms['loginForm'].action,
-      type: 'POST',
-      data: JSON.stringify({ username: $('#username').val(), password: $('#password').val() }),
-      headers: {
-        "X-Requested-With": "XMLHttpRequest",
-        "Content-Type": "application/json",
-        "Cache-Control": "no-cache"
-      },
-      success: function(data) {
-        localStorage['token'] = data.token;
-        localStorage['refreshToken'] = data.refreshToken;
-        ractive.hideLogin();
-      }
-    });
-  },
-  logout: function() {
-    delete localStorage['username'];
-    delete localStorage['password'];
-    document.cookie = this.CSRF_COOKIE+'=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-    // IE returns collection; Chrome and others the first
-    if (document.forms['logoutForm']==undefined) document.location.href == ractive.getServer()+'/login';
-    else if (document.forms['logoutForm'].length>1) document.forms['logoutForm'][0].submit();
-    else document.forms['logoutForm'].submit();
   },
   parseDate: function(timeString) {
     var d = new Date(timeString);
     // IE strikes again
     if (d == 'Invalid Date') d = parseDateIEPolyFill(timeString);
     return d;
-  },
-  refreshToken: function(settings) {
-    console.info('refreshToken');
-    $.ajax({
-      dataType: "json",
-      url: ractive.getServer()+'/auth/token',
-      crossDomain: true,
-      headers: {
-        "X-Requested-With": "XMLHttpRequest",
-        "X-Authorization": "Bearer "+localStorage['refreshToken'],
-        "Cache-Control": "no-cache"
-      },
-      success: function( data ) {
-        ractive.set('saveObserver', false);
-        localStorage['token'] = data.token;
-        // update token and retry
-        settings.headers['X-Authorization'] = 'Bearer '+data.token;
-        $.ajax(settings);
-        ractive.hideLogin();
-        ractive.set('saveObserver', true);
-      },
-      error: function() {
-        ractive.showLogin();
-      }
-    });
   },
   rewrite: function(id) {
     console.info('rewrite:'+id);
@@ -473,6 +409,17 @@ var BaseRactive = Ractive.extend({
     }, EASING_DURATION*10);
     else $('#messages, .messages').append('<span class="text-danger pull-right glyphicon glyphicon-remove" onclick="ractive.hideMessage()"></span>');
   },
+  showReconnected: function() {
+    console.log('showReconnected');
+    $( "#ajax-loader" ).hide();
+    if ($('#connectivityMessages:visible').length>0) {
+      $('#connectivityMessages').remove();
+      $('body').append('<div id="connectivityMessages" class="alert-info">Reconnected</div>').show();
+      setTimeout(function() {
+        $('#connectivityMessages').fadeOut();
+      }, EASING_DURATION*10);
+    }
+  },
   showUpload: function () {
     console.log('showUpload...');
     $('#upload').slideDown();
@@ -501,7 +448,7 @@ var BaseRactive = Ractive.extend({
     console.log('switchToTenant: '+tenant);
     $.ajax({
       method: 'PUT',
-      url: ractive.getServer()+"/admin/tenant/"+ractive.get('username')+'/'+tenant,
+      url: ractive.getServer()+"/admin/tenant/"+$auth.getClaim('sub')+'/'+tenant,
       success: function() {
         window.location.reload();
       }
@@ -571,49 +518,6 @@ var BaseRactive = Ractive.extend({
   }
 });
 
-$( document ).ajaxError(function( event, request, settings ) {
-  switch (request.status) {
-  case 0:
-    // server unavailable, retry
-    if (settings['retryIn']==undefined) settings.retryIn = 4000;
-    else settings.retryIn = settings.retryIn * 2;
-    var msg = 'Unable to connect, retrying in '+(settings.retryIn/1000)+' secs ...';
-    ractive.showDisconnected(msg);
-    setTimeout(function() {
-      $.ajax(settings);
-    }, settings.retryIn);
-    break;
-  case 200:
-    break;
-  case 400:
-    var msg = request.responseJSON == null ? textStatus+': '+errorThrown : errorThrown+': '+request.responseJSON.message;
-    ractive.showError(msg);
-    break;
-  case 401:
-  case 403:
-  case 405: /* Could also be a bug but in production we'll assume a timeout */
-    if (settings.url.indexOf('token')==-1 && localStorage['refreshToken']!=undefined) {
-      ractive.refreshToken(settings);
-    } else {
-      ractive.showLogin();
-    }
-    break;
-  case 404:
-    var path ='';
-    if (request.responseJSON != undefined) {
-      path = " '"+request.responseJSON.path+"'";
-    }
-    var msg = "That's odd, we can't find the page"+path+". Please let us know about this message";
-    console.error('msg:'+msg);
-    ractive.showError(msg);
-    break;
-  default:
-    var msg = "Bother! Something has gone wrong (code "+request.status+"): "+textStatus+':'+errorThrown;
-    console.error('msg:'+msg);
-    $( "#ajax-loader" ).hide();
-    ractive.showError(msg);
-  }
-});
 //$( document ).ajaxSuccess(function( event, request, settings ) {
 //  if (settings['retryIn']!=undefined) ractive.showReconnected();
 //});
@@ -631,6 +535,7 @@ $( document ).bind('keypress', function(e) {
 });
 
 $(document).ready(function() {
+  ractive.set('saveObserver', false);
   // are we running in sub-context? TODO no longer required?
   if (document.location.href.indexOf('https://trakeo.com/srp')!=-1) {
     ractive.set('server','https://trakeo.com/srp');
@@ -646,7 +551,48 @@ $(document).ready(function() {
       ga('send', 'pageview');
     })();
   }
+
   ractive.loadStandardPartials(ractive.get('stdPartials'));
+
+  $( document ).ajaxComplete(function( event, jqXHR, ajaxOptions ) {
+    if (jqXHR.status > 0) ractive.showReconnected();
+  });
+
+  ractive.observe('tenant', function(newValue, oldValue, keypath) {
+    console.log('tenant changed');
+    if ((oldValue == undefined || oldValue.id == '') && newValue != undefined && newValue.id != '' && ractive['fetch'] != undefined) {
+      ractive.fetch();
+    }
+  });
+
+  ractive.on( 'sort', function ( event, column ) {
+    console.info('sort on '+column);
+    // if already sorted by this column reverse order
+    if (this.get('sortColumn')==column) this.set('sortAsc', !this.get('sortAsc'));
+    this.set( 'sortColumn', column );
+  });
+
+  ractive.observe('title', function(newValue, oldValue, keypath) {
+    console.log('title changing from '+oldValue+' to '+newValue);
+    if (newValue!=undefined && newValue!='') {
+      $('title').empty().append(newValue);
+    }
+  });
+
+  ractive.observe('searchTerm', function(newValue, oldValue, keypath) {
+    console.log('searchTerm changed');
+    if (typeof ractive['showResults'] == 'function') ractive.showResults();
+    setTimeout(ractive.showSearchMatched, 1000);
+  });
+
+  var params = getSearchParameters();
+  if (params['searchTerm']!=undefined) {
+    ractive.set('searchTerm',decodeURIComponent(params['searchTerm']));
+  } else if (params['q']!=undefined) {
+    ractive.set('searchTerm',decodeURIComponent(params['q']));
+  }
+  var i18n = new I18nController($env.server+'/workmgmt/2.2.0');
+  ractive.set('saveObserver', true);
 });
 
 // TODO remove the redundancy of having this in base Ractive and here
