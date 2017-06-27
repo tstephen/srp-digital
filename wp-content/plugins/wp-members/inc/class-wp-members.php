@@ -311,12 +311,13 @@ class WP_Members {
 		add_action( 'wp_print_styles',       'wpmem_enqueue_style' );      // load the stylesheet if using the new forms
 
 		// Add filters.
-		add_filter( 'the_content',           array( $this, 'do_securify' ), 99 );
-		add_filter( 'allow_password_reset',  'wpmem_no_reset' );                 // no password reset for non-activated users
-		add_filter( 'register_form',         'wpmem_wp_register_form' );         // adds fields to the default wp registration
-		add_filter( 'registration_errors',   'wpmem_wp_reg_validate', 10, 3 );   // native registration validation
-		add_filter( 'comments_open',         'wpmem_securify_comments', 99 );    // securifies the comments
-		add_filter( 'wpmem_securify',        'wpmem_reg_securify' );             // adds success message on login form if redirected
+		add_filter( 'the_content',               array( $this, 'do_securify' ), 99 );
+		add_filter( 'allow_password_reset',      'wpmem_no_reset' );                 // no password reset for non-activated users
+		add_filter( 'register_form',             'wpmem_wp_register_form' );         // adds fields to the default wp registration
+		add_action( 'woocommerce_register_form', 'wpmem_woo_register_form' );
+		add_filter( 'registration_errors',       'wpmem_wp_reg_validate', 10, 3 );   // native registration validation
+		add_filter( 'comments_open',             'wpmem_securify_comments', 99 );    // securifies the comments
+		add_filter( 'wpmem_securify',            'wpmem_reg_securify' );             // adds success message on login form if redirected
 		
 		// If registration is moderated, check for activation (blocks backend login by non-activated users).
 		if ( $this->mod_reg == 1 ) { 
@@ -425,10 +426,12 @@ class WP_Members {
 		require_once( WPMEM_PATH . 'inc/core.php' );
 		require_once( WPMEM_PATH . 'inc/api.php' );
 		require_once( WPMEM_PATH . 'inc/utilities.php' );
+		require_once( WPMEM_PATH . 'inc/forms.php' );
 		require_once( WPMEM_PATH . 'inc/dialogs.php' );
 		require_once( WPMEM_PATH . 'inc/sidebar.php' );
 		require_once( WPMEM_PATH . 'inc/shortcodes.php' );
 		require_once( WPMEM_PATH . 'inc/email.php' );
+		require_once( WPMEM_PATH . 'inc/users.php' );
 		require_once( WPMEM_PATH . 'inc/deprecated.php' );
 	}
 
@@ -510,23 +513,23 @@ class WP_Members {
 		switch ( $action ) {
 
 			case 'login':
-				$regchk = wpmem_login();
+				$regchk = $this->user->login();
 				break;
 
 			case 'logout':
-				$regchk = wpmem_logout();
+				$regchk = $this->user->logout();
 				break;
 			
 			case 'pwdchange':
-				$regchk = wpmem_change_password();
+				$regchk = $this->user->password_update( 'change' );
  				break;
 			
 			case 'pwdreset':
-				$regchk = wpmem_reset_password();
+				$regchk = $this->user->password_update( 'reset' );
 				break;
 			
 			case 'getusername':
-				$regchk = wpmem_retrieve_username();
+				$regchk = $this->user->retrieve_username();
 				break;
 			
 			case 'register':

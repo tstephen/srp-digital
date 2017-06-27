@@ -67,27 +67,44 @@ class WP_Members_Admin_API {
 	 * @since 3.1.7 Loads all admin dependent files.
 	 */
 	function load_dependencies() {
-		if ( is_multisite() && current_user_can( 'edit_theme_options' ) ) {
+		
+		// Default permissions for loading admin dependencies.
+		$defaults = array( 
+			'main'    => 'edit_theme_options',
+			'users'   => 'list_users',
+			'options' => 'manage_options',
+			'posts'   => 'edit_posts',
+		);
+		/**
+		 * Filter permission defaults.
+		 *
+		 * @since 3.1.8
+		 *
+		 * @param  array $defaults
+		 *
+		 * @todo Still needs final evaluation.
+		 */
+		$permissions = apply_filters( 'wpmem_load_admin_permissions', $defaults );
+		
+		if ( current_user_can( $permissions['main'] ) ) {
 			require_once(  WPMEM_PATH . 'admin/admin.php' );
 		}
-		if ( current_user_can( 'edit_users' ) ) { 
-			require_once( WPMEM_PATH . 'admin/admin.php' );
+		if ( current_user_can( $permissions['users'] ) ) { 
+			require_once( WPMEM_PATH . 'admin/users.php' );
 			require_once( WPMEM_PATH . 'admin/user-profile.php' );
 		}
-		if ( current_user_can( 'manage_options' ) ) {
+		if ( current_user_can( $permissions['options'] ) ) {
 			require_once( WPMEM_PATH . 'admin/tab-options.php' );
 			require_once( WPMEM_PATH . 'admin/tab-fields.php' );
 			require_once( WPMEM_PATH . 'admin/tab-emails.php' );
 			require_once( WPMEM_PATH . 'admin/tab-captcha.php' );
 			require_once( WPMEM_PATH . 'admin/tab-about.php' );
+			require_once( WPMEM_PATH . 'admin/tab-dialogs.php' );
 			require_once( WPMEM_PATH . 'admin/dialogs.php' );
 		}
-		if ( current_user_can( 'edit_posts' ) ) {
+		if ( current_user_can( $permissions['posts'] ) ) {
 			require_once( WPMEM_PATH . 'admin/post.php' );
 		}
-		require_once( WPMEM_PATH . 'admin/tab-dialogs.php' );
-		require_once( WPMEM_PATH . 'inc/users.php' );
-		require_once( WPMEM_PATH . 'admin/users.php' );
 		require_once( WPMEM_PATH . 'admin/includes/api.php' );
 		include_once( WPMEM_PATH . 'inc/wp-registration.php' );
 	}
@@ -109,12 +126,14 @@ class WP_Members_Admin_API {
 		add_action( 'wpmem_admin_do_tab',            'wpmem_a_about_tab', 999, 1 );
 		
 		// If user has a role that cannot edit users, set profile actions for non-admins.
-		if ( ! current_user_can( 'edit_users' ) ) { 	
+		if ( ! current_user_can( 'edit_users' ) ) {
 			// User actions and filters.
+			add_action( 'user_edit_form_tag',         'wpmem_user_profile_multipart' );
 			add_action( 'show_user_profile',          'wpmem_user_profile'   );
 			add_action( 'edit_user_profile',          'wpmem_user_profile'   );
 			add_action( 'profile_update',             'wpmem_profile_update' );
 		} else {
+			add_action( 'user_edit_form_tag',         'wpmem_user_profile_multipart' );
 			add_action( 'show_user_profile',          'wpmem_admin_fields' );
 			add_action( 'edit_user_profile',          'wpmem_admin_fields' );
 			add_action( 'profile_update',             'wpmem_admin_update' );
@@ -460,6 +479,33 @@ class WP_Members_Admin_API {
 		//	$wpmem->fields[ $field[2] ] = $field;
 		//}
 		$this->current_form_fields = wpmem_fields();
+	}
+	
+	/**
+	 * Build admin panel form action url.
+	 *
+	 * @since 3.1.8
+	 *
+	 * @global string $pagenow
+ 	 * @global string $plugin_page
+ 	 * @global object $wpmem         The WP_Members Object.
+	 * @param  mixed  $args          Array of additional arguments|boolean. Default: false.
+	 * @return string $url
+	 */
+	function form_post_url( $args = false ) {
+		global $pagenow, $plugin_page, $wpmem;
+		$tab = wpmem_get( 'tab', false, 'get' );
+		$params = array( 'page' => $plugin_page );
+		if ( $tab ) {
+			$params['tab'] = $tab;
+		}
+		if ( $args ) {
+			foreach( $args as $key => $val ) {
+				$params[ $key ] = $val;
+			}
+		}
+		$url = add_query_arg( $params, admin_url( $pagenow ) );
+		return $url;
 	}
 	
 } // End of WP_Members_Admin_API class.

@@ -97,6 +97,8 @@ see http://rocketgeek.com/tips-and-tricks/load-a-custom-stylesheet/
 #wpmem_reg input[type="password"],
 #wpmem_reg input[type="email"],
 #wpmem_reg input[type="url"],
+#wpmem_reg input[type="number"],
+#wpmem_reg input[type="date"],
 #wpmem_reg textarea,
 #wpmem_login input[type="text"],
 #wpmem_login input[type="password"] {
@@ -148,6 +150,7 @@ see http://rocketgeek.com/tips-and-tricks/load-a-custom-stylesheet/
 	line-height: 1;
 	font-weight: 700;
 	margin-bottom: 10px;
+	width: 100%;
 }
 #wpmem_reg .form, 
 #wpmem_login .form {
@@ -173,7 +176,9 @@ see http://rocketgeek.com/tips-and-tricks/load-a-custom-stylesheet/
 #wpmem_reg .div_radio,
 #wpmem_reg .div_image,
 #wpmem_reg .div_file,
-#wpmem_reg .div_url { 
+#wpmem_reg .div_url,
+#wpmem_reg .div_number,
+#wpmem_reg .div_date { 
 	width:74%;
 	margin:0 0 14px 0;
 }

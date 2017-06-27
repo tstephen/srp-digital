@@ -4,7 +4,7 @@ Contributors: PressLabs
 Donate link: https://www.presslabs.com/gitium/
 Tags: git, version, versioning, deployment, version-control, github, bitbucket, travis, code, revision, testing, development, branch, production, staging, debug, plugin, gitium, presslabs, simple
 Requires at least: 3.9
-Tested up to: 4.6
+Tested up to: 4.8
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -43,7 +43,7 @@ Alternatively, go into your WordPress dashboard and click on Plugins -> Add Plug
 
 = Usage =
 
-Activate the plugin and follow the on-screen instructions under the `Code` menu.
+Activate the plugin and follow the on-screen instructions under the `Gitium` menu.
 
 _IMPORTANT_: Gitium does its best not to version your WordPress core, neither your `/wp-content/uploads` folder.
 
@@ -65,7 +65,7 @@ The behavior in case of conflicts is to overwrite the changes on the `origin` re
 
 = How to deploy automatically after a push? =
 
-You can ping the webhook url after a push to automatically deploy the new code. The webhook url can be found under `Code` menu. This url also plays well with Github or Bitbucket webhooks.
+You can ping the webhook url after a push to automatically deploy the new code. The webhook url can be found under `Gitium` menu, `Settings` section. This url also plays well with Github or Bitbucket webhooks.
 
 = Does it works on multi site setups? =
 
@@ -77,6 +77,11 @@ Submodules are currently not supported.
 
 
 == Changelog ==
+= 1.0-rc10 =
+* Bumped wordpress tested version
+
+= 1.0-rc9 =
+* PHP7 compat and wp-cli
 
 = 1.0-rc8 =
 * Fix some indents

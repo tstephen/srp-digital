@@ -1,6 +1,7 @@
 <?php
 class Elm_Plugin {
 	const MB_IN_BYTES = 1048576; //= 1024 * 1024
+	const MAX_NOTIFICATION_EMAIL_ADDRESSES = 30;
 
 	/**
 	 * @var scbOptions $settings Plugin settings.
@@ -23,10 +24,12 @@ class Elm_Plugin {
 			array(
 				'widget_line_count' => 20,
 				'strip_wordpress_path' => false,
-				'send_errors_to_email' => '',
+				'send_errors_to_email' => array(),
 				'email_line_count' => 100,
 				'email_interval' => 3600, //seconds
 				'email_last_line_timestamp' => 0,
+				'last_sent_email_timestamp' => 0,
+
 				'timestamp_format' => 'M d, H:i:s',
 				'sort_order' => 'chronological',
 				'extra_filter_line_count' => 1000,
@@ -80,7 +83,8 @@ class Elm_Plugin {
 	 * @param scbOptions $newSettings
 	 */
 	public function updateEmailSchedule($newSettings) {
-		if ( $newSettings->get('send_errors_to_email') == '' ) {
+		$emails = $newSettings->get('send_errors_to_email');
+		if ( empty($emails) ) {
 			$this->emailCronJob->unschedule();
 		} else {
 			$this->emailCronJob->reschedule(array('interval' => $newSettings->get('email_interval')));
@@ -94,7 +98,8 @@ class Elm_Plugin {
 	}
 
 	public function emailErrors() {
-		if ( $this->settings->get('send_errors_to_email') == '' ) {
+		$emails = $this->settings->get('send_errors_to_email');
+		if ( empty($emails) ) {
 			//Can't send errors to email if no email address is specified.
 			return;
 		}
@@ -108,6 +113,16 @@ class Elm_Plugin {
 		$log = Elm_PhpErrorLog::autodetect();
 		if ( is_wp_error($log) ) {
 			trigger_error('Error log not detected', E_USER_WARNING);
+			$lock->release();
+			return;
+		}
+
+		//Make sure emails are sent no more than once every email_interval seconds.
+		$timeSinceLastEmail = time() - $this->settings->get('last_sent_email_timestamp');
+		$desiredInterval = $this->settings->get('email_interval');
+		//Some deviation is acceptable since WP cron is not very precise.
+		$acceptableDeviation = min(120, intval($desiredInterval * 0.1));
+		if ( $timeSinceLastEmail < ($desiredInterval - $acceptableDeviation) ) {
 			$lock->release();
 			return;
 		}
@@ -180,6 +195,7 @@ class Elm_Plugin {
 
 			if ( wp_mail($this->settings->get('send_errors_to_email'), $subject, $body) ) {
 				$this->settings->set('email_last_line_timestamp', $lastEntryTimestamp);
+				$this->settings->set('last_sent_email_timestamp', time());
 			} else{
 				trigger_error('Failed to send an email, wp_mail() returned FALSE', E_USER_WARNING);
 			}

@@ -2,8 +2,8 @@
 Contributors: whiteshadow
 Tags: dashboard widget, administration, error reporting, admin, maintenance, php
 Requires at least: 4.5
-Tested up to: 4.8-alpha
-Stable tag: 1.5.2
+Tested up to: 4.9-alpha
+Stable tag: 1.5.4
 
 Adds a Dashboard widget that displays the latest messages from your PHP error log. It can also send logged errors to email.
 
@@ -46,8 +46,16 @@ Follow these steps to install the plugin on your site:
 
 == Changelog ==
 
+= 1.5.4 =
+* Fixed the error "can't use method return value in write context". It was a compatibility issue that only affected PHP versions below 5.5.
+
+= 1.5.3 =
+* You can send email notifications to multiple addresses. Just enter a comma-separated list of emails.
+* Made sure that email notifications are sent no more often than the configured frequency even when WordPress is unreliable and triggers cron events too frequently.
+* Tested up to WP 4.9-alpha-40871.
+
 = 1.5.2 =
-* Fix a fatal error caused by a missing directory. Apparently, SVN externals don't work properly in the wordpress.org plugin repository.
+* Fixed a fatal error caused by a missing directory. Apparently, SVN externals don't work properly in the wordpress.org plugin repository.
 
 = 1.5.1 =
 * Added an option to ignore specific error messages. Ignored messages don't show up in the dashboard widget and don't generate email notifications, but they stay in the log file.

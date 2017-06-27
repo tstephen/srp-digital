@@ -253,6 +253,7 @@ class Elm_DashboardWidget {
 		echo '</ul>';
 	}
 
+	/** @noinspection PhpUnusedPrivateMethodInspection Unfinished feature. */
 	private function displaySummary() {
 		//TODO: Finish summary generation.
 		$summary = $this->plugin->getSummary(new Elm_PhpErrorLog('C:\xampp\htdocs\cbtool\blog\wp-content\adminmenueditor_com.php.error.log'));
@@ -326,7 +327,9 @@ class Elm_DashboardWidget {
 			}
 
 			$this->settings->set('strip_wordpress_path', isset($formInputs['strip_wordpress_path']));
-			$this->settings->set('send_errors_to_email', trim(strval($formInputs['send_errors_to_email'])));
+
+			$emails = $this->parseNotificationEmailList(strval($formInputs['send_errors_to_email']));
+			$this->settings->set('send_errors_to_email', $emails);
 
 			$this->settings->set('email_interval', intval($formInputs['email_interval']));
 			if ( $this->settings->get('email_interval') <= 60 ) {
@@ -437,14 +440,25 @@ class Elm_DashboardWidget {
 			_x('Notifications', 'configuration section heading', 'error-log-monitor')
 		);
 
+		$emails = $this->settings->get('send_errors_to_email');
+		if ( !is_array($emails) ) {
+			$emails = $this->parseNotificationEmailList($emails);
+		}
 		printf(
 			'<p>
 				<label for="%1$s-send_errors_to_email">%2$s</label>
-				<input type="text" class="widefat" name="%1$s[send_errors_to_email]" id="%1$s-send_errors_to_email" value="%3$s">
+				<input type="text" class="widefat" name="%1$s[send_errors_to_email]" id="%1$s-send_errors_to_email" 
+				       value="%3$s"
+				       title="%4$s">
 			</p>',
 			esc_attr($this->widgetId),
 			__('Periodically email logged errors to:', 'error-log-monitor'),
-			$this->settings->get('send_errors_to_email')
+			implode(', ', $emails),
+			_x(
+				'You can enter multiple emails by separating them with a comma.',
+				'tooltip for the email field',
+				'error-log-monitor'
+			)
 		);
 
 		printf(
@@ -568,6 +582,29 @@ class Elm_DashboardWidget {
 			echo '</table>';
 		}
 
+	}
+
+	/**
+	 * Parse and validate a comma-separated list of notification email addresses.
+	 *
+	 * @param string $commaSeparatedList
+	 * @return string[]
+	 */
+	private function parseNotificationEmailList($commaSeparatedList) {
+		$emails = array_map('trim', explode(',', $commaSeparatedList));
+		$emails = array_filter($emails, array($this, 'looksLikeAnEmail'));
+		$emails = array_slice($emails, 0, Elm_Plugin::MAX_NOTIFICATION_EMAIL_ADDRESSES);
+		return $emails;
+	}
+
+	/**
+	 * Extremely basic email validation.
+	 *
+	 * @param string $text
+	 * @return bool
+	 */
+	private function looksLikeAnEmail($text) {
+		return is_string($text) && (strlen($text) >= 3) && (strpos($text, '@') !== false);
 	}
 
 	private function printSeverityFilterOptions($fieldNamePrefix, $selectedOptions) {

@@ -213,13 +213,14 @@ endif;
  * Add registration fields to the native WP registration.
  *
  * @since 2.8.3
+ * @since 3.1.8 Added $process argument.
  */
-function wpmem_wp_register_form() {
+function wpmem_wp_register_form( $process = 'wp' ) {
 	/**
 	 * Load native WP registration functions.
 	 */
 	require_once( WPMEM_PATH . 'inc/wp-registration.php' );
-	wpmem_do_wp_register_form();
+	wpmem_do_wp_register_form( $process );
 }
 
 
@@ -372,37 +373,15 @@ function wpmem_securify_comments_array( $comments , $post_id ) {
  *
  * @since 3.0.8
  * @since 3.1.6 Dependencies now loaded by object.
+ * @since 3.1.8 Now a wrapper for $wpmem->retrieve_username() in WP_Members_Users Class.
+ *
+ * @global object $wpmem The WP-Members object class.
  *
  * @return string $regchk The regchk value.
  */
 function wpmem_retrieve_username() {
-	
-	if ( isset( $_POST['formsubmit'] ) ) {
-		
-		$email = sanitize_email( $_POST['user_email'] );
-		$user  = ( isset( $_POST['user_email'] ) ) ? get_user_by( 'email', $email ) : false;
-	
-		if ( $user ) {
-			
-			// Send it in an email.
-			wpmem_inc_regemail( $user->ID, '', 4 );
-	
-			/**
-			 * Fires after retrieving username.
-			 *
-			 * @since 3.0.8
-			 *
-			 * @param int $user_ID The user's numeric ID.
-			 */
-			do_action( 'wpmem_get_username', $user->ID );
-
-			return 'usernamesuccess';
-			
-		} else {
-			return 'usernamefailed';
-		}
-	}
-	return;
+	global $wpmem;
+	return $wpmem->user->retrieve_username();
 }
 
 

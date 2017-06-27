@@ -66,6 +66,7 @@ class WP_Members_Forms {
 		case "url":
 		case "email":
 		case "number":
+		case "date":
 			$class = ( 'textbox' == $class ) ? "textbox" : $class;
 			switch ( $type ) {
 				case 'url':
@@ -74,8 +75,8 @@ class WP_Members_Forms {
 				case 'email':
 					$value = esc_attr( wp_unslash( $value ) );
 					break;
-				case 'number':
-					$value = $value;
+				//case 'number':
+					//$value = esc_attr( $value );
 				default:
 					$value = stripslashes( esc_attr( $value ) );
 					break;
@@ -84,8 +85,8 @@ class WP_Members_Forms {
 			$placeholder = ( $placeholder ) ? ' placeholder="' . $placeholder . '"' : '';
 			$pattern     = ( $pattern     ) ? ' pattern="' . $pattern . '"' : '';
 			$title       = ( $title       ) ? ' title="' . $title . '"' : '';
-			$min         = ( isset( $args['min'] ) ) ? ' min="' . $args['min'] . '"' : '';
-			$max         = ( isset( $args['max'] ) ) ? ' max="' . $args['max'] . '"' : '';
+			$min         = ( isset( $args['min'] ) && $args['min'] != '' ) ? ' min="' . $args['min'] . '"' : '';
+			$max         = ( isset( $args['max'] ) && $args['max'] != '' ) ? ' max="' . $args['max'] . '"' : '';
 			$str = "<input name=\"$name\" type=\"$type\" id=\"$name\" value=\"$value\" class=\"$class\"$placeholder$title$pattern$min$max" . ( ( $required ) ? " required " : "" ) . " />";
 			break;
 		
@@ -106,7 +107,7 @@ class WP_Members_Forms {
 			break;
 	
 		case "textarea":
-			$value = stripslashes( esc_textarea( $value ) );
+			$value = stripslashes( $value ); // stripslashes( esc_textarea( $value ) );
 			$class = ( 'textbox' == $class ) ? "textarea" : $class;
 			$rows  = ( isset( $args['rows'] ) ) ? $args['rows'] : '5';
 			$cols  = ( isset( $args['cols'] ) ) ? $args['cols'] : '20';
@@ -313,11 +314,12 @@ class WP_Members_Forms {
 	}
 
 	/**
-	 * Login Form Dialog.
+	 * Login Form Builder.
 	 *
 	 * Builds the form used for login, change password, and reset password.
 	 *
 	 * @since 2.5.1
+	 * @since 3.1.7 Moved to forms object class as login_form().
 	 * @since 3.1.7 Added WP action login_form.
 	 *
 	 * @param  string $page 
@@ -485,22 +487,26 @@ class WP_Members_Forms {
 
 		$links_array = array(
 			'forgot' => array(
+				'tag'  => 'forgot',
 				'link' => add_query_arg( 'a', 'pwdreset', $wpmem->user_pages['profile'] ),
 				'page' => 'profile',
 				'action' => 'login',
 			),
-			'register' => array( 
+			'register' => array(
+				'tag'  => 'reg',
 				'link' => $wpmem->user_pages['register'],
 				'page' => 'register',
 				'action' => 'login',
 			),
 			'username' => array(
+				'tag'  => 'username',
 				'link' => add_query_arg( 'a', 'getusername', $wpmem->user_pages['profile'] ),
 				'page' => 'profile',
 				'action' => 'pwdreset',
 			),
 		);
 		foreach ( $links_array as $key => $value ) {
+			$tag = $value['tag'];
 			if ( ( $wpmem->user_pages[ $value['page'] ] || 'members' == $page ) && $value['action'] == $arr['action'] ) {
 				/**
 				 * Filters register, forgot password, and forgot username links.
@@ -510,7 +516,7 @@ class WP_Members_Forms {
 				 *
 				 * @param string The raw link.
 				 */
-				$link = apply_filters( "wpmem_{$key}_link", $value['link'] );
+				$link = apply_filters( "wpmem_{$tag}_link", $value['link'] );
 				$str  = $wpmem->get_text( "{$key}_link_before" ) . '<a href="' . $link . '">' . $wpmem->get_text( "{$key}_link" ) . '</a>';
 				/**
 				 * Filters the register, forgot password, and forgot username links HTML.
@@ -522,7 +528,26 @@ class WP_Members_Forms {
 				 * @param string $str  The link HTML.
 				 * @param string $link The link.
 				 */
-				$form = $form . $args['link_before'] . apply_filters( "wpmem_{$key}_link_str", $str, $link ) . $args['link_after'] . $args['n'];
+				$link = $args['link_before'] . apply_filters( "wpmem_{$tag}_link_str", $str, $link ) . $args['link_after'] . $args['n'];
+				/*
+				 * If this is the register link, and the current post type is set to
+				 * display the register form, and the current page is not the login
+				 * page, then do not add the register link, otherwise add the link.
+				 */
+				if ( 'register' == $key ) {
+					if ( isset( $wpmem->user_pages['login'] ) && $wpmem->user_pages['login'] != '' ) {
+						$form = ( 1 == $wpmem->show_reg[ get_post_type( get_the_ID() ) ] && wpmem_current_url() != wpmem_login_url() ) ? $form : $form . $link;
+					} else {
+						global $post;
+						if ( has_shortcode( $post->post_content, 'wpmem_profile' ) ) {
+							$form = $form;
+						} else {
+							$form = ( 1 == $wpmem->show_reg[ get_post_type( get_the_ID() ) ] && ! has_shortcode( $post->post_content, 'wpmem_form' ) ) ? $form : $form . $link;
+						}
+					}
+				} else {
+					$form = $form . $link;
+				}
 			}
 		}
 
@@ -571,14 +596,15 @@ class WP_Members_Forms {
 		$form = apply_filters( 'wpmem_login_form_before', '', $arr['action'] ) . $form;
 
 		return $form;
-	} // End wpmem_login_form.
+	} // End login_form.
 
 	/**
-	 * Registration Form Dialog.
+	 * Registration Form Builder.
 	 *
 	 * Outputs the form for new user registration and existing user edits.
 	 *
 	 * @since 2.5.1
+	 * @since 3.1.7 Moved to forms object class as register_form().
 	 *
 	 * @global object $wpmem        The WP_Members object.
 	 * @global string $wpmem_regchk Used to determine if the form is in an error state.
@@ -745,10 +771,6 @@ class WP_Members_Forms {
 				if ( $meta_key != 'tos' ) {
 
 					$class = ( $field['type'] == 'password' || $field['type'] == 'email' || $field['type'] == 'url' ) ? 'text' : $field['type'];
-
-				//	$label = '<label for="' . $meta_key . '" class="' . $class . '">' . __( $field['label'], 'wp-members' );
-				//	$label = ( $field['required'] ) ? $label . $args['req_mark'] : $label;
-				//	$label = $label . '</label>';
 					
 					$label = wpmem_form_label( array(
 						'meta_key' => $meta_key, 
@@ -766,7 +788,8 @@ class WP_Members_Forms {
 
 					switch ( $meta_key ) {
 						case( 'description' ):
-							$val = htmlspecialchars( get_user_meta( $userdata->ID, 'description', 'true' ) );
+						case( 'textarea' == $field['type'] ):
+							$val = get_user_meta( $userdata->ID, $meta_key, 'true' ); // esc_textarea() is run when field is created.
 							break;
 
 						case 'user_email':
@@ -775,7 +798,7 @@ class WP_Members_Forms {
 							break;
 
 						case 'user_url':
-							$val = esc_url( $userdata->user_url );
+							$val = $userdata->user_url; // esc_url() is run when the field is created.
 							break;
 
 						case 'display_name':
@@ -860,7 +883,6 @@ class WP_Members_Forms {
 						} else {
 							$input = ( $attachment_url ) ? '<img src="' . $attachment_url . '">' : $empty_file;
 						}
-						// @todo - come up with a way to handle file updates - user profile form does not support multitype
 						$input.= '<br />' . $wpmem->get_text( 'profile_upload' ) . '<br />';
 						$input.= wpmem_form_field( array(
 							'name'    => $meta_key, 
@@ -1090,7 +1112,7 @@ class WP_Members_Forms {
 		$form = $args['txt_before'] . $form . $args['txt_after'];
 
 		// Remove line breaks if enabled for easier filtering later.
-		$form = ( $args['strip_breaks'] ) ? str_replace( array( "\n", "\r", "\t" ), array( '','','' ), $form ) : $form;
+		$form = ( $args['strip_breaks'] ) ? $this->strip_breaks( $form, $rows ) : $form; //str_replace( array( "\n", "\r", "\t" ), array( '','','' ), $form ) : $form;
 
 		/**
 		 * Filter the generated HTML of the entire form.
@@ -1134,6 +1156,34 @@ class WP_Members_Forms {
 
 		// Return the generated form.
 		return $form;
-	} // End wpmem_inc_registration.
+	} // End register_form().
+	
+	/**
+	 * Strip line breaks from form.
+	 *
+	 * Function removes line breaks and tabs. Checks for textarea fields
+	 * before stripping line breaks.
+	 *
+	 * @since 3.1.8
+	 *
+	 * @param  string $form
+	 * @param  array  $rows
+	 * @return string $form
+	 */
+	function strip_breaks( $form, $rows ) {
+		foreach( $rows as $key => $row ) {
+			if ( 'textarea' == $row['type'] ) {
+				$textareas[ $key ] = $row['field'];
+			}
+		}
+		$form = str_replace( array( "\n", "\r", "\t" ), array( '','','' ), $form );
+		if ( ! empty ( $textareas ) ) {
+			foreach ( $textareas as $textarea ) {
+				$stripped = str_replace( array( "\n", "\r", "\t" ), array( '','','' ), $textarea );
+				$form = str_replace( $stripped, $textarea, $form );
+			}
+		}
+		return $form;
+	}
 
 } // End of WP_Members_Forms class.
