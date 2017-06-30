@@ -87,8 +87,8 @@ var BaseRactive = Ractive.extend({
   entityName: function(entity) {
     console.info('entityName');
     var id = ractive.uri(entity);
-    var lastSlash = id.lastIndexOf('/');
-    return id.substring(id.lastIndexOf('/', lastSlash-1)+1, lastSlash);
+    var lastSlash = id.lastindexOf('/');
+    return id.substring(id.lastindexOf('/', lastSlash-1)+1, lastSlash);
   },
   fetchConfig: function() {
     console.info('fetchConfig');
@@ -186,7 +186,7 @@ var BaseRactive = Ractive.extend({
   id: function(entity) {
     console.log('id: '+entity);
     var id = ractive.uri(entity);
-    return id.substring(id.lastIndexOf('/')+1);
+    return id.substring(id.lastindexOf('/')+1);
   },
   initAutoComplete: function() {
     console.log('initAutoComplete');
@@ -466,6 +466,74 @@ var BaseRactive = Ractive.extend({
     }
     return uri;
   },
+  toCsv: function(json, title, headings) {
+    //If json is not an object then JSON.parse will parse the JSON string in an Object
+    var arr = typeof json != 'object' ? JSON.parse(json) : json;
+
+    var csv = '';
+
+    // write title on first row
+    csv += title + '\n\n';
+
+    if (headings === undefined || headings == true) {
+      // extract label from json fields in array idx 0
+      var row = '';
+
+      for (var idx in arr[0]) {
+          row += idx + ',';
+      }
+
+      row = row.slice(0, -1); // strip trailing comma
+      headings = row + '\n';
+    }
+    csv += headings + '\n';
+
+    var propNames = headings.split(',');
+    for (var i = 0; i < arr.length; i++) {
+        var row = '';
+
+        for (var j = 0 ; j < propNames.length ; j++) {
+          try {
+            var val = eval('arr['+i+'].'+propNames[j]);
+            row += '"' + (val == undefined ? '' : val) + '",';
+          } catch (err) {
+            console.error('Fail to extract property '+propNames[j]+'from row '+i);
+          }
+        }
+
+        row = row.slice(0, -1); // strip trailing comma
+        csv += row + '\n';
+    }
+
+    if (csv == '') {
+        alert("Invalid data");
+        return;
+    }
+
+    //Generate a file name (<title with _ for spaces>-<timestamp>)
+    var fileName = title.replace(/ /g,"_")+new Date().toISOString().substring(0,16).replace(/[T:]/g,'-');
+
+    //Initialize file format you want csv or xls
+    var uri = 'data:text/csv;charset=utf-8,' + escape(csv);
+
+    // Now the little tricky part.
+    // you can use either>> window.open(uri);
+    // but this will not work in some browsers
+    // or you will not get the correct file extension
+
+    //this trick will generate a temp <a /> tag
+    var link = document.createElement("a");
+    link.href = uri;
+
+    //set the visibility hidden so it will not effect on your web-layout
+    link.style = "visibility:hidden";
+    link.download = fileName + ".csv";
+
+    //this part will append the anchor tag and remove it after automatic click
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  },
   toggleSection: function(sect) {
     console.info('toggleSection: '+$(sect).attr('id'));
     $('#'+$(sect).attr('id')+'>div').toggle();
@@ -662,11 +730,11 @@ Array.uniq = function(fieldName, arr) {
   // console.info('uniq');
   list = '';
   for (idx in arr) {
-    if (index(arr[idx],fieldName) != undefined
-        && list.indexOf(index(arr[idx],fieldName)) == -1) {
+    if (idx(arr[idx],fieldName) != undefined
+        && list.indexOf(idx(arr[idx],fieldName)) == -1) {
       if (list != '')
         list += ','
-      list += index(arr[idx],fieldName);
+      list += idx(arr[idx],fieldName);
     }
   }
   return list;
@@ -681,8 +749,8 @@ if (!String.prototype.endsWith) {
         position = subjectString.length;
       }
       position -= searchString.length;
-      var lastIndex = subjectString.indexOf(searchString, position);
-      return lastIndex !== -1 && lastIndex === position;
+      var lastidx = subjectString.indexOf(searchString, position);
+      return lastidx !== -1 && lastidx === position;
   };
 }
 

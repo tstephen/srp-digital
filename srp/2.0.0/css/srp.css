@@ -24,13 +24,10 @@ h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
   margin-bottom: 15px;
 }
 .workings h4 {
-	border-bottom: none;
+  border-bottom: none;
 }
 figure {
-	text-align: center;
-}
-input,select,textarea {
-	margin: 0 5px 0 10px;
+  text-align: center;
 }
 .navbar-static-bottom, .footer-widget-area {
   border-top-color: #ec9300;
@@ -144,7 +141,12 @@ h2 a.glyphicon:hover {
   color: #ec9300;
 	cursor: pointer;
 }
-
+form .criteria {
+  width: 100%;
+}
+form .criteria input {
+  margin: 2px 3px;
+}
 .form {
 	display: block;
 	list-style: none;
@@ -157,11 +159,7 @@ h2 a.glyphicon:hover {
 }
 
 .form input {
-	margin-left: 0px;
-}
-.form label {
-	padding-right: 10px;
-  text-align: right;
+  margin-left: 0px;
 }
 .form.create-form {
   padding-bottom: 2px;
@@ -169,6 +167,7 @@ h2 a.glyphicon:hover {
 .navbar-sticky {
   position:fixed;
   top: 0;
+  width:83% /* equiv of col-10 */
 }
 .navbar-sticky .profile {
 	top: -32px;
