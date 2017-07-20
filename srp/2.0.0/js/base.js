@@ -87,8 +87,8 @@ var BaseRactive = Ractive.extend({
   entityName: function(entity) {
     console.info('entityName');
     var id = ractive.uri(entity);
-    var lastSlash = id.lastindexOf('/');
-    return id.substring(id.lastindexOf('/', lastSlash-1)+1, lastSlash);
+    var lastSlash = id.lastIndexOf('/');
+    return id.substring(id.lastIndexOf('/', lastSlash-1)+1, lastSlash);
   },
   fetchConfig: function() {
     console.info('fetchConfig');
@@ -186,7 +186,7 @@ var BaseRactive = Ractive.extend({
   id: function(entity) {
     console.log('id: '+entity);
     var id = ractive.uri(entity);
-    return id.substring(id.lastindexOf('/')+1);
+    return id.substring(id.lastIndexOf('/')+1);
   },
   initAutoComplete: function() {
     console.log('initAutoComplete');
@@ -207,7 +207,7 @@ var BaseRactive = Ractive.extend({
   },
   initAutoCompletePart2: function(d, data) {
     if (d.name!=undefined) ractive.set(d.name,data);
-    $(d.selector).typeahead({ items:'all',minLength:0,source:data });
+    if ($(d.selector)['typeahead']!=undefined) $(d.selector).typeahead({ items:'all',minLength:0,source:data });
     $(d.selector).on("click", function (ev) {
       newEv = $.Event("keydown");
       newEv.keyCode = newEv.which = 40;
@@ -749,8 +749,8 @@ if (!String.prototype.endsWith) {
         position = subjectString.length;
       }
       position -= searchString.length;
-      var lastidx = subjectString.indexOf(searchString, position);
-      return lastidx !== -1 && lastidx === position;
+      var lastIdx = subjectString.indexOf(searchString, position);
+      return lastIdx !== -1 && lastIdx === position;
   };
 }
 

@@ -175,6 +175,9 @@ form .criteria input {
 .navbar-sticky .profile-img img {
   margin-top: -6px;
 }
+.number {
+  text-align: right;
+}
 .beta,
 .omny-bar {
   background-color: #f9f9f9;

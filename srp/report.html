@@ -407,24 +407,7 @@
         <section id="carbonFootprintSect">
           <h3>Modelled Carbon Footprint</h3>
           <p>
-            The information provided in the previous sections of this sustainability report uses the ERIC returns as its data source. However, we are aware that this does not reflect our entire carbon footprint. Therefore, the following information uses a scaled model based on work performed by the Sustainable Development Unit (SDU) in 2009/10. More information available here: http://www.sduhealth.org.uk/policy-strategy/reporting/nhs-carbon-footprint.aspx
-          </p>
-          <p>
-            Resulting in an estimated total carbon footprint of
-            {{! "&TEXT(ROUND($'Output - Report (provider)'.D186,0),"#,##0")&" }}
-            TODO
-            tonnes of carbon dioxide equivalent emissions (tCO<sub>2</sub>e). Our carbon
-            intensity per pound is
-            {{! "&TEXT(ROUND($'Benchmarking - Hotspots profile'.K64,0),"#,##0")&" }}
-            TODO
-            grams of carbon dioxide equivalent emissions per pound of operating
-            expenditure (gCO<sub>2</sub>e/&pound;). Average emissions for
-            {{! "&IF($Input.B20=1,LOWER($Input.B19)&" services","our service mix")&" }}
-            TODO
-            is
-            {{! "&TEXT($'Benchmarking - Hotspots profile'.K69,"#,##0")&" }}
-            TODO
-            grams per pound.
+            The information provided in the previous sections of this sustainability report uses the ERIC returns as its data source. However, we are aware that this does not reflect our entire carbon footprint. Therefore, the following information uses a scaled model based on work performed by the Sustainable Development Unit (SDU) in 2009-10. More information available here: http://www.sduhealth.org.uk/policy-strategy/reporting/nhs-carbon-footprint.aspx
           </p>
           <p>
             <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-footprint.csv"
@@ -435,18 +418,32 @@
             <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-emissions-profile.csv"
                  class="rpt stacked" id="emissionsProfileGraph" width="600" height="400"></svg>
           </p>
+          {{#if getAnswer('ECLASS_USER')}}
+            <section id="eclassCarbonProfileSect">
+              <h2>E-Class Procurement Profile</h2>
+              <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/eclass-carbon-profile.html"></div>
+            </section>
+          {{else}}
+            <section id="sduCarbonProfileSect">
+              <h2>SDU Whole organisation carbon profile</h2>
+              <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/sdu-carbon-profile.html"></div>
+            </section>
+          {{/if}}
+          <!-- TODO sdu carbon profile above and the one below differ only by the inclusion of energy in the below -->
           <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-emissions-profile.html"></div>
         </section>
 
-        <!--section id="trajectorySect">
+        <section id="trajectorySect">
           <h3>Modelled trajectory</h3>
           <p>{{formatAnswer('trajectoryPerf')}}</p>
-          <p>TODO
+          <p>
             <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-trajectory.csv"
-                 class="rpt stacked" id="carbonTrajectoryGraph" width="600" height="400"></svg>
+                data-colors="#0072ce,#0BBDE5,#0BDBC9"
+                data-y-axis-label="Emissions (TCO&#x2082;e)"
+                class="rpt stacked" id="carbonTrajectoryGraph" width="600" height="400"></svg>
           </p>
           <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-trajectory.html"></div>
-        </section-->
+        </section>
 
         <section id="benchmarkSect">
           <h3>Benchmarking</h3>
@@ -475,7 +472,7 @@
 
   <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
   <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  <script src="https://api.srp.digital/webjars/Bootstrap-3-Typeahead/3.1.1/bootstrap3-typeahead.js"></script>  
+  <script src="https://api.srp.digital/webjars/Bootstrap-3-Typeahead/3.1.1/bootstrap3-typeahead.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.js"></script>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/ractive/0.7.3/ractive.min.js'></script>
   <script src="https://d3js.org/d3.v4.min.js"></script>

@@ -36,22 +36,18 @@
       <section id="scope3Sect">
         <h2>Scope 3 - Indirect</h2>
         <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/scope-3.html"></div>
-
         <section id="scope3TravelSect">
           <h3>Scope 3 Breakdown - Travel</h3>
           <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/travel-co2e.html"></div>
         </section>
-
         <section id="scope3WaterSect">
           <h3>Scope 3 Breakdown - Water</h3>
           <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/water-co2e.html"></div>
         </section>
-
         <section id="scope3WasteSect">
           <h3>Scope 3 Breakdown - Waste</h3>
           <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/waste-co2e.html"></div>
         </section>
-
         <section id="scope3BiomassSect">
           <h3>Scope 3 Breakdown - Biomass (well to tank)</h3>
           <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/biomass-co2e-wtt.html"></div>
@@ -62,6 +58,18 @@
         <h3>Outside Scopes - Biomass (total)</h3>
         <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/biomass-co2e-noscope.html"></div>
       </section>
+
+      {{#if getAnswer('ECLASS_USER')}}
+        <section id="eclassCarbonProfileSect">
+          <h2>E-Class Procurement Profile</h2>
+          <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/eclass-carbon-profile.html"></div>
+        </section>
+      {{else}}
+        <section id="sduCarbonProfileSect">
+          <h2>SDU Whole organisation carbon profile</h2>
+          <div class="rpt table" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/sdu-carbon-profile.html"></div>
+        </section>
+      {{/if}}
     {{else}}
       <section class="loading" id="loadingSect">
         <span class="loading">Your report should load automatically in the next few moments.</span>

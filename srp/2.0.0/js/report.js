@@ -25,7 +25,10 @@ var ractive = new BaseRactive({
     username: localStorage['username'],
     formatAnswer: function(qName) {
       if (qName==undefined || ractive.get('surveyReturn')==undefined) return '';
-      return ractive.getAnswer(qName);
+      else {
+        var answer = ractive.getAnswer(qName);
+        return answer == undefined ? '' : answer;
+      }
     },
     isCcg: function() {
       if (ractive.get('surveyReturn')==undefined) return '';
@@ -74,9 +77,12 @@ var ractive = new BaseRactive({
     });
   },
   fetchCsv: function(ctrl, callback) {
+    var url = $(ctrl).data('src').indexOf('//')==-1
+        ? ractive.getServer()+$(ctrl).data('src')
+        : $(ctrl).data('src').replace(/host:port/,window.location.host);
     $.ajax({
       dataType: "text",
-      url: ractive.getServer()+$(ctrl).data('src'),
+      url: url,
       crossDomain: true,
       headers: {
         "X-Requested-With": "XMLHttpRequest",
@@ -86,7 +92,11 @@ var ractive = new BaseRactive({
       success: function( data ) {
         ractive.set('saveObserver', false);
         //ractive.set(keypath,data);
-        callback('#'+ctrl.id, data);
+        var options = {};
+        if ($(ctrl).data('colors') != undefined) options.colors = $(ctrl).data('colors').split(',');
+        if ($(ctrl).data('x-axis-label') != undefined) options.xAxisLabel = $(ctrl).data('x-axis-label');
+        if ($(ctrl).data('y-axis-label') != undefined) options.yAxisLabel = $(ctrl).data('y-axis-label');
+        callback('#'+ctrl.id, data, options);
         ractive.set('saveObserver', true);
       }
     });
@@ -106,6 +116,12 @@ var ractive = new BaseRactive({
         $(ctrl).empty().append(data);
         ractive.set('saveObserver', true);
       }
+    });
+  },
+  formatNumber: function() {
+    $('.number').each(function(i,d) {
+      var a = d.innerText.substring(0,d.innerText.indexOf('.'));
+      d.innerText = a.replace(new RegExp("^(\\d{" + (a.length%3?a.length%3:0) + "})(\\d{3})", "g"), "$1,$2").replace(/(\d{3})+?/gi, "$1,").replace(/^,/,'').slice(0,-1);
     });
   },
   getAnswer: function(qName) {
