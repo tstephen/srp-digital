@@ -208,6 +208,8 @@ var $r = (function ($, ractive, $auth) {
 
   me.submit = function() {
     //console.info('submit return');
+    // bit of a hack as can't figure the load order issue that hides form
+    if (!$('.questionnaire').is('visible')) $('.questionnaire').slideDown();
     if ($r.dirty == false) {
       //console.debug('skip save, not dirty');
       return;
@@ -258,10 +260,12 @@ var $r = (function ($, ractive, $auth) {
   ractive.fetch();
   _fetchReturn();
   _fetchLists();
+  $('.questionnaire').slideDown();
   // $auth.addLoginCallback(ractive.fetch);
   // $auth.addLoginCallback(_fetchReturn);
   // $auth.addLoginCallback(_fetchLists());
   // $auth.addLoginCallback(_bindLists());
+  $auth.addLoginCallback(function() { $('.questionnaire').slideDown(); });
 
   if (ractive['fetchCallbacks']==undefined) ractive.fetchCallbacks = $.Callbacks();
   ractive.fetchCallbacks.add(_hideCalcs);

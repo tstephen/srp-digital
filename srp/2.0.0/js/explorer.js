@@ -141,7 +141,7 @@ var ractive = new BaseRactive({
       $('datalist#orgs').remove();
       $('body').append('<datalist id="orgs">');
       for (var idx = 0 ; idx < data.length ; idx++) {
-        $('datalist#orgs').append('<option value="'+data[idx]['orgCode']+'">'+data[idx].name+'</option>');
+        $('datalist#orgs').append('<option value="'+data[idx]['code']+'">'+data[idx].name+'</option>');
       };
     });
   },

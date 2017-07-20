@@ -207,7 +207,7 @@ var BaseRactive = Ractive.extend({
   },
   initAutoCompletePart2: function(d, data) {
     if (d.name!=undefined) ractive.set(d.name,data);
-    if ($(d.selector)['typeahead']!=undefined) $(d.selector).typeahead({ items:'all',minLength:0,source:data });
+    if ($(d.selector)['typeahead'] == 'function') $(d.selector).typeahead({ items:'all',minLength:0,source:data });
     $(d.selector).on("click", function (ev) {
       newEv = $.Event("keydown");
       newEv.keyCode = newEv.which = 40;
