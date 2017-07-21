@@ -12,8 +12,8 @@
     <thead>
       <tr>
         <th></th>
-        <th on-click="sort:name">Name<span class="sortable {{ sorted('name') }} glyphicon "></span></th>
-        <th on-click="sort:value">Value<span class="sortable {{ sorted('value') }} glyphicon "></span></th>
+        <th on-click="sort:name">Name<span class="sortable {{ sorted('name') }} glyphicon glyphicon-btn "></span></th>
+        <th on-click="sort:value">Value<span class="sortable {{ sorted('value') }} glyphicon glyphicon-btn "></span></th>
         <th class="col-actions">Actions</th>
       </tr>
     </thead>
@@ -25,8 +25,8 @@
             <td>{{name}}</td>
             <td>{{value}}</td>
             <td class="col-actions">
-              <a class="clickable admin glyphicon glyphicon-remove" aria-hidden="true" on-click="delete(this)" title="Delete this record"></a>
-              <a class="clickable glyphicon glyphicon-pencil" aria-hidden="true" on-click="edit(this)" title="View or edit this parameter"></a>
+              <a class="clickable admin glyphicon glyphicon-btn glyphicon-remove" aria-hidden="true" on-click="delete(this)" title="Delete this record"></a>
+              <a class="clickable glyphicon glyphicon-btn glyphicon-pencil" aria-hidden="true" on-click="edit(this)" title="View or edit this parameter"></a>
             </td>
           </tr>
       {{/}}

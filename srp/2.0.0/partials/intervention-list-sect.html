@@ -12,12 +12,12 @@
     <thead>
       <tr data-id="{{selfRef}}">
         <th></th>
-        <th on-click="sort:name">Name<span class="sortable {{ sorted('name') }} glyphicon "></span></th>
-        <th on-click="sort:status">Status<span class="sortable {{ sorted('status') }} glyphicon "></span></th>
-        <th on-click="sort:organisationType">Organisation Type<span class="sortable {{ sorted('organisationType') }} glyphicon "></span></th>
-        <th on-click="sort:shareOfNational">Share of National<span class="sortable {{ sorted('shareOfNational') }} glyphicon "></span></th>
-        <th on-click="sort:tonnesCo2eSavedTargetYear">tCO<sub>2</sub>e Saved<span class="sortable {{ sorted('tonnesCo2eSavedTargetYear') }} glyphicon "></span></th>
-        <th on-click="sort:costPerTonneCo2e">MAC <br/>£/tCO<sub>2</sub>e<span class="sortable {{ sorted('costPerTonneCo2e') }} glyphicon "></span></th>
+        <th on-click="sort:name">Name<span class="sortable {{ sorted('name') }} glyphicon glyphicon-btn "></span></th>
+        <th on-click="sort:status">Status<span class="sortable {{ sorted('status') }} glyphicon glyphicon-btn "></span></th>
+        <th on-click="sort:organisationType">Organisation Type<span class="sortable {{ sorted('organisationType') }} glyphicon glyphicon-btn "></span></th>
+        <th on-click="sort:shareOfNational">Share of National<span class="sortable {{ sorted('shareOfNational') }} glyphicon glyphicon-btn "></span></th>
+        <th on-click="sort:tonnesCo2eSavedTargetYear">tCO<sub>2</sub>e Saved<span class="sortable {{ sorted('tonnesCo2eSavedTargetYear') }} glyphicon glyphicon-btn "></span></th>
+        <th on-click="sort:costPerTonneCo2e">MAC <br/>£/tCO<sub>2</sub>e<span class="sortable {{ sorted('costPerTonneCo2e') }} glyphicon glyphicon-btn "></span></th>
         <th class="col-actions">Actions</th>
       </tr>
     </thead>
@@ -33,8 +33,8 @@
             <td style="text-align:right">{{tonnesCo2eSavedTargetYear.formatDecimal(0, '.', ',')}}</td>
             <td style="text-align:right">{{costPerTonneCo2e.formatDecimal(0, '.', ',')}}</td>
             <td class="col-actions">
-              <a class="clickable admin glyphicon glyphicon-remove" aria-hidden="true" on-click="delete(this)" title="Delete this record"></a>
-              <a class="clickable glyphicon glyphicon-pencil" aria-hidden="true" on-click="edit(this)" title="View or edit this intervention"></a>
+              <a class="clickable admin glyphicon glyphicon-btn glyphicon-remove" aria-hidden="true" on-click="delete(this)" title="Delete this record"></a>
+              <a class="clickable glyphicon glyphicon-btn glyphicon-pencil" aria-hidden="true" on-click="edit(this)" title="View or edit this intervention"></a>
             </td>
           </tr>
       {{/}}

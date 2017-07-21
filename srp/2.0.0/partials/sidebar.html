@@ -1,15 +1,15 @@
 <div class="omny-burger" on-click="toggleSidebar()">
-  <span class="clickable glyphicon glyphicon-menu-hamburger" title="{{title}}"></span>
+  <span class="clickable glyphicon glyphicon-btn glyphicon-menu-hamburger" title="{{title}}"></span>
 </div>
 <div class="omny-bar {{#profile.omnyBarPosition}}omny-bar-{{profile.omnyBarPosition}}{{/}} {{^profile.omnyBarPosition}}omny-bar-left{{/}}">
   <ul>
     <li>
-      <span class="clickable glyphicon glyphicon-menu-hamburger" on-click="toggleSidebar()" title="{{title}}"></span>
+      <span class="clickable glyphicon glyphicon-btn glyphicon-menu-hamburger" on-click="toggleSidebar()" title="{{title}}"></span>
     </li>
     {{#tenant.toolbar}}
       {{#if matchRole(role) }}
         <li class="page"><a href="{{context}}{{url}}">
-          <span class="glyphicon {{icon}} {{#active==url}}active{{/}}" title="{{title}}"></span>
+          <span class="glyphicon glyphicon-btn {{icon}} {{#active==url}}active{{/}}" title="{{title}}"></span>
         </a></li>
       {{/if}}
     {{/}}

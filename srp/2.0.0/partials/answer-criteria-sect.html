@@ -31,10 +31,10 @@
 <section id="criteriaSect">
   <form class="form-inline" id="criteriaForm">
       <h2>Search Criteria
-      <!--a class="clickable glyphicon glyphicon-paperclip" href="#notes" title="Jump to Notes"></a-->
+      <!--a class="clickable glyphicon glyphicon-btn glyphicon-paperclip" href="#notes" title="Jump to Notes"></a-->
       <span class="pull-right">
-        <a class="glyphicon glyphicon-plus" aria-hidden="true" on-click="addCriterion()" title="Add another criterion"></a>
-        <a class="clickable glyphicon glyphicon-search" aria-hidden="true" on-click="search()" style="border-radius:5px;border:1px solid;height:34px;margin-left:5px;" title="Search with these criteria"></a>
+        <a class="glyphicon glyphicon-btn glyphicon-plus" aria-hidden="true" on-click="addCriterion()" title="Add another criterion"></a>
+        <a class="clickable glyphicon glyphicon-btn glyphicon-search" aria-hidden="true" on-click="search()" style="border-radius:5px;border:1px solid;height:34px;margin-left:5px;" title="Search with these criteria"></a>
       </span>
     </h2>
 
@@ -46,7 +46,7 @@
             <input class="col-md-1 form-control criteria-operator" list="operators" placeholder="Start typing to filter options" id="operator{{idx}}" required value="{{operator}}">
             <input class="col-md-5 form-control criteria-value" id="value{{idx}}" required value="{{value}}">
             <span class="col-md-1">
-              <a class="glyphicon glyphicon-remove" aria-hidden="true" on-click="deleteCriterion(i)" title="Remove this criterion"></a>
+              <a class="glyphicon glyphicon-btn glyphicon-remove" aria-hidden="true" on-click="deleteCriterion(i)" title="Remove this criterion"></a>
             </span>
             <!--p class="help-block">Draft, Ready for review, Published etc.</p-->
           </li>

@@ -2,7 +2,7 @@
   <form class="form" id="currentForm">
     <h2 class="form-inline">Edit Organisation Type
       <span class="pull-right">
-        <a class="clickable glyphicon glyphicon-remove" aria-hidden="true" on-click="delete(current)" title="Delete this record"></a>
+        <a class="clickable glyphicon glyphicon-btn glyphicon-remove" aria-hidden="true" on-click="delete(current)" title="Delete this record"></a>
       </span>
     </h2>
 
@@ -15,15 +15,19 @@
         </li>
         <li class="form-group">
           <label class="col-md-4 col-sm-4">Icon:</label>
-          <input class="typeahead form-control" id="curIcon" value="{{current.icon}}"/>
+          <input class="form-control" id="curIcon" value="{{current.icon}}"/>
           <p class="help-block col-md-offset-4">Name of the icon to use in the intervention planner.</p>
         </li>
         <li class="form-group">
           <label class="col-md-4 col-sm-4 required">Status:</label>
-          <input class="typeahead form-control" id="curStatus" placeholder="Start typing to filter options" required value="{{current.status}}"/>
+          <input class="form-control" id="curStatus" list="status" placeholder="Start typing to filter options" required value="{{current.status}}"/>
           <p class="help-block col-xs-offset-4">Green will be included in public pages; red will not; amber to be determined.</p>
         </li>
-
+        <li class="form-group">
+          <label class="col-md-4 col-sm-4">Sector:</label>
+          <input class="form-control" id="curSector" list="sectors" value="{{current.sector}}"/>
+          <p class="help-block col-md-offset-4">Whether the organisation is part of NHS, Public Health or Social Care</p>
+        </li>
         <!-- <li class="form-group">
           <label class="">Annual Turnover (£):</label>
           <input class="form-control" id="curAnnualTurnover" type="number" checked="{{current.annualTurnover}}"/>
@@ -44,18 +48,20 @@
     <div class="currentBody col-md-6 col-sm-12">
       <ul class="form inline-form edit-form">
         <li class="form-group">
-          <label class="col-md-4 col-sm-4 required">Commissioner:</label>
-          <input class="form-control" data-a-pad="false" id="curCommissioner" type="checkbox" checked="{{current.commissioner}}"/>{{#current.commissoioner==true}} Yes{{/}}
-          <p class="help-block col-xs-offset-4">This organisation influences or commissions services delivered by others.</p>
+          <label class="col-md-4 col-sm-4">Commissioner:</label>
+          <input class="form-control" data-a-pad="false" id="curCommissioner" type="checkbox" checked="{{current.commissioner}}"/>
+          <span class="secondary-label">{{#current.commissioner==true}}Yes{{else}}No{{/}}</span>
+          <p class="help-block col-xs-offset-4">Organisations of this type influence or commission services delivered by others.</p>
         </li>
         <li class="form-group">
-          <label class="col-md-4 col-sm-4">Sector:</label>
-          <input class="typeahead form-control" id="curSector" value="{{current.sector}}"/>
-          <p class="help-block col-md-offset-4">Whether the organisation is part of NHS, Public Health or Social Care</p>
+          <label class="col-md-4 col-sm-4">Inc. in SDU report?:</label>
+          <input class="form-control" data-a-pad="false" id="curReportingType" type="checkbox" checked="{{current.reportingType}}"/>
+          <span class="secondary-label">{{#current.reportingType==true}}Yes{{else}}No{{/}}</span>
+          <p class="help-block col-xs-offset-4">This organisation type should be listed in the SDU return.</p>
         </li>
         <li class="form-group">
           <label class="col-md-4 col-sm-4">Count:</label>
-          <input class="typeahead form-control" id="curCount" value="{{current.count}}"/>
+          <input class="form-control" id="curCount" type="number" value="{{current.count}}"/>
           <p class="help-block col-md-offset-4">Number of this type of organisation within England</p>
         </li>
         <!--<li class="form-group">

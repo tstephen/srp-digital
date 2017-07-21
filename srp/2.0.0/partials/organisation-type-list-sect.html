@@ -12,9 +12,10 @@
     <thead>
       <tr>
         <th></th>
-        <th on-click="sort:name">Name<span class="sortable {{ sorted('name') }} glyphicon "></span></th>
-        <th on-click="sort:count">Count<span class="sortable {{ sorted('count') }} glyphicon "></span></th>
-        <th on-click="sort:sector">Sector<span class="sortable {{ sorted('sector') }} glyphicon "></span></th>
+        <th on-click="sort:name">Name<span class="sortable {{ sorted('name') }} glyphicon glyphicon-btn "></span></th>
+        <th on-click="sort:count">Count<span class="sortable {{ sorted('count') }} glyphicon glyphicon-btn "></span></th>
+        <th on-click="sort:sector">Sector<span class="sortable {{ sorted('sector') }} glyphicon glyphicon-btn "></span></th>
+        <th on-click="sort:reportingType">Inc. in SDU Report?<span class="sortable {{ sorted('reportingType') }} glyphicon glyphicon-btn "></span></th>
         <th class="col-actions">Actions</th>
       </tr>
     </thead>
@@ -26,9 +27,10 @@
             <td>{{name}}</td>
             <td>{{count}}</td>
             <td>{{sector}}</td>
+            <td>{{#if reportingType==true}}<span class="glyphicon glyphicon-ok-circle"></span>{{else}}<span class="glyphicon glyphicon-ban-circle"></span>{{/if}}</td>
             <td class="col-actions">
-              <a class="clickable admin glyphicon glyphicon-remove" aria-hidden="true" on-click="delete(this)" title="Delete this record"></a>
-              <a class="clickable glyphicon glyphicon-pencil" aria-hidden="true" on-click="edit(this)" title="View or edit this organisationType"></a>
+              <a class="clickable admin glyphicon glyphicon-btn glyphicon-remove" aria-hidden="true" on-click="delete(this)" title="Delete this record"></a>
+              <a class="clickable glyphicon glyphicon-btn glyphicon-pencil" aria-hidden="true" on-click="edit(this)" title="View or edit this organisationType"></a>
             </td>
           </tr>
       {{/}}
@@ -37,7 +39,7 @@
     <tfoot>
       {{# searchTerm!=undefined }}
         <tr><th colspan="9">{{searchMatched == 0 ? 'No' : searchMatched}} matching organisation type{{searchMatched==1 ? '' : 's'}}</th></tr>
-      {{/}} 
+      {{/}}
     </tfoot>
   </table>
 </section>
