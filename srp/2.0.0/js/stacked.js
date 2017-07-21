@@ -1,13 +1,14 @@
 function renderStacked(selector, csvString, options) {
   var defaultOptions = {
     colors: ["#0B4BE5", "#0072CE", "#0BBDE5", "#0BDBC9", "#00F299"],
+    margin: {top: 20, right: 20, bottom: 50, left: 40},
     xAxisLabel: "Financial Years",
     yAxisLabel: "Tonnes CO\u2082e"
   }
   options = $.extend(defaultOptions, options == undefined ? {} : options);
 
   var svg = d3.select(selector),
-      margin = {top: 20, right: 20, bottom: 30, left: 40},
+      margin = options.margin,
       width = +svg.attr("width") - margin.left - margin.right,
       height = +svg.attr("height") - margin.top - margin.bottom,
       g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -62,6 +63,12 @@ function renderStacked(selector, csvString, options) {
       .attr("text-anchor", "end")
       .text(options.xAxisLabel);
 
+  g.selectAll(".tick>text")
+  	.style("text-anchor","end")
+  	.attr("transform", function(d) {
+  		return "rotate(-45)";
+  	});
+
   g.append("g")
       .attr("class", "axis")
       .call(d3.axisLeft(y).ticks(null, "s"))
@@ -81,10 +88,10 @@ function renderStacked(selector, csvString, options) {
   // Only to be applied to the core emissions.
   var x1 = 0;
   var y1 = data[0]['Core emissions']; // Core emissions in 2007-08 is 100% (baseline)
-  var x2 = x('15-16'); // x dimension scaled to 2015-16
+  var x2 = x('2015-16')+( x.bandwidth()/2); // x dimension scaled to 2015-16
   var y2 = y1 * (1 - ((100-90) / 100)); // 10% reduction from 2007-08 baseline
   var ccaPhase1 = [[x1,y1,x2,y2]];
-  var x3 = x('20-21'); // x dimension scaled to 2020
+  var x3 = x('2020-21'); // x dimension scaled to 2020
   var y3 = y2 * (1 - ((100-66   ) / 100)); // 34% reduction from 2015-16 to 20-21
   var ccaPhase2 = [[x2,y2,x3,y3]];
 
@@ -121,9 +128,9 @@ function renderStacked(selector, csvString, options) {
 
   // Organisation's own target - n% reduction in emissions from base year by 2020/21
   var n = 32;
-  var x4 = x('11-12'); // x dimension scaled to baseline year
+  var x4 = x('2011-12'); // x dimension scaled to baseline year
   var y4 = data[4]['total']; //
-  var x5 = x('20-21'); // x dimension scaled to 2020
+  var x5 = x('2020-21'); // x dimension scaled to 2020
   var y5 = y4 * (1 - ((n) / 100)); // n% reduction from baseline
   var orgTarget = [[x4,y4,x5,y5]];
 
