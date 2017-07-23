@@ -1,23 +1,17 @@
 <section id="currentSect" style="display:none">
   <form class="inline-form form" id="currentForm">
     <h2 class="form-inline form">
-      {{#current._links.self}}
-        <span>Edit </span>
-      {{/}}
-      {{^current._links.self}}
-        <span>Create </span>
-      {{/}}
       <span>Parameter:</span>
       <span>{{current.name}}</span>
       <span class="pull-right">
         <a class="clickable glyphicon glyphicon-btn glyphicon-remove" aria-hidden="true" on-click="delete(current)" title="Delete this record"></a>
       </span>
     </h2>
-    
+
     <div class="currentBody col-md-6 col-sm-12 col-xs-12">
       <ul class="form edit-form">
         <li>
-          <label class="required col-md-4">Name:</label><input class="typeahead form-control" id="curName" required value="{{current.name}}"/>
+          <label class="required col-md-4">Name:</label><input class="form-control" id="curName" required value="{{current.name}}"/>
           <p class="help-block col-md-offset-4">The parameter under consideration.</p>
         </li>
         <li>
@@ -35,5 +29,5 @@
       </ul>
     </div>
   </form>
-  
+
 </section>

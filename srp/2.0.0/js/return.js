@@ -29,7 +29,7 @@ var $r = (function ($, ractive, $auth) {
       // if (_survey != undefined) $('#ORG_NAME').attr('list','orgs');
       _bindLists();
     });
-    $.getJSON(_server+'/sdu/organisation-types/', function(data) {
+    $.getJSON(_server+'/sdu/organisation-types/?filter=reportingType', function(data) {
       ractive.set('orgTypes', data);
       //if (_survey != undefined) ractive.addSelectOptions('#ORG_TYPE', data);
       _bindLists();
@@ -132,7 +132,7 @@ var $r = (function ($, ractive, $auth) {
     $('section.questionnaire').slideDown();
     // Add ERIC import button
     $('h1 .importEric').remove();
-    $('h1').append('<span class="btn glyphicon glyphicon-import pull-right importEric" onclick="$r.importEric()">Import ERIC data</span>');
+    $('h1').append('<span class="btn glyphicon glyphicon-btn glyphicon-import pull-right importEric" onclick="$r.importEric()">Import ERIC data</span>');
   }
 
   me.fill = function(survey) {

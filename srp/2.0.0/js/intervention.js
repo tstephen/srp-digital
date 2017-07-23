@@ -128,9 +128,10 @@ var ractive = new BaseRactive({
       if (searchTerm==undefined || searchTerm.length==0) {
         return true;
       } else {
-        return obj.orgType.toLowerCase().indexOf(searchTerm.toLowerCase())>=0
-          || obj.name.toLowerCase().indexOf(searchTerm.toLowerCase())>=0
-          || obj.status.toLowerCase().indexOf(searchTerm.toLowerCase())>=0;
+        return obj.organisationType.name.toLowerCase().indexOf(searchTerm.toLowerCase())>=0
+          || obj.interventionType.name.toLowerCase().indexOf(searchTerm.toLowerCase())>=0
+          || obj.interventionType.status.toLowerCase().indexOf(searchTerm.toLowerCase())>=0
+          || obj.organisationType.name.toLowerCase().indexOf(searchTerm.toLowerCase())>=0;
       }
     },
     pv: function(futureValue, years) {
@@ -207,6 +208,16 @@ var ractive = new BaseRactive({
       }
     },
     title: "Interventions"
+  },
+  partials: {
+    profileArea: '',
+    titleArea: '',
+    loginSect: '',
+    interventionListSect: '',
+    interventionCurrentSect: '',
+    interventionTimeModal: '',
+    helpModal: '',
+    sidebar: ''
   },
   add: function () {
     console.log('add...');
@@ -386,13 +397,7 @@ var ractive = new BaseRactive({
       return { id: obj.selfRef, name: obj.name };
     });
     ractive.set('dataInterventionTypes',data);
-    $('#curInterventionType').typeahead({ items:'all',minLength:0,source:data });
-    $('#curInterventionType').on("click", function (ev) {
-      newEv = $.Event("keydown");
-      newEv.keyCode = newEv.which = 40;
-      $(ev.target).trigger(newEv);
-      return true;
-   });
+    ractive.addDataList({ name: 'interventionTypes'}, data);
   },
   initOrganisationTypes: function() {
     console.log('initOrganisationTypes');
@@ -400,13 +405,7 @@ var ractive = new BaseRactive({
       return { id: obj.selfRef, name: obj.name };
     });
     ractive.set('dataOrganisationTypes',data);
-    $('#curOrganisationType').typeahead({ items:'all',minLength:0,source:data });
-    $('#curOrganisationType').on("click", function (ev) {
-      newEv = $.Event("keydown");
-      newEv.keyCode = newEv.which = 40;
-      $(ev.target).trigger(newEv);
-      return true;
-   });
+    ractive.addDataList({ name: 'organisationTypes'}, data);
   },
   initTimeSeries: function(field,loadingStrategy) {
     console.info('initTimeSeries for: '+field);
@@ -437,9 +436,7 @@ var ractive = new BaseRactive({
   save: function () {
     console.log('save intervention: '+ractive.get('current.interventionType.name')+'...');
     ractive.set('saveObserver',false);
-    var id = ractive.get('current')._links === undefined ? undefined : (
-        ractive.get('current')._links.self.href.indexOf('?') == -1 ? ractive.get('current')._links.self.href : ractive.get('current')._links.self.href.substr(0,ractive.get('current')._links.self.href.indexOf('?')-1)
-    );
+    var id = ractive.uri(ractive.get('current'));
     console.log('  id: '+id+', so will '+(id === undefined ? 'POST' : 'PUT'));
     ractive.set('saveObserver',true);
 
@@ -452,7 +449,7 @@ var ractive = new BaseRactive({
       tmp.tenantId = ractive.get('tenant.id');
       console.log('ready to save intervention'+JSON.stringify(tmp)+' ...');
       $.ajax({
-        url: id === undefined ? ractive.getServer()+'/interventions' : ractive.rewrite(id),
+        url: id === undefined ? ractive.getServer()+'/interventions' : id,
         type: id === undefined ? 'POST' : 'PUT',
         contentType: 'application/json',
         data: JSON.stringify(tmp),
@@ -481,32 +478,19 @@ var ractive = new BaseRactive({
   select: function(intervention) {
     console.log('select: '+JSON.stringify(intervention));
     ractive.set('saveObserver',false);
-	  // adapt between Spring Hateos and Spring Data Rest
-	  if (intervention['_links'] == undefined && intervention.links != undefined) {
-	    intervention._links = intervention.links;
-	    $.each(intervention.links, function(i,d) {
-        if (d.rel == 'self') intervention._links.self = { href:d.href };
-      });
-	  }
-	  if (intervention._links != undefined) {
-	    var url = intervention._links.self.href.indexOf('?')==-1 ? intervention._links.self.href : intervention._links.self.href.substr(0,intervention._links.self.href.indexOf('?')-1);
-	    console.log('loading detail for '+url);
-	    $.getJSON(ractive.getServer()+url+'?projection=complete',  function( data ) {
-        console.log('found intervention '+data);
-        ractive.set('current', data);
-        ractive.initControls();
-        // who knows why this is needed, but it is, at least for first time rendering
-        $('.autoNumeric').autoNumeric('update',{});
-        ractive.toggleResults();
-        $('#currentSect').slideDown();
-        ractive.set('saveObserver',true);
-      });
-    } else {
-      console.log('Skipping load as no _links.'+intervention.name);
-      ractive.set('current', intervention);
-      ractive.hideResults();
+
+    var url = ractive.tenantUri(intervention);
+    console.log('loading detail for '+url);
+    $.getJSON(url,  function( data ) {
+      console.log('found intervention '+data);
+      ractive.set('current', data);
+      ractive.initControls();
+      // who knows why this is needed, but it is, at least for first time rendering
+      $('.autoNumeric').autoNumeric('update',{});
+      ractive.toggleResults();
+      $('#currentSect').slideDown();
       ractive.set('saveObserver',true);
-    }
+    });
   },
   showActivityIndicator: function(msg, addClass) {
     document.body.style.cursor='progress';

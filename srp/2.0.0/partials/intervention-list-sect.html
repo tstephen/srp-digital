@@ -26,9 +26,9 @@
       {{# matchSearch(this) && matchFilter(this) }}
           <tr data-href="{{links[rel=='self'].href}}" on-click="edit(this)">
             <td>{{i+1}}</td>
-            <td>{{name}}</td>
-            <td>{{status}}</td>
-            <td>{{orgType}}</td>
+            <td>{{interventionType.name}}</td>
+            <td>{{interventionType.status}}</td>
+            <td>{{organisationType.name}}</td>
             <td>{{shareOfTotal}}</td>
             <td style="text-align:right">{{tonnesCo2eSavedTargetYear.formatDecimal(0, '.', ',')}}</td>
             <td style="text-align:right">{{costPerTonneCo2e.formatDecimal(0, '.', ',')}}</td>
@@ -43,7 +43,7 @@
     <tfoot>
       {{# searchTerm!=undefined }}
         <tr><th colspan="9">{{searchMatched == 0 ? 'No' : searchMatched}} matching intervention{{searchMatched==1 ? '' : 's'}}</th></tr>
-      {{/}} 
+      {{/}}
     </tfoot>
   </table>
 </section>

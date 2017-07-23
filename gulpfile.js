@@ -17,7 +17,7 @@ gulp.task('dev2prod', function() {
 });
 
 gulp.task('prod2dev', function() {
-  gulp.src(['srp/*.html'])
+  gulp.src(['srp/**/*.html'])
     .pipe(replace('https://api.srp.digital', 'http://localhost:8083'))
     .pipe(gulp.dest('srp/'));
   gulp.src(['sdu/sdu.json'])

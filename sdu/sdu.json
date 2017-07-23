@@ -204,8 +204,9 @@
         {  "name": "South West"  },
         {  "name": "Yorkshire and Humber"  }
       ]
-    },{ "ref": "#curSector", "values": [
+    },{ "name": "sectors", "ref": "#curSector", "values": [
         {  "name": "NHS"  },
+        {  "name": "Private Sector"  },
         {  "name": "Public Health"  },
         {  "name": "Social Care"  }
       ]

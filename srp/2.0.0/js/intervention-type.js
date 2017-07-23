@@ -293,9 +293,7 @@ var ractive = new BaseRactive({
   save: function () {
     console.log('save interventionType: '+ractive.get('current').name+'...');
     ractive.set('saveObserver',false);
-    var id = ractive.get('current')._links === undefined ? undefined : (
-        ractive.get('current')._links.self.href.indexOf('?') == -1 ? ractive.get('current')._links.self.href : ractive.get('current')._links.self.href.substr(0,ractive.get('current')._links.self.href.indexOf('?')-1)
-    );
+    var id = ractive.uri(ractive.get('current'));
     console.log('  id: '+id+', so will '+(id === undefined ? 'POST' : 'PUT'));
     // Workaround for incompatibility between autoNumeric and server side number fields
     try { ractive.set('current.costPerTonneCo2e',$('#curCostPerTonneCo2e').autoNumeric('get')); } catch (e) {}
@@ -320,7 +318,7 @@ var ractive = new BaseRactive({
       tmp.tenantId = ractive.get('tenant.id');
 //      console.log('ready to save interventionType'+JSON.stringify(tmp)+' ...');
       $.ajax({
-        url: id === undefined ? ractive.getServer()+'/intervention-types' : ractive.rewrite(id),
+        url: id === undefined ? ractive.getServer()+'/intervention-types' : id,
         type: id === undefined ? 'POST' : 'PUT',
         contentType: 'application/json',
         data: JSON.stringify(tmp),
@@ -372,46 +370,18 @@ var ractive = new BaseRactive({
   select: function(interventionType) {
     console.log('select: '+JSON.stringify(interventionType));
     ractive.set('saveObserver',false);
-	  // adapt between Spring Hateos and Spring Data Rest
-	  if (interventionType['_links'] == undefined && interventionType.links != undefined) {
-	    interventionType._links = interventionType.links;
-	    $.each(interventionType.links, function(i,d) {
-        if (d.rel == 'self') interventionType._links.self = { href:d.href };
-      });
-	  }
-	  if (interventionType._links != undefined) {
-	    var url = interventionType._links.self.href.indexOf('?')==-1 ? interventionType._links.self.href : interventionType._links.self.href.substr(0,interventionType._links.self.href.indexOf('?')-1);
-	    console.log('loading detail for '+url);
-	    $.getJSON(ractive.getServer()+url,  function( data ) {
-        console.log('found interventionType '+data);
-        ractive.set('current', data);
-        ractive.initControls();
-        $('#curDataStatus').typeahead({ items:'all',minLength:0,source:ractive.get('status') });
-        $('#curDataStatus').on("click", function (ev) {
-          newEv = $.Event("keydown");
-          newEv.keyCode = newEv.which = 40;
-          $(ev.target).trigger(newEv);
-          return true;
-        });
-        $('#curAnalysisStatus').typeahead({ items:'all',minLength:0,source:ractive.get('status') });
-        $('#curAnalysisStatus').on("click", function (ev) {
-          newEv = $.Event("keydown");
-          newEv.keyCode = newEv.which = 40;
-          $(ev.target).trigger(newEv);
-          return true;
-        });
-        // who knows why this is needed, but it is, at least for first time rendering
-        $('.autoNumeric').autoNumeric('update',{});
-        ractive.toggleResults();
-        $('#currentSect').slideDown();
-        ractive.set('saveObserver',true);
-      });
-    } else {
-      console.log('Skipping load as no _links.'+interventionType.name);
-      ractive.set('current', interventionType);
-      ractive.hideResults();
+    var url = ractive.tenantUri(interventionType);
+    console.log('loading detail for '+url);
+    $.getJSON(url,  function( data ) {
+      console.log('found interventionType '+data);
+      ractive.set('current', data);
+      ractive.initControls();
+      // who knows why this is needed, but it is, at least for first time rendering
+      $('.autoNumeric').autoNumeric('update',{});
+      ractive.toggleResults();
+      $('#currentSect').slideDown();
       ractive.set('saveObserver',true);
-    }
+    });
   },
   showActivityIndicator: function(msg, addClass) {
     document.body.style.cursor='progress';

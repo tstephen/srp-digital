@@ -19,14 +19,7 @@ var newLineRegEx = /\n/g;
 
 
 /**
- * Extends Ractive to handle authentication for RESTful clients connecting
- * to Spring servers.
- *
- * Also offers some standard controls like Typeahead and a re-branding mechanism.
- *
- * Form names expected:
- *   loginForm
- *   logoutForm
+ * Extends Ractive to handle offers some standard controls and a re-branding mechanism.
  */
 var BaseRactive = Ractive.extend({
   CSRF_TOKEN: 'XSRF-TOKEN',
@@ -190,29 +183,15 @@ var BaseRactive = Ractive.extend({
   },
   initAutoComplete: function() {
     console.log('initAutoComplete');
-    if (ractive.get('tenant.typeaheadControls')!=undefined && ractive.get('tenant.typeaheadControls').length>0) {
-      $.each(ractive.get('tenant.typeaheadControls'), function(i,d) {
-        //console.log('binding ' +d.url+' to typeahead control: '+d.selector);
-        if (d.url==undefined) {
-          ractive.initAutoCompletePart2(d,d.values);
+    $.each(ractive.get('tenant.typeaheadControls'), function(i,d) {
+      //console.log('binding ' +d.url+' to typeahead control: '+d.selector);
+      if (d.url==undefined) {
+        ractive.addDataList(d,d.values);
+      } else {
+        $.get(ractive.getServer()+d.url, function(data){
           ractive.addDataList(d,d.values);
-        } else {
-          $.get(ractive.getServer()+d.url, function(data){
-            ractive.initAutoCompletePart2(d,data);
-            ractive.addDataList(d,d.values);
-          },'json');
-        }
-      });
-    }
-  },
-  initAutoCompletePart2: function(d, data) {
-    if (d.name!=undefined) ractive.set(d.name,data);
-    if ($(d.selector)['typeahead'] == 'function') $(d.selector).typeahead({ items:'all',minLength:0,source:data });
-    $(d.selector).on("click", function (ev) {
-      newEv = $.Event("keydown");
-      newEv.keyCode = newEv.which = 40;
-      $(ev.target).trigger(newEv);
-      return true;
+        },'json');
+      }
     });
   },
   initAutoNumeric: function() {
@@ -308,19 +287,6 @@ var BaseRactive = Ractive.extend({
     if (d == 'Invalid Date') d = parseDateIEPolyFill(timeString);
     return d;
   },
-  rewrite: function(id) {
-    console.info('rewrite:'+id);
-    if (ractive.get('server')!=undefined && ractive.get('server')!='' && id.indexOf(ractive.get('server'))==-1) {
-      //console.error('  rewrite is necessary');
-      if (id.indexOf('://')==-1) {
-        return ractive.getServer()+id;
-      } else {
-        return ractive.getServer()+id.substring(id.indexOf('/', id.indexOf('://')+4));
-      }
-    } else {
-      return id;
-    }
-  },
   saveDoc: function () {
     console.log('saveDoc '+JSON.stringify(ractive.get('current.doc'))+' ...');
     var n = ractive.get('current.doc');
@@ -407,7 +373,7 @@ var BaseRactive = Ractive.extend({
     if (fadeOutMessages && additionalClass!='bg-danger text-danger') setTimeout(function() {
       $('#messages').fadeOut();
     }, EASING_DURATION*10);
-    else $('#messages, .messages').append('<span class="text-danger pull-right glyphicon glyphicon-remove" onclick="ractive.hideMessage()"></span>');
+    else $('#messages, .messages').append('<span class="text-danger pull-right glyphicon glyphicon-btn glyphicon-remove" onclick="ractive.hideMessage()"></span>');
   },
   showReconnected: function() {
     console.log('showReconnected');
@@ -454,7 +420,6 @@ var BaseRactive = Ractive.extend({
       }
     })
   },
-  // TODO see also rewrite, probably ought to merge
   tenantUri: function(entity) {
     console.log('tenantUri: '+entity);
     var uri = ractive.uri(entity);
@@ -575,10 +540,14 @@ var BaseRactive = Ractive.extend({
       });
     } else if (entity['_links']!=undefined) {
       uri = ractive.stripProjection(entity._links.self.href);
+    } else if (entity['id']!=undefined) {
+      uri = ractive.get('entityPath')+'/'+entity.id;
     }
     // work around for sub-dir running
-    if (uri.indexOf(ractive.getServer())==-1) {
+    if (uri != undefined && uri.indexOf(ractive.getServer())==-1 && uri.indexOf('//')!=-1) {
       uri = ractive.getServer() + uri.substring(uri.indexOf('/', uri.indexOf('//')+2));
+    } else if (uri != undefined && uri.indexOf('//')==-1) {
+      uri = ractive.getServer()+uri;
     }
 
     ractive.set('saveObserver', saveObserver);

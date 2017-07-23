@@ -235,12 +235,10 @@ var ractive = new BaseRactive({
   save: function () {
     console.log('save organisationType: '+ractive.get('current').lastName+'...');
     ractive.set('saveObserver',false);
-    var id = ractive.get('current')._links === undefined ? undefined : (
-        ractive.get('current')._links.self.href.indexOf('?') == -1 ? ractive.get('current')._links.self.href : ractive.get('current')._links.self.href.substr(0,ractive.get('current')._links.self.href.indexOf('?')-1)
-    );
-    ractive.set('saveObserver',true);
+    var id = ractive.uri(ractive.get('current'));
     if (document.getElementById('currentForm')==undefined) {
       // loading... ignore
+      ractive.set('saveObserver',true);
     } else if(document.getElementById('currentForm').checkValidity()) {
       // cannot save organisationType and account in one (grrhh), this will clone...
       var tmp = JSON.parse(JSON.stringify(ractive.get('current')));
@@ -249,7 +247,7 @@ var ractive = new BaseRactive({
       tmp.tenantId = ractive.get('tenant.id');
 //      console.log('ready to save organisationType'+JSON.stringify(tmp)+' ...');
       $.ajax({
-        url: id === undefined ? ractive.getServer()+'/organisation-types' : ractive.rewrite(id),
+        url: id === undefined ? ractive.getServer()+'/organisation-types' : id,
         type: id === undefined ? 'POST' : 'PUT',
         contentType: 'application/json',
         data: JSON.stringify(tmp),
@@ -271,20 +269,14 @@ var ractive = new BaseRactive({
       console.warn('Cannot save yet as Organisation Type is invalid');
       $('#currentForm :invalid').addClass('field-error');
       ractive.showMessage('Cannot save yet as Organisation Type is incomplete');
+      ractive.set('saveObserver',true);
     }
   },
   select: function(organisationType) {
     console.log('select: '+JSON.stringify(organisationType));
     ractive.set('saveObserver',false);
-	  // adapt between Spring Hateos and Spring Data Rest
-	  if (organisationType['_links'] == undefined && organisationType.links != undefined) {
-	    organisationType._links = organisationType.links;
-	    $.each(organisationType.links, function(i,d) {
-        if (d.rel == 'self') organisationType._links.self = { href:d.href };
-      });
-	  }
 	  if (organisationType._links != undefined) {
-	    var url = organisationType._links.self.href.indexOf('?')==-1 ? organisationType._links.self.href : organisationType._links.self.href.substr(0,organisationType._links.self.href.indexOf('?')-1);
+	    var url = ractive.tenantUri(organisationType);
 	    console.log('loading detail for '+url);
 	    $.getJSON(ractive.getServer()+url,  function( data ) {
         console.log('found organisationType '+data);

@@ -230,24 +230,10 @@ var ractive = new BaseRactive({
     }
     return uri;
   },
-  initAutoCompleteOnDemand: function(selector, data) {
-    $(selector).typeahead({ items:'all',minLength:0,source:data });
-    $(selector).on("click", function (ev) {
-      newEv = $.Event("keydown");
-      newEv.keyCode = newEv.which = 40;
-      $(ev.target).trigger(newEv);
-      return true;
-    });
-  },
-  oninit: function() {
-    console.log('oninit');
-  },
   save: function () {
     console.log('save parameter: '+ractive.get('current').name+'...');
     ractive.set('saveObserver',false);
-    var id = ractive.get('current')._links === undefined ? undefined : (
-        ractive.get('current')._links.self.href.indexOf('?') == -1 ? ractive.get('current')._links.self.href : ractive.get('current')._links.self.href.substr(0,ractive.get('current')._links.self.href.indexOf('?')-1)
-    );
+    var id = ractive.uri(ractive.get('current'));
     console.log('  id: '+id+', so will '+(id === undefined ? 'POST' : 'PUT'));
     ractive.set('saveObserver',true);
     if (document.getElementById('currentForm')==undefined) {
@@ -255,8 +241,7 @@ var ractive = new BaseRactive({
     } else if(document.getElementById('currentForm').checkValidity()) {
       ractive.set('current.tenantId', ractive.get('tenant.id'));
       $.ajax({
-        //url: id === undefined ? ractive.get('tenant.id')+'/parameters/' : id.replace('/parameters',ractive.get('tenant.id')+'/parameters'),
-        url: id === undefined ? ractive.getServer()+'/parameters/' : ractive.rewrite(id),
+        url: id === undefined ? ractive.getServer()+'/parameters/' : id,
         type: id === undefined ? 'POST' : 'PUT',
         contentType: 'application/json',
         data: JSON.stringify(ractive.get('current')),

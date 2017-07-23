@@ -13,7 +13,7 @@
         <a class="clickable glyphicon glyphicon-btn glyphicon-remove" aria-hidden="true" on-click="delete(current)" title="Delete this record"></a>
       </span>
     </h2>
-    
+
     <div class="currentBody col-md-6 col-sm-12 col-xs-12">
       <ul class="form edit-form">
         <li>
@@ -25,15 +25,15 @@
           <textarea class="form-control" id="curDescription" value="{{current.description}}"></textarea>
         </li>
         <li>
-          <label class="col-md-4 required">MACC Status:</label><input class="typeahead form-control" id="curStatus" placeholder="Start typing to filter options" required value="{{current.status}}"/>
+          <label class="col-md-4 required">MACC Status:</label><input class="form-control" id="curStatus" list="status" placeholder="Start typing to filter options" required value="{{current.status}}"/>
           <p class="help-block col-xs-offset-4">Green will be included in MAC Curve; red will not; amber to be determined.</p>
         </li>
         <li>
-          <label class="col-md-4">Data Status:</label><input class="typeahead form-control" id="curDataStatus" placeholder="Start typing to filter options" value="{{current.dataStatus}}"/>
+          <label class="col-md-4">Data Status:</label><input class="form-control" id="curDataStatus" list="status" placeholder="Start typing to filter options" value="{{current.dataStatus}}"/>
           <p class="help-block col-xs-offset-4">Do we have the data to support this intervention?</p>
         </li>
         <li>
-          <label class="col-md-4">Analysis Status:</label><input class="typeahead form-control" id="curAnalysisStatus" placeholder="Start typing to filter options" value="{{current.analysisStatus}}"/>
+          <label class="col-md-4">Analysis Status:</label><input class="form-control" id="curAnalysisStatus" list="status" placeholder="Start typing to filter options" value="{{current.analysisStatus}}"/>
           <p class="help-block col-xs-offset-4">Is the analysis of data for this intervention complete?</p>
         </li>
       </ul>
@@ -41,32 +41,32 @@
     <div class="currentBody col-md-6 col-sm-12 col-xs-12">
       <ul class="form edit-form">
         <li>
-          <label class="col-md-4 required">Classification:</label><input class="typeahead form-control" id="curClassification" placeholder="Start typing to filter options" required value="{{current.classification}}"/>
+          <label class="col-md-4 required">Classification:</label><input class="form-control" id="curClassification" placeholder="Start typing to filter options" required value="{{current.classification}}"/>
           <p class="help-block col-xs-offset-4">Four levels of classification, select Level 4.</p>
         </li>
         <li>
-          <label class="col-md-4">Strategic Focus:</label><input class="typeahead form-control" id="curStrategicFocus" readonly disabled value="{{current.strategicFocus}}"/>
+          <label class="col-md-4">Strategic Focus:</label><input class="form-control" id="curStrategicFocus" readonly disabled value="{{current.strategicFocus}}"/>
           <p class="help-block col-xs-offset-4"></p>
         </li>
         <li>
-          <label class="col-md-4">Tactical Driver:</label><input class="typeahead form-control" id="curTacticalDriver" readonly disabled value="{{current.tacticalDriver}}"/>
+          <label class="col-md-4">Tactical Driver:</label><input class="form-control" id="curTacticalDriver" readonly disabled value="{{current.tacticalDriver}}"/>
           <p class="help-block col-xs-offset-4"></p>
         </li>
         <li>
-          <label class="col-md-4">Sub-category:</label><input class="typeahead form-control" id="curOperationalSubCategory" readonly disabled value="{{current.operationalSubCategory}}"/>
+          <label class="col-md-4">Sub-category:</label><input class="form-control" id="curOperationalSubCategory" readonly disabled value="{{current.operationalSubCategory}}"/>
           <p class="help-block col-xs-offset-4"></p>
         </li>
       </ul>
     </div>
-    
+
     <h3 class="form-inline" style="clear:both">Factors affecting this intervention</h3>
 
     <div class="currentBody col-md-6 col-sm-12 col-xs-12">
       <ul class="form edit-form">
        <!-- <li>
-          <label class="col-md-4 required">Modelling Year:</label><input class="typeahead form-control" id="curModellingYear" max="2099" min="1970" placeholder="yyyy" required type="number" value="{{current.modellingYear}}"/>
+          <label class="col-md-4 required">Modelling Year:</label><input class="form-control" id="curModellingYear" max="2099" min="1970" placeholder="yyyy" required type="number" value="{{current.modellingYear}}"/>
           <p class="help-block col-xs-offset-4">The year this intervention's analysis was last updated.</p>
-        </li> --> 
+        </li> -->
         <li>
           <label class="col-md-4 required">Lifetime: </label>
           <div class="input-group">
@@ -109,11 +109,11 @@
         </li>
         <li>
           <label class="col-md-4 required">Cross-org'n:</label>
-          <input class="form-control" data-a-pad="false" id="curCrossOrganisation" type="checkbox" checked="{{current.crossOrganisation}}"/>{{#current.crossOrganisation==true}} Yes{{/}} 
+          <input class="form-control" data-a-pad="false" id="curCrossOrganisation" type="checkbox" checked="{{current.crossOrganisation}}"/>{{#current.crossOrganisation==true}} Yes{{/}}
           <p class="help-block col-xs-offset-4">Check if this intervention requires cross-organisational co-ordination / commissioning.</p>
         </li>
       </ul>
-    </div>    
+    </div>
     <div class="currentBody col-md-6 col-sm-12 col-xs-12">
       <ul class="form edit-form">
         <li>
@@ -145,7 +145,7 @@
       <ul class="form edit-form">
       </ul>
     </div>
-  
+
     <h3 class="form-inline" style="clear:both">Impacts</h3>
        <div class="currentBody col-md-6 col-sm-12 col-xs-12">
      <ul class="form edit-form">
@@ -246,7 +246,7 @@
         </li>
       </ul>
     </div>
-    
+
     <h3 class="form-inline" style="clear:both">Additional information</h3>
 
     <div class="currentBody col-md-6 col-sm-12 col-xs-12">
@@ -267,9 +267,9 @@
         </li>
       </ul>
     </div>
-  
+
   </form>
-  
-  
-  
+
+
+
 </section>
