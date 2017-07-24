@@ -59,6 +59,12 @@ var $r = (function ($, ractive, $auth) {
         for (k in me.rtn.answers) {
           if (_period != me.rtn.answers[k].applicablePeriod) continue;
           if (me.rtn.answers[k].question.name==survey.categories[i].questions[j].name) {
+            if (me.rtn.answers[k].question.type=='checkbox' && typeof me.rtn.answers[k].response == 'string') {
+              me.rtn.answers[k].response = me.rtn.answers[k].response.split(',');
+            }
+            if (me.rtn.answers[k].question.type=='radio' && typeof me.rtn.answers[k].response == 'string') {
+              me.rtn.answers[k].response = me.rtn.answers[k].response.split(',');
+            }
             switch (me.rtn.answers[k].question.name) {
             // special handling for organisation ...
             case 'ORG_CODE':
@@ -223,6 +229,12 @@ var $r = (function ($, ractive, $auth) {
     });
     if (_server.indexOf('api.srp.digital')!=-1) {
       me.rtn.selfRef = me.rtn.selfRef.replace(/localhost/, 'api.srp.digital');
+    }
+    // handle checkbox options
+    for (idx = 0 ; idx< me.rtn.answers.length ; idx++) {
+      // console.warn(idx);
+      if (Array.isArray(me.rtn.answers[idx].response)) me.rtn.answers[idx].response = me.rtn.answers[idx].response.join();
+      delete me.rtn.answers[idx].question['optionNames'];
     }
     return $.ajax({
         url: me.rtn.selfRef,
