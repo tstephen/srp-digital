@@ -132,13 +132,28 @@ var $r = (function ($, ractive, $auth) {
       $('#PROVIDERS_COMMISSIONED').parent().parent().hide();
     }
   }
+  me.diag = function() {
+    _loginSuccessful();
+  }
+  function _loginSuccessful() {
+    // $('.questionnaire').slideDown();
+    console.debug('  username:'+$auth.getClaim('sub'));
+    console.debug('  tenant:'+ractive.get('tenant.id'));
+    console.debug('  survey:'+_survey);
+    console.debug('  return:'+me.rtn);
+    console.debug('  orgs:'+(ractive.get('orgs') == undefined ? 0 : ractive.get('orgs').length));
+    console.debug('  orgTypes:'+(ractive.get('orgTypes') == undefined ? 0 : ractive.get('orgTypes').length));
+    if (_survey == undefined) ractive.fetch();
+    if (me.rtn == undefined) _fetchReturn();
+    if (ractive.get('orgTypes') == undefined) _fetchLists();
+  }
 
   function _showQuestionnaire() {
     if (_survey == undefined) _fetchReturn();
     $('section.questionnaire').slideDown();
     // Add ERIC import button
     $('h1 .importEric').remove();
-    $('h1').append('<span class="btn glyphicon glyphicon-btn glyphicon-import pull-right importEric" onclick="$r.importEric()">Import ERIC data</span>');
+    $('h1').append('<button class="btn pull-right importEric" onclick="$r.importEric()">Import ERIC data<span class="glyphicon glyphicon-import"></span></button>');
   }
 
   me.fill = function(survey) {
@@ -215,7 +230,7 @@ var $r = (function ($, ractive, $auth) {
   me.submit = function() {
     //console.info('submit return');
     // bit of a hack as can't figure the load order issue that hides form
-    if (!$('.questionnaire').is('visible')) $('.questionnaire').slideDown();
+    //if (!$('.questionnaire').is('visible')) $('.questionnaire').slideDown();
     if ($r.dirty == false) {
       //console.debug('skip save, not dirty');
       return;
@@ -269,15 +284,7 @@ var $r = (function ($, ractive, $auth) {
 
   // set and load questionnaire
   ractive.set('questionnaireDef',_server+'/surveys/findByName/'+_surveyName);
-  ractive.fetch();
-  _fetchReturn();
-  _fetchLists();
-  $('.questionnaire').slideDown();
-  // $auth.addLoginCallback(ractive.fetch);
-  // $auth.addLoginCallback(_fetchReturn);
-  // $auth.addLoginCallback(_fetchLists());
-  // $auth.addLoginCallback(_bindLists());
-  $auth.addLoginCallback(function() { $('.questionnaire').slideDown(); });
+  $auth.addLoginCallback(_loginSuccessful);
 
   if (ractive['fetchCallbacks']==undefined) ractive.fetchCallbacks = $.Callbacks();
   ractive.fetchCallbacks.add(_hideCalcs);

@@ -67,9 +67,8 @@ small {
   padding-left: 20px !imp ortant;
   font-style: italic;
 }
-.btn.importEric {
-  font-family: Arial, sans-serif;
-
+.btn.importEric > .glyphicon {
+  padding:6px;
 }
 .navbar-brand {
 	padding-top: 0;
