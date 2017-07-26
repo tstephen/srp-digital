@@ -26,9 +26,8 @@ var ractive = new BaseRactive({
     commissioningOrganisationTypes: [],
     display000s: false,
     healthWarning:'This resource is intended to provide an overview of carbon and cost reduction opportunities, as well as a framework within which users can develop their own analysis. The figures are derived from specific case studies and as such will not be equally applicable for every organisation. Developing local business cases will require local technical and economic assessments. This tool identifies the potential opportunities, interventions to investigate and scale of savings and is not a substitute for the usual financial analysis required to assemble a case for investment.',
-    licenseTerms: function () {
-      return "By signing up to the Sustainability Intervention Planner your organisation's name, actual and proposed sustainability interventions will be recorded within the system. The data may be aggregated with other organisations data to understand the potential for the entire sector but will remain anonymous. Only the Sustainable Development Unit for the health and care system in England and trakeo ltd. will have access to your information, which will be used solely for the purposes of research, benchmarking and to otherwise promote sustainable development within the health sector. We will not share your personal details with any other organisations. If you provide feedback about this website we will only use it to develop and improve the site.\n\n"
-          +ractive.get('healthWarning');
+    isLoggedIn: function() {
+      return $auth.getClaim('sub')==undefined;
     },
     organisationTypes: [],
     // TODO fetch dynamically
@@ -69,6 +68,7 @@ var ractive = new BaseRactive({
       }
     },
     showAddUserIntervention: true,
+    server: $env.server,
     sort: function (array, column, asc) {
       console.info('sort '+(asc ? 'ascending' : 'descending')+' on: '+column);
       array = array.slice(); // clone, so we don't modify the underlying data
@@ -93,7 +93,7 @@ var ractive = new BaseRactive({
     },
     stdPartials: [
       { "name": "sustainabilityInterventionPlanner", "url": "../2.0.0/partials/planner.html"},
-      { "name": "licenseModal", "url": "../2.0.0/partials/planner-license-modal.html"},
+      { "name": "loginSect", "url": $env.server+"/webjars/auth/1.0.0/partials/login-sect.html"},
       { "name": "maccOptionsSect", "url": "../2.0.0/partials/macc-options-sect.html"},
       { "name": "maccDisplaySect", "url": "../2.0.0/partials/macc-display-sect.html"},
       { "name": "macTableDisplaySect", "url": "../2.0.0/partials/mac-table-sect.html"},
@@ -131,27 +131,6 @@ var ractive = new BaseRactive({
     ractive.recordPlan();
 
     $('#userInterventionModal').modal('hide');
-  },
-  agreeLicense: function() {
-    console.info('agreeLicense');
-    ractive.set('current.licenseAgreed',true);
-    ractive.set('current.tenantId',ractive.get('tenant.id'));
-    $('#licenseModal').modal('hide');
-    $.ajax({
-      contentType: 'application/json',
-      url: ractive.getServer()+'/'+ractive.get('tenant.id')+'/messages/omny.registration.json',
-      type: 'POST',
-      data: JSON.stringify(ractive.get('current')),
-      success: completeHandler = function(data, textStatus, jqXHR) {
-        //console.log('data: '+ data);
-        var location = jqXHR.getResponseHeader('Location');
-        console.log(' created contact: '+location);
-        ractive.set('current.id',location.substring(location.lastIndexOf('/')+1));
-        ractive.set('current.shortId',location.substring(location.lastIndexOf('/')+1));
-        ractive.showMessage('Account created, please check your email to confirm your access');
-        if (ractive.get('step')=='review') ractive.showUserInterventionModal();
-      }
-    });
   },
   existingInterventions: function() {
     console.info('existingInterventions');
@@ -220,8 +199,6 @@ var ractive = new BaseRactive({
 //    ractive.initAutoComplete();
 //    ractive.initAutoNumeric();
 //    ractive.initDatepicker();
-  },
-  oninit: function() {
   },
   replaceGraph: function() {
     console.info('replaceGraph: ');
@@ -292,17 +269,9 @@ var ractive = new BaseRactive({
       $('#result').fadeIn(1000);
     });
   },
-  showLicense: function() {
-    console.info('showLicense');
-    $('#licenseModal').modal('show');
-  },
   showUserInterventionModal: function() {
     console.info('showUserInterventionModal');
-    if (ractive.get('current')==undefined || ractive.get('current.licenseAgreed')!=true) {
-      return ractive.showLicense();
-    } else {
-      $('#userInterventionModal').modal('show');
-    }
+    $('#userInterventionModal').modal('show');
   },
   setScaleFunc: function(idx) {
     console.info('setScaleFunc');
@@ -398,9 +367,6 @@ var ractive = new BaseRactive({
   updatePlan: function(step) {
     console.log('updatePlan');
     ractive.set('step',step);
-    if (ractive.get('current')==undefined || ractive.get('current.licenseAgreed')!=true) {
-      return ractive.showLicense();
-    }
   }
 });
 
