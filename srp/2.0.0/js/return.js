@@ -267,6 +267,12 @@ var $r = (function ($, ractive, $auth) {
   ractive.observe('q.activeCategory', function (newValue, oldValue, keypath) {
     if (newValue!=oldValue) {
       _hideNotApplicable();
+      parent.notifyClick();
+      // allow time for notify click to scroll to top and for iframe to calc new height
+      setTimeout(function() {
+        //parent.alert(''+$('#containerSect').height());
+        parent.notifyIFrameSize($('#containerSect').height());
+      },100);
     }
   });
 

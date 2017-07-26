@@ -285,27 +285,12 @@
     updateSlide();
   }
 
-  function iResize() { 
-    var iFrames = document.getElementsByTagName('iframe');
-    console.info('iResize has '+iFrames.length);
-    for (var i = 0, j = iFrames.length; i < j; i++) {
-      console.info('  current height: '+iFrames[i].contentWindow.document.body.offsetHeight);
-      iFrames[i].style.height = iFrames[i].contentWindow.document.body.offsetHeight + 'px';
-    }
-  }
-
-  jQuery('iframe').load( function() {
-    // unfortunately this delay is needed to give the frame script time to run
-    setTimeout( iResize, 1000 );
-  });
-
   /*
    * Load all the functions once it's ready.
    */
   $( window ).load( function() {
 
     // Load the functions.
-    iResize();
     slideshow();
     remove_image_attributes();
     heights();
@@ -324,4 +309,11 @@
   }, 500 ) );
 
 } )( jQuery );
+
+function notifyClick() {
+  jQuery('html, body').animate({ scrollTop: jQuery("#qIFrame").offset().top }, 1000);
+}
+function notifyIFrameSize(height) {
+  document.getElementById('qIFrame').style.height=(height+32)+"px";
+}
 
