@@ -196,6 +196,19 @@ form .criteria input {
 .omny-burger {
   margin: 4px 5px;
 }
+.save-indicator-animation {
+  animation: blinker 1s linear infinite;
+}
+.save-indicator {
+  display:none;
+  font-size: 36px;
+  right: 36px;
+  position: fixed;
+  top: 48%;
+}
+@keyframes blinker {
+  50% { opacity: 0; }
+}
 .tr-large-icon {
   font-size: 96px;
   color: #ec9300;

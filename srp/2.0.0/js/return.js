@@ -229,8 +229,6 @@ var $r = (function ($, ractive, $auth) {
 
   me.submit = function() {
     //console.info('submit return');
-    // bit of a hack as can't figure the load order issue that hides form
-    //if (!$('.questionnaire').is('visible')) $('.questionnaire').slideDown();
     if ($r.dirty == false) {
       //console.debug('skip save, not dirty');
       return;
@@ -251,6 +249,7 @@ var $r = (function ($, ractive, $auth) {
       if (Array.isArray(me.rtn.answers[idx].response)) me.rtn.answers[idx].response = me.rtn.answers[idx].response.join();
       delete me.rtn.answers[idx].question['optionNames'];
     }
+    $('.save-indicator').show();
     return $.ajax({
         url: me.rtn.selfRef,
         type: 'PUT',
@@ -259,6 +258,12 @@ var $r = (function ($, ractive, $auth) {
         dataType:'text',
         success: function(data, textStatus, jqXHR) {
           console.log('updated ok, data: '+ data);
+          $('.save-indicator span').toggleClass('save-indicator-animation glyphicon-save glyphicon-saved');
+          setTimeout(function() {
+            $('.save-indicator').fadeOut(function() {
+              $('.save-indicator span').toggleClass('save-indicator-animation glyphicon-save glyphicon-saved');
+            });
+          }, 3000);
           $r.dirty = false;
         }
       });
