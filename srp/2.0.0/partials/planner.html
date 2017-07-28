@@ -80,7 +80,7 @@
         {{#interventions:idx}}
           {{#if idx % 3 == 0}}<div class="row">{{/if}}
           <div class="col-md-4 col-sm-12">
-            <label class="checkbox" for="option{{idx}}">{{intervention.interventionType.name}}</label>
+            <label class="checkbox" for="option{{idx}}">{{name}}</label>
             <input class="dataSet" data-idx="0" type="checkbox" id="option{{idx}}" {{#if isLoggedIn() }} readonly="on" disabled="on"{{/if}} onblur="ractive.updateExistingInterventions('{{name}}')" name="dataSet">
           </div>
         {{/}}
