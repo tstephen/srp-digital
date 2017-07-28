@@ -142,6 +142,26 @@ var ractive = new BaseRactive({
     if (ractive.hasRole('admin')) $('.admin').show();
     if (ractive.fetchCallbacks!=null) ractive.fetchCallbacks.fire();
   },
+  fetchPlan: function() {
+    console.info('fetchPlan...');
+    ractive.set('saveObserver', false);
+    $.ajax({
+      dataType: "json",
+      url: ractive.getServer() + '/' + ractive.get('tenant.id') + '/accounts/'+$auth.getClaim('org'),
+      crossDomain: true,
+      success: function(data) {
+        ractive.set('account', data);
+        ractive.set('current.abatementPlanBy',$auth.getClaim('sub'));
+        // ractive.set('current.existingInterventions',data.customFields.existingInterventions.split());
+        // var fieldNames = Object.keys(data.customFields);
+        // for (var idx in fieldNames) {
+        //   ractive.set('current.characteristics.'+idx+'.unit',fieldNames[idx]);
+        //   ractive.set('current.characteristics.'+idx+'.unitCount',data.customFields[fieldNames[idx]]);
+        // }
+        ractive.set('saveObserver', true);
+      }
+    });
+  },
   fetchOrganisationInterventions: function() {
     console.info('fetchOrganisationInterventions');
     ractive.set('saveObserver', false);
@@ -158,6 +178,15 @@ var ractive = new BaseRactive({
         ractive.set('current.existingInterventions',[]);
         ractive.set('current.characteristics',ractive.uniqUnits());
 
+        if (ractive.get('account')!=undefined) {
+          var existing = ractive.get('current.customFields.existingInterventions');
+          if (existing != undefined) ractive.set('current.existingInterventions',existing.split());
+          var fields = ractive.get('current.characteristics');
+          for (var idx in fields) {
+            var val = ractive.get('account.customFields')[ractive.get('current.characteristics.'+idx+'.unit')];
+            if (val!=undefined) ractive.set('current.characteristics.'+idx+'.unitCount',val);
+          }
+        }
         // take a copy of what we showed...
         // TODO except it gets updated too...
 //        ractive.set('current.defaultInterventions', ractive.get('interventions').slice());
@@ -209,29 +238,20 @@ var ractive = new BaseRactive({
   },
   recordPlan: function() {
     console.info('recordPlan');
-    if (ractive.get('current.shortId')!=undefined) {
+    if ($auth.getClaim('sub')!=undefined) {
       var tmp = JSON.parse(JSON.stringify(ractive.get('current')));
-      tmp.accountType = tmp.orgTypeName;
-      delete tmp.orgTypeName;
-      tmp.account = {
-        customFields: {
-          existingInterventions: tmp.existingIntervention,
-          characteristics: []
-        }
-      }
-      delete tmp.existingInterventions;
+      tmp.abatementPlanBy = $auth.getClaim('sub');
+      tmp.tenantId = ractive.get('tenant.id');
+      tmp.orgCode = $auth.getClaim('org');
+      tmp.existingInterventions = (tmp.existingInterventions == undefined ? '' : tmp.existingInterventions.join());
       for (var idx in tmp.characteristics) {
-        tmp.account.customFields.characteristics.push({
-          unit: tmp.characteristics[idx].unit,
-          unitCount: tmp.characteristics[idx].unitCount
-        });
+        tmp[tmp.characteristics[idx].unit] = tmp.characteristics[idx].unitCount;
       }
       delete tmp.characteristics;
       $.ajax({
-        contentType: 'application/json',
-        url: ractive.getServer()+'/'+ractive.get('tenant.id')+'/messages/sdu.abatementplan.json',
+        url: ractive.getServer()+'/msg/'+ractive.get('tenant.id')+'/srp.abatementplan.json',
         type: 'POST',
-        data: JSON.stringify(tmp),
+        data: { json: JSON.stringify(tmp) },
         success: completeHandler = function(data) {
           console.log('submitted plan, response was: '+ data);
         }

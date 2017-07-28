@@ -54,7 +54,7 @@
           <div class="col-md-offset-1 col-md-3 col-sm-12">
             <div class="form-group">
               <label for="curUnitCount{{idx}}">{{name}} {{unit}}</label>
-              <input class="form-control" id="curUnitCount{{idx}}" on-blur="updatePlan('tailor')" placeholder="{{unit}}" {{#if isLoggedIn() }} readonly="on" disabled="on"{{/if}} title="{{unitDescription}}" type="number" value="{{unitCount}}">
+              <input class="form-control" id="curUnitCount{{idx}}" on-blur="updatePlan('tailor')" placeholder="{{unit}}" {{#if isLoggedIn() }} readonly="on" disabled="on"{{/if}} title="{{unitDescription}}" step="any" type="number" value="{{unitCount}}">
               <p class="help-block help-block-lg">{{unitDescription}}</p>
             </div>
           </div>
