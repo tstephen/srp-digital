@@ -46,7 +46,9 @@
 
     <section role="tabpanel" class="tab-pane" id="tailor" style="margin-bottom:30px">
       <h3>Tailor to your organisation</h3>
-      <p>Based on the organisation type you selected we have estimates for these values but if you provide actual data it will scale the interventions to your organisation. <em>To enter your own details you need to be logged in.</em></p>
+      <p>Based on the organisation type you selected we have estimates for these values but if you provide actual data it will scale the interventions to your organisation.
+        {{#if !isLoggedIn()}}<em>To enter your own details you need to be logged in.</em>{{/if}}
+      </p>
       <p>Further information on scale factors is available in each intervention.</p>
       <form class="form-horizontal">
         {{#current.characteristics:idx}}
@@ -75,7 +77,9 @@
     </section>
 
     <section role="tabpanel" class="tab-pane" id="existingInterventions">
-      <h3>Which of these interventions have you <em>already</em> implemented? <em>(Once again, to enter your own details you need to be logged in.</em>)</h3>
+      <h3>Which of these interventions have you <em>already</em> implemented?
+        {{#if !isLoggedIn()}}<em>(Once again, to enter your own details you need to be logged in.</em>){{/if}}
+      </h3>
       <form class="form-horizontal">
         {{#interventions:idx}}
           {{#if idx % 3 == 0}}<div class="row">{{/if}}

@@ -360,10 +360,6 @@ var BaseRactive = Ractive.extend({
         .prop('height', window.innerHeight*0.8);
     $('#helpModal').modal({});
   },
-  showLogin: function() {
-    console.info('showLogin');
-    $('#loginSect').slideDown();
-  },
   showMessage: function(msg, additionalClass) {
     console.log('showMessage: '+msg);
     if (additionalClass == undefined) additionalClass = 'bg-info text-info';
@@ -629,6 +625,7 @@ $(document).ready(function() {
     ractive.set('searchTerm',decodeURIComponent(params['q']));
   }
   var i18n = new I18nController($env.server+'/workmgmt/2.2.0');
+
   ractive.set('saveObserver', true);
 });
 

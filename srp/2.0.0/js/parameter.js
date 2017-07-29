@@ -118,7 +118,7 @@ var ractive = new BaseRactive({
       else return 'hidden';
     },
     stdPartials: [
-      { "name": "loginSect", "url": $env.server+"/webjars/auth/1.0.0/partials/login-sect.html"},
+      { "name": "loginSect", "url": $env.server+"/webjars/auth/1.1.0/partials/login-sect.html"},
       { "name": "navbar", "url": "2.0.0/partials/parameter-navbar.html"},
       { "name": "profileArea", "url": "2.0.0/partials/profile-area.html"},
       { "name": "sidebar", "url": "2.0.0/partials/sidebar.html"},

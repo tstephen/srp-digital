@@ -93,7 +93,7 @@ var ractive = new BaseRactive({
     },
     stdPartials: [
       { "name": "sustainabilityInterventionPlanner", "url": "../2.0.0/partials/planner.html"},
-      { "name": "loginSect", "url": $env.server+"/webjars/auth/1.0.0/partials/login-sect.html"},
+      { "name": "loginSect", "url": $env.server+"/webjars/auth/1.1.0/partials/login-sect.html"},
       { "name": "maccOptionsSect", "url": "../2.0.0/partials/macc-options-sect.html"},
       { "name": "maccDisplaySect", "url": "../2.0.0/partials/macc-display-sect.html"},
       { "name": "macTableDisplaySect", "url": "../2.0.0/partials/mac-table-sect.html"},
