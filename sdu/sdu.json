@@ -56,6 +56,7 @@
     { "url": "/srp/interventions.html", "icon": "glyphicon-flash", "role": "analyst", "title": "Interventions", "description": "Manage the impact data for interventions on each organisation type" },
     { "url": "/srp/organisation-types.html", "icon": "glyphicon-flash", "role": "analyst", "title": "Organisation Types", "description": "Manage the different types of organisations applying interventions" },
     { "url": "/srp/parameters.html", "icon": "glyphicon-flash", "role": "analyst", "title": "Parameters", "description": "Manage the parameters that change over time to keep calculations up to date" },
+    { "url": "/srp/questions.html", "icon": "glyphicon-question-sign", "role": "analyst", "description": "Manage survey questions", "name": "Survey Questions" },
     { "url": "/srp/accounts.html", "icon": "omny-icon-address-book", "role": "analyst", "description": "Find a particular health or social care provider", "name": "Organisations" },
     { "url": "/srp/memo.html", "icon": "glyphicon-envelope", "role": "admin", "name": "Templates", "description": "Create and edit your message templates"  },
     { "url": "/srp/definitions.html", "icon": "omny-icon-process-model", "role": "admin", "description": "View your process definitions here", "name": "Process Definitions" },
