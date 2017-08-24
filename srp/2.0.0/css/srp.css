@@ -110,6 +110,17 @@ th {
   height: 80px;
   margin-top: 10px;
 }
+.rpt .controls {
+  z-index: 1000;
+  position: absolute;
+  right: 50px;
+}
+.rpt .controls .glyphicon-btn {
+  border: 1px solid #ddd;
+  background-color: #f9f9f9;
+  font-size: 36px;
+  padding: 12px
+}
 .scorecardicon {
 	font-size: 3em;
 	color: #ec9300;

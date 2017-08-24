@@ -81,100 +81,108 @@ function renderStacked(selector, csvString, options) {
       .attr("text-anchor", "start")
       .text(options.yAxisLabel);
 
-  // Climate Change Act 2008 target line
-  // Interpreted in the NHS as
-  // - a 10% reduction between 2007-08 and 2015-16 ; and
-  // - an overall 34% reduction by 2020/21
-  // Only to be applied to the core emissions.
-  var x1 = 0;
-  var y1 = data[0]['Core emissions']; // Core emissions in 2007-08 is 100% (baseline)
-  var x2 = x('2015-16')+( x.bandwidth()/2); // x dimension scaled to 2015-16
-  var y2 = y1 * (1 - ((100-90) / 100)); // 10% reduction from 2007-08 baseline
-  var ccaPhase1 = [[x1,y1,x2,y2]];
-  var x3 = x('2020-21'); // x dimension scaled to 2020
-  var y3 = y2 * (1 - ((100-66   ) / 100)); // 34% reduction from 2015-16 to 20-21
-  var ccaPhase2 = [[x2,y2,x3,y3]];
+  // SDU target lines
+  if (data[0]!=undefined && data[0]['Core emissions'] != undefined) {
+    // Climate Change Act 2008 target line
+    // Interpreted in the NHS as
+    // - a 10% reduction between 2007-08 and 2015-16 ; and
+    // - an overall 34% reduction by 2020/21
+    // Only to be applied to the core emissions.
+    var x1 = 0;
+    var y1 = data[0]['Core emissions']; // Core emissions in 2007-08 is 100% (baseline)
+    var x2 = x('2015-16')+( x.bandwidth()/2); // x dimension scaled to 2015-16
+    var y2 = y1 * (1 - ((100-90) / 100)); // 10% reduction from 2007-08 baseline
+    var ccaPhase1 = [[x1,y1,x2,y2]];
+    var x3 = x('2020-21'); // x dimension scaled to 2020
+    var y3 = y2 * (1 - ((100-66   ) / 100)); // 34% reduction from 2015-16 to 20-21
+    var ccaPhase2 = [[x2,y2,x3,y3]];
 
-  g.selectAll(".ccaPhase1")
-      .data(ccaPhase1)
-      .enter()
-    .append("line")
-      .attr("class", "ccaPhase1")
-      .attr("x1", function(d) { return d[0]; })
-      .attr("y1", function(d) { return y(d[1]); })
-      .attr("x2", function(d) { return d[2]; })
-      .attr("y2", function(d) { return y(d[3]); })
-      .attr("stroke", "black")
-      .attr("stroke-width", 1);
+    g.selectAll(".ccaPhase1")
+        .data(ccaPhase1)
+        .enter()
+      .append("line")
+        .attr("class", "ccaPhase1")
+        .attr("x1", function(d) { return d[0]; })
+        .attr("y1", function(d) { return y(d[1]); })
+        .attr("x2", function(d) { return d[2]; })
+        .attr("y2", function(d) { return y(d[3]); })
+        .attr("stroke", "black")
+        .attr("stroke-width", 1);
 
-  g.selectAll(".ccaPhase2")
-      .data(ccaPhase2)
-      .enter()
-    .append("line")
-      .attr("class", "ccaPhase2")
-      .attr("x1", function(d) { return d[0]; })
-      .attr("y1", function(d) { return y(d[1]); })
-      .attr("x2", function(d) { return d[2]; })
-      .attr("y2", function(d) { return y(d[3]); })
-      .attr("stroke", "black")
-      .attr("stroke-width", 1);
+    g.selectAll(".ccaPhase2")
+        .data(ccaPhase2)
+        .enter()
+      .append("line")
+        .attr("class", "ccaPhase2")
+        .attr("x1", function(d) { return d[0]; })
+        .attr("y1", function(d) { return y(d[1]); })
+        .attr("x2", function(d) { return d[2]; })
+        .attr("y2", function(d) { return y(d[3]); })
+        .attr("stroke", "black")
+        .attr("stroke-width", 1);
 
-  var legend = g.append("g")
-      .attr("text-anchor", "end")
-    .selectAll("g")
-    .data(keys.slice().reverse())
-    .enter().append("g")
-      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+    var legend = g.append("g")
+        .attr("text-anchor", "end")
+      .selectAll("g")
+      .data(keys.slice().reverse())
+      .enter().append("g")
+        .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+    var trendLines = ["CCA 2008"]; // just in case don't have enough org data
 
-  // Organisation's own target - n% reduction in emissions from base year by 2020/21
-  var n = 32;
-  var x4 = x('2011-12'); // x dimension scaled to baseline year
-  var y4 = data[4]['total']; //
-  var x5 = x('2020-21'); // x dimension scaled to 2020
-  var y5 = y4 * (1 - ((n) / 100)); // n% reduction from baseline
-  var orgTarget = [[x4,y4,x5,y5]];
+    // Organisation's own target - n% reduction in emissions from base year by 2020/21
+    if (data[4]!=undefined && data[4]['total'] != undefined) {
+      trendLines = ["CCA 2008", "Org'n Target"]; // both trend lines available
 
-  g.selectAll(".orgTarget")
-      .data(orgTarget)
-      .enter()
-    .append("line")
-      .attr("class", "orgTarget")
-      .attr("x1", function(d) { return d[0]; })
-      .attr("y1", function(d) { return y(d[1]); })
-      .attr("x2", function(d) { return d[2]; })
-      .attr("y2", function(d) { return y(d[3]); })
-      .attr("stroke", "#0B4BE5")
-      .attr("stroke-width", 1);
+      var n = 32;
+      var x4 = x('2011-12'); // x dimension scaled to baseline year
+      var y4 = data[4]['total']; //
+      var x5 = x('2020-21'); // x dimension scaled to 2020
+      var y5 = y4 * (1 - ((n) / 100)); // n% reduction from baseline
+      var orgTarget = [[x4,y4,x5,y5]];
 
-  legend.append("rect")
-      .attr("x", width - 19)
-      .attr("width", 19)
-      .attr("height", 19)
-      .attr("fill", z);
+      g.selectAll(".orgTarget")
+          .data(orgTarget)
+          .enter()
+        .append("line")
+          .attr("class", "orgTarget")
+          .attr("x1", function(d) { return d[0]; })
+          .attr("y1", function(d) { return y(d[1]); })
+          .attr("x2", function(d) { return d[2]; })
+          .attr("y2", function(d) { return y(d[3]); })
+          .attr("stroke", "#0B4BE5")
+          .attr("stroke-width", 1);
+    }
 
-  legend.append("text")
-      .attr("x", width - 24)
-      .attr("y", 9.5)
-      .attr("dy", "0.32em")
-      .text(function(d) { return d; });
+    legend.append("rect")
+        .attr("x", width - 19)
+        .attr("width", 19)
+        .attr("height", 19)
+        .attr("fill", z);
 
-  var legend2 = g.append("g")
-      .attr("text-anchor", "end")
-    .selectAll("g")
-    .data(["CCA 2008", "Org'n Target"])
-    .enter().append("g")
-      .attr("transform", function(d, i) { return "translate(0," + (i+4) * 20 + ")"; });
+    legend.append("text")
+        .attr("x", width - 24)
+        .attr("y", 9.5)
+        .attr("dy", "0.32em")
+        .text(function(d) { return d; });
 
-  var z2 = d3.scaleOrdinal().range(['#000',"#0B4BE5"]);
-  legend2.append("rect")
-      .attr("x", width - 19)
-      .attr("width", 19)
-      .attr("height", 3)
-      .attr("fill", z2);
+    var legend2 = g.append("g")
+        .attr("text-anchor", "end")
+      .selectAll("g")
+      .data(trendLines)
+      .enter().append("g")
+        .attr("transform", function(d, i) { return "translate(0," + (i+4) * 20 + ")"; });
 
-  legend2.append("text")
-      .attr("x", width - 24)
-      .attr("y", 9.5)
-      .attr("dy", "-0.2em")
-      .text(function(d) { return d; });
+    var z2 = d3.scaleOrdinal().range(['#000',"#0B4BE5"]);
+    legend2.append("rect")
+        .attr("x", width - 19)
+        .attr("width", 19)
+        .attr("height", 3)
+        .attr("fill", z2);
+
+    legend2.append("text")
+        .attr("x", width - 24)
+        .attr("y", 9.5)
+        .attr("dy", "-0.2em")
+        .text(function(d) { return d; });
+  }
 }

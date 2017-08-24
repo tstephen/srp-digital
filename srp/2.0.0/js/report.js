@@ -113,7 +113,14 @@ var ractive = new BaseRactive({
       },
       success: function( data ) {
         ractive.set('saveObserver', false);
-        $(ctrl).empty().append(data);
+        $(ctrl).empty().append(data)
+          .on('mouseover', function(ev) {
+            $('#'+ev.currentTarget.id+' .controls').show();
+          })
+          .on('mouseout', function(ev) {
+            $('#'+ev.currentTarget.id+' .controls').hide();
+          });
+        $('#'+ctrl.id+' .controls .glyphicon-share').wrap('<a href="'+ractive.getServer()+$(ctrl).data('src')+'" target="_blank"></a>');
         ractive.set('saveObserver', true);
       }
     });
