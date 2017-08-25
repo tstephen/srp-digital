@@ -7,6 +7,7 @@ var $r = (function ($, ractive, $auth) {
   var _isCcg = false;
   var _server = $env.server;
   var _survey;
+  var _surveyPeriod = '2016-17'; // TODO read system param
   var _now = new Date();
   var _period = getSearchParameters()['p'] == undefined
       ? (_now.getFullYear()-1)+'-'+(_now.getFullYear()-2000)
@@ -20,6 +21,24 @@ var $r = (function ($, ractive, $auth) {
     if ($('#ORG_TYPE option')!=undefined && $('#ORG_TYPE option').length==0 && ractive.get('orgTypes')!=undefined) {
       ractive.addSelectOptions('#ORG_TYPE', ractive.get('orgTypes'));
     }
+  }
+
+  function _disableHeadSections() {
+    console.info('disableHeadSections');
+    $('#Organisation h3').wrapInner('<span class="title"></span>').append(' - <em>Please enter these details only for the current year</em>')
+    $('#Policy h3').wrapInner('<span class="title"></span>').append(' - <em>Please enter these details only for the current year</em>')
+    $('#Performance h3').wrapInner('<span class="title"></span>').append(' - <em>Please enter these details only for the current year</em>')
+    //$('#Organisation input,#Organisation select,#Policy input,#Policy select,#Performance input,#Performance select').removeAttr('readonly').removeAttr('disabled');
+    $('#Organisation ol,#Policy ol,#Performance ol').hide();
+  }
+
+  function _enableHeadSections() {
+    console.info('enableHeadSections');
+    $('#Organisation h3').empty().append('Organisation');
+    $('#Policy h3').empty().append('Policy');
+    $('#Performance h3').empty().append('Performance');
+    //$('#Organisation input,#Organisation select,#Policy input,#Policy select,#Performance input,#Performance select').attr('readonly','readonly').attr('disabled','disabled');
+    $('#Organisation ol,#Policy ol,#Performance ol').show();
   }
 
   function _fetchLists() {
@@ -214,17 +233,27 @@ var $r = (function ($, ractive, $auth) {
   me.moveNext = function() {
     console.info('_moveNext');
     var currentYear = parseInt(_period.substring(0,4));
+    if (currentYear >= _now.getFullYear()) {
+      ractive.showError('You cannot enter data for the future');
+      $('.next').hide();
+      return;
+    }
     _period = (currentYear+1)+'-'+(currentYear+2-2000);
     ractive.set('q.about.title', 'SDU return '+_period);
     _fill(_survey);
+    if (_period == _surveyPeriod) _enableHeadSections();
+    else _disableHeadSections();
   }
 
   me.movePrevious = function() {
     console.info('_movePrevious');
+    $('.next').show();
     var currentYear = _period.substring(0,4);
     _period = (currentYear-1)+'-'+(currentYear-2000);
     ractive.set('q.about.title', 'SDU return '+_period);
     _fill(_survey);
+    if (_period == _surveyPeriod) _enableHeadSections();
+    else _disableHeadSections();
   }
 
   me.submit = function() {
