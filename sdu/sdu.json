@@ -54,12 +54,17 @@
     { "url": "/srp/public/planner.html", "icon": "tr-icon-organization", "title": "Your carbon and cost benefit curve", "description": "A tool to identify the most suitable interventions for individual organisations" },
     { "url": "/srp/intervention-types.html", "icon": "glyphicon-flash", "role": "analyst", "title": "Intervention Types", "description": "Manage the available intervention types affecting Carbon footprint" },
     { "url": "/srp/interventions.html", "icon": "glyphicon-flash", "role": "analyst", "title": "Interventions", "description": "Manage the impact data for interventions on each organisation type" },
-    { "url": "/srp/organisation-types.html", "icon": "glyphicon-flash", "role": "analyst", "title": "Organisation Types", "description": "Manage the different types of organisations applying interventions" },
-    { "url": "/srp/parameters.html", "icon": "glyphicon-flash", "role": "analyst", "title": "Parameters", "description": "Manage the parameters that change over time to keep calculations up to date" },
+    { "url": "/srp/organisation-types.html", "icon": "glyphicon-flash", "role": "admin", "title": "Organisation Types", "description": "Manage the different types of organisations applying interventions" },
+    { "url": "/srp/return.html", "icon": "glyphicon-open", "role": "user", "title": "SDU Return", "description": "Enter sustainability data for your SDU report" },
+    { "url": "/srp/report.html", "icon": "glyphicon-dashboard", "role": "user", "title": "SDU Report", "description": "View SDU report" },
+    { "url": "/srp/treasury.html", "icon": "glyphicon-gbp", "role": "user", "title": "Treasury Report", "description": "View Treasury report" },
+    { "url": "/srp/explorer.html", "icon": "glyphicon-globe", "role": "analyst", "title": "Data Explorer", "description": "Create arbitrary reports on the SDU report and ERIC data" },
+    { "url": "/srp/parameters.html", "icon": "glyphicon-equalizer", "role": "analyst", "title": "Parameters", "description": "Manage the parameters that change over time to keep calculations up to date" },
     { "url": "/srp/questions.html", "icon": "glyphicon-question-sign", "role": "analyst", "description": "Manage survey questions", "name": "Survey Questions" },
     { "url": "/srp/accounts.html", "icon": "omny-icon-address-book", "role": "analyst", "description": "Find a particular health or social care provider", "name": "Organisations" },
     { "url": "/srp/memo.html", "icon": "glyphicon-envelope", "role": "admin", "name": "Templates", "description": "Create and edit your message templates"  },
     { "url": "/srp/definitions.html", "icon": "omny-icon-process-model", "role": "admin", "description": "View your process definitions here", "name": "Process Definitions" },
+    { "url": "/srp/me.html", "icon": "omny-icon-user", "name": "My Profile", "role": "user", "description": "View and manage your account profile" },
     { "url": "/srp/admin/users.html", "icon": "omny-icon-user", "name": "User Management", "role": "super_admin", "description": "View and manage user accounts and access" },
     { "url": "/srp/status.html", "icon": "glyphicon-thumbs-up", "role": "admin", "name": "Status", "description": "Check on the status of the system configuration" }
   ],
@@ -75,7 +80,8 @@
     { "name": "sduGP SurgeryExtension", "url": "https://api.srp.digital/partials/account-extension.html"},
     { "name": "sduMental HealthExtension", "url": "https://api.srp.digital/partials/account-extension.html"},
     { "name": "sduPublic HealthExtension", "url": "https://api.srp.digital/partials/account-extension.html"},
-    { "name": "sduSpecialistExtension", "url": "https://api.srp.digital/partials/account-extension.html"}
+    { "name": "sduSpecialistExtension", "url": "https://api.srp.digital/partials/account-extension.html"},
+    { "name": "sduUserExtension", "url": "/srp/2.0.0/partials/user-extension.html"}
   ],
   "processes": [
     { "name": "Add Activity To Contact", "ref": "AddActivityToContact", "url": "processes/link/omny/custmgmt/AddActivityToContact.bpmn" },
@@ -104,6 +110,8 @@
     "contactDescription": "Summary",
     "contactDescriptionHint": "For example, the Head's name etc.",
     "contacts": "Contacts",
+    "org": "Organisation",
+    "orgHint": "The organisation you will be reporting on behalf of",
     "phone1": "Phone",
     "stage": "Status"
   },

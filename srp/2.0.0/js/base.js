@@ -569,10 +569,10 @@ $( document ).bind('keypress', function(e) {
 
 $(document).ready(function() {
   ractive.set('saveObserver', false);
+  ractive.set('context','/srp');
   // are we running in sub-context? TODO no longer required?
-  if (document.location.href.indexOf('https://trakeo.com/srp')!=-1) {
-    ractive.set('server','https://trakeo.com/srp');
-    ractive.set('context','/srp');
+  if (document.location.href.indexOf('https://srp.digital/srp')!=-1) {
+    ractive.set('server','https://srp.digital/srp');
 
     (function() {
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

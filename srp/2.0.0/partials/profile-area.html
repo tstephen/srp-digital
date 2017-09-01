@@ -1,8 +1,13 @@
 <div class="profile pull-right">
   <form name="logoutForm" action="{{context}}/logout" method="POST">
-    <span class="tenant">{{#tenant}}{{tenant.id}}{{else}}srp{{/}}</span>
-    <span id="tenantId" class="replaceable super-admin tenant" contenteditable="true" onblur="ractive.switchToTenant($('#tenantId').text())" name="tenantId" style=""value="{{tenant == null ? 'Click to set' : tenant.id}}"></span>
-    <a href="{{context}}/me.html" title="To set your profile picture, please visit gravatar.com">
+    {{#if matchRole('super_admin')}}
+      <select class="super-admin tenant" id="curTenant" onchange="ractive.switchToTenant($('#curTenant').val())">
+        {{#profile.allowedTenantsAsList}}
+          <option value="{{.}}" {{#if . == tenant.id}}selected{{/if}}>{{.}}</option>
+        {{/}}
+      </select>
+    {{/if}}
+    <a href="/srp/me.html" title="To set your profile picture, please visit gravatar.com">
       <span class="profile-img">{{username}}</span>
     </a>
     <a class="clickable glyphicon glyphicon-btn glyphicon-log-out logout" aria-hidden="true" on-click="logout()"></a>
