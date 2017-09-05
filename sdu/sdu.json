@@ -131,7 +131,7 @@
         {  "id": "AcuteTrust", "name": "Acute Trust"  },
         {  "id": "AdultSocialCare", "name": "Adult Social Care"  },
         {  "id": "Ambulance", "name": "Ambulance"  },
-        {  "id": "CCG", "name": "Clinical Commissioning Group"  },
+        {  "id": "Clinical_Commissioning_Group", "name": "Clinical Commissioning Group"  },
         {  "id": "Community", "name": "Community"  },
         {  "id": "Dentist", "name": "Dentist"  },
         {  "id": "DeptAndALBs", "name": "Dept and ALBs"  },

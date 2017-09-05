@@ -32,7 +32,7 @@ var ractive = new BaseRactive({
     },
     isCcg: function() {
       if (ractive.get('surveyReturn')==undefined) return '';
-      if (ractive.getAnswer('ORG_TYPE')=='CCG') return true;
+      if (ractive.getAnswer('ORG_TYPE')=='Clinical Commissioning Groups') return true;
       else return false;
     },
     stdPartials: [
