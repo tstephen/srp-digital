@@ -213,6 +213,15 @@
         {  "name": "South West"  },
         {  "name": "Yorkshire and Humber"  }
       ]
+    },{ "name": "questionTypes", "ref": "#curType", "values": [
+        {  "id": "date", "name": "date"  },
+        {  "id": "email", "name": "email"  },
+        {  "id": "number", "name": "number"  },
+        {  "id": "checkbox", "name": "radio"  },
+        {  "id": "text", "name": "text"  },
+        {  "id": "time", "name": "time"  },
+        {  "id": "url", "name": "url"  }
+      ]
     },{ "name": "sectors", "ref": "#curSector", "values": [
         {  "name": "NHS"  },
         {  "name": "Private Sector"  },

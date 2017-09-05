@@ -27,12 +27,12 @@
         </li>
         <li>
           <label class="col-md-4">Type:</label>
-          <input class="form-control" id="curType" value="{{current.type}}"/>
+          <input class="form-control" id="curType" list="questionTypes" value="{{current.type}}"/>
           <p class="help-block col-xs-offset-4"></p>
         </li>
         <li>
           <label class="col-md-4">Placeholder:</label>
-          <input class="form-control" id="curPlaceholder" value="{{current.placeholder}}"/>
+          <input class="form-control" id="curPlaceholder" placeholder="If unspecified, will be a simple text input" value="{{current.placeholder}}"/>
           <p class="help-block col-xs-offset-4"></p>
         </li>
         <li>
@@ -45,11 +45,11 @@
       <ul class="form edit-form">
         <li>
           <label class="col-md-4">Required:</label>
-          <input class="form-control" id="curRequired" value="{{current.required}}"/>
+          <input class="form-control" id="curRequired" type="checkbox" value="{{current.required}}"/>
           <p class="help-block col-xs-offset-4"></p>
         </li>
         <li>
-          <label class="col-md-4 required">Unit:</label>
+          <label class="col-md-4">Unit:</label>
           <input class="form-control" id="curUnit" value="{{current.unit}}"/>
           <p class="help-block col-xs-offset-4"></p>
         </li>

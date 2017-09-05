@@ -227,7 +227,7 @@ var ractive = new BaseRactive({
       tmp.tenantId = ractive.get('tenant.id');
 //      console.log('ready to save question'+JSON.stringify(tmp)+' ...');
       $.ajax({
-        url: id === undefined ? ractive.getServer()+'/questions' : id,
+        url: id === undefined ? ractive.getServer()+'/'+tmp.tenantId+'/questions/' : id,
         type: id === undefined ? 'POST' : 'PUT',
         contentType: 'application/json',
         data: JSON.stringify(tmp),
@@ -257,17 +257,23 @@ var ractive = new BaseRactive({
     console.log('select: '+JSON.stringify(question));
     ractive.set('saveObserver',false);
     var url = ractive.tenantUri(question);
-    console.log('loading detail for '+url);
-    $.getJSON(url,  function( data ) {
-      console.log('found question '+data);
-      ractive.set('current', data);
-      ractive.initControls();
-      // who knows why this is needed, but it is, at least for first time rendering
-      $('.autoNumeric').autoNumeric('update',{});
-      ractive.toggleResults();
-      $('#currentSect').slideDown();
+    if (url == undefined) {
+      console.log('Skipping load as no uri.');
+      ractive.set('current', question);
       ractive.set('saveObserver',true);
-    });
+    } else {
+      console.log('loading detail for '+url);
+      $.getJSON(url,  function( data ) {
+        console.log('found question '+data);
+        ractive.set('current', data);
+        ractive.initControls();
+        // who knows why this is needed, but it is, at least for first time rendering
+        $('.autoNumeric').autoNumeric('update',{});
+        ractive.toggleResults();
+        $('#currentSect').slideDown();
+        ractive.set('saveObserver',true);
+      });
+    }
   },
   showActivityIndicator: function(msg, addClass) {
     document.body.style.cursor='progress';

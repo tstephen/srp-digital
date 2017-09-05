@@ -422,9 +422,9 @@ var BaseRactive = Ractive.extend({
     if (uri != undefined && uri.indexOf(ractive.get('tenant.id'))==-1) {
       uri = uri.replace(ractive.get('entityPath'),'/'+ractive.get('tenant.id')+ractive.get('entityPath'));
     }
-    if (uri != undefined && ractive.get('context')!=undefined) {
-      uri = uri.replace('/'+ractive.get('tenant.id'),ractive.get('context')+'/'+ractive.get('tenant.id'));
-    }
+    // if (uri != undefined && ractive.get('context')!=undefined) {
+    //   uri = uri.replace('/'+ractive.get('tenant.id'),ractive.get('context')+'/'+ractive.get('tenant.id'));
+    // }
     return uri;
   },
   toCsv: function(json, title, headings) {

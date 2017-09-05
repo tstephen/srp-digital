@@ -133,7 +133,7 @@ var $r = (function ($, ractive, $auth) {
    * Last category are calculations that need to be hidden.
    */
   function _hideCalcs() {
-    ractive.splice('q.categories', ractive.get('q.categories').length-1, 1);
+    //ractive.splice('q.categories', ractive.get('q.categories').length-1, 1);
   }
 
   /**
