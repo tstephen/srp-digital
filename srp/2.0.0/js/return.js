@@ -21,6 +21,8 @@ var $r = (function ($, ractive, $auth) {
     if ($('#ORG_TYPE option')!=undefined && $('#ORG_TYPE option').length==0 && ractive.get('orgTypes')!=undefined) {
       ractive.addSelectOptions('#ORG_TYPE', ractive.get('orgTypes'));
     }
+    $('#CCG1_SERVED,#CCG2_SERVED,#CCG3_SERVED,#CCG4_SERVED,#CCG5_SERVED,#CCG6_SERVED').attr('list','orgs');
+    $('#PROVIDER1_COMMISSIONED,#PROVIDER2_COMMISSIONED,#PROVIDER3_COMMISSIONED,#PROVIDER4_COMMISSIONED,#PROVIDER5_COMMISSIONED,#PROVIDER6_COMMISSIONED,#PROVIDER7_COMMISSIONED,#PROVIDER8_COMMISSIONED').attr('list','orgs');
   }
 
   function _disableHeadSections() {
@@ -98,7 +100,7 @@ var $r = (function ($, ractive, $auth) {
               break;
             case 'ORG_TYPE':
               ractive.set('q.categories.'+i+'.questions.'+j+'.response', me.rtn.answers[k].response);
-              if (me.rtn.answers[k].response == 'CCG') _isCcg = true;
+              if (me.rtn.answers[k].response == 'Clinical Commissioning Groups') _isCcg = true;
               $('#ORG_TYPE').attr('list','orgTypes');
               break;
             default:
@@ -141,14 +143,14 @@ var $r = (function ($, ractive, $auth) {
    */
   function _hideNotApplicable() {
     if (_isCcg) {
-      $('#CCGS_SERVED,#NO_PATIENT_CONTACTS,#PATIENT_CONTACT_MEASURE,#DESFLURANE,#ISOFLURANE,#SEVOFLURANE,#NITROUS_OXIDE,#PORTABLE_NITROUS_OXIDE_MIX,#PORTABLE_NITROUS_OXIDE_MIX_MATERNITY,#CHP_ELECTRICAL_OUTPUT,#EXPORTED_THERMAL_ENERGY,#WOOD_LOGS_OWNED_RENEWABLE_CONSUMPTION,#WOOD_CHIPS_OWNED_RENEWABLE_CONSUMPTION,#WOOD_PELLETS_OWNED_RENEWABLE_CONSUMPTION,#ELEC_OWNED_RENEWABLE_CONSUMPTION').parent().parent().hide();
+      $('#CCG1_SERVED,#CCG2_SERVED,#CCG3_SERVED,#CCG4_SERVED,#CCG5_SERVED,#CCG6_SERVED,#NO_PATIENT_CONTACTS,#PATIENT_CONTACT_MEASURE,#DESFLURANE,#ISOFLURANE,#SEVOFLURANE,#NITROUS_OXIDE,#PORTABLE_NITROUS_OXIDE_MIX,#PORTABLE_NITROUS_OXIDE_MIX_MATERNITY,#CHP_ELECTRICAL_OUTPUT,#EXPORTED_THERMAL_ENERGY,#WOOD_LOGS_OWNED_RENEWABLE_CONSUMPTION,#WOOD_CHIPS_OWNED_RENEWABLE_CONSUMPTION,#WOOD_PELLETS_OWNED_RENEWABLE_CONSUMPTION,#ELEC_OWNED_RENEWABLE_CONSUMPTION').parent().parent().hide();
       for (var idx in ractive.get('q.categories')) {
         if (ractive.get('q.categories.'+idx+'.name')=='Gases') {
           ractive.splice('q.categories', idx, 1);
         }
       }
     } else {
-      $('#PROVIDERS_COMMISSIONED').parent().parent().hide();
+      $('#PROVIDER1_COMMISSIONED,#PROVIDER2_COMMISSIONED,#PROVIDER3_COMMISSIONED,#PROVIDER4_COMMISSIONED,#PROVIDER5_COMMISSIONED,#PROVIDER6_COMMISSIONED,#PROVIDER7_COMMISSIONED,#PROVIDER8_COMMISSIONED').parent().parent().hide();
     }
   }
   me.diag = function() {
