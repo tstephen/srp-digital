@@ -257,6 +257,12 @@
         {  "id": "Amber", "name": "Amber"  },
         {  "id": "Red", "name": "Red"  }
       ]
+    },{ "name": "units", "ref": "#curUnits", "values": [
+        {  "id": "£", "name": "£"  },
+        {  "id": "£,000s", "name": "£,000s"  },
+        {  "id": "%", "name": "%"  },
+        {  "id": "tCO2e", "name": "tCO2e"  }
+      ]
     },{ "name": "wastes", "ref": "#curWasteChange", "values": [
         {  "name": ">97% high cost"  },
         {  "name": "90-97% high cost"  },
