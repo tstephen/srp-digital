@@ -246,6 +246,10 @@ a {
 }
 
 /* Entry Header */
+.category-healhy-returns-2020 .entry-header .entry-meta .posted-on,
+.category-sustainable-reporting .entry-header .entry-meta .posted-on {
+  display: none;
+}
 .archive .entry-header,
 .blog .entry-header,
 .search-results .entry-header {
