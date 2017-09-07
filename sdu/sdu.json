@@ -47,6 +47,8 @@
     { "label": "License Agreed", "key": "licenseAgreed"}
   ],
   "contactActions": [
+    { "name": "Send email", "ref": "SendMemo", "url": true  },
+    { "name": "Send new password", "ref": "SendNewPassword", "url": false }
   ],
   "toolbar": [
     { "url": "/srp/public/macc-national.html", "icon": "tr-icon-england", "title": "National carbon cost benefit curve", "description": "Latest findings for the Health and Social Care sector in England" },
@@ -87,12 +89,14 @@
     { "name": "Add Activity To Contact", "ref": "AddActivityToContact", "url": "processes/link/omny/custmgmt/AddActivityToContact.bpmn" },
     { "name": "Add Note To Contact", "ref": "AddNoteToContact", "url": "processes/link/omny/custmgmt/AddNoteToContact.bpmn" },
     { "name": "Create Contact and Account", "ref": "CreateContactAndAccount", "url": "processes/link/omny/custmgmt/CreateContactAccountAndOrder.bpmn" },
+    { "name": "Merge memo", "ref": "MergeMemoTemplate", "url": "processes/link/omny/memos/MergeMemoTemplate.bpmn" },
     { "name": "Raise Ticket", "ref": "RaiseTicket", "url": "processes/link/omny/support/RaiseTicket.bpmn" },
     { "name": "Record an enquiry", "ref": "RecordEnquiry", "url": "processes/link/omny/website/RecordEnquiry.bpmn" },
     { "name": "Register a new user", "ref": "RegisterOmnyContact", "url": "processes/link/omny/website/RegisterOmnyContact.bpmn" },
     { "name": "Reset user's password", "ref": "ResetPassword", "url": "processes/link/omny/support/ResetPassword.bpmn" },
     { "name": "Select enquiry response", "ref": "SelectEnquiryResponse", "url": "processes/link/omny/mail/SelectDefaultEnquiryResponse.bpmn" },
-    { "name": "Send Memo", "ref": "SendMemo", "url": "processes/link/omny/memos/SendMemo.bpmn" },
+    { "name": "Send memo", "ref": "SendMemo", "url": "processes/link/omny/memos/SendMemo.bpmn" },
+    { "name": "Send new password", "ref": "SendNewPassword", "url": "processes/link/omny/support/SendNewPassword.bpmn" },
     { "name": "Send alert", "ref": "SendAlert", "url": "processes/link/omny/alerts/SendAlertMemo.bpmn" },
     { "name": "Update contact", "ref": "UpdateContact", "url": "processes/link/omny/custmgmt/UpdateContact.bpmn" },
     { "name": "Record abatement plan", "ref": "RecordAbatementPlan", "url": "processes/digital/srp/macc/RecordAbatementPlan.bpmn" },
