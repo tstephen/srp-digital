@@ -27,7 +27,7 @@ var ractive = new BaseRactive({
     display000s: false,
     healthWarning:'This resource is intended to provide an overview of carbon and cost reduction opportunities, as well as a framework within which users can develop their own analysis. The figures are derived from specific case studies and as such will not be equally applicable for every organisation. Developing local business cases will require local technical and economic assessments. This tool identifies the potential opportunities, interventions to investigate and scale of savings and is not a substitute for the usual financial analysis required to assemble a case for investment.',
     isLoggedIn: function() {
-      return $auth.getClaim('sub')==undefined;
+      return !$auth.getClaim('sub')==undefined;
     },
     organisationTypes: [],
     // TODO fetch dynamically
