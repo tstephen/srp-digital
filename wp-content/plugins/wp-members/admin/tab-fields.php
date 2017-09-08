@@ -14,6 +14,11 @@
  * @copyright 2006-2017
  */
 
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit();
+}
+
 /**
  * Load WP_Members_Fields_Table object
  */
@@ -387,6 +392,8 @@ function wpmem_a_render_fields_tab_field_table() {
 
 	$wpmem_ut_fields_skip = array( 'user_email', 'confirm_email', 'password', 'confirm_password' );	
 	$wpmem_ut_fields = get_option( 'wpmembers_utfields' );
+	$wpmem_us_fields_skip = array( 'user_email', 'confirm_email', 'password', 'confirm_password' );	
+	$wpmem_us_fields = get_option( 'wpmembers_usfields' );
 
 	$wpmem_fields = get_option( 'wpmembers_fields', array() );
 	foreach ( $wpmem_fields as $key => $field ) {
@@ -395,8 +402,8 @@ function wpmem_a_render_fields_tab_field_table() {
 		if ( is_numeric( $key ) ) {
 			
 			$meta = $field[2];
-			
 			$ut_checked = ( ( $wpmem_ut_fields ) && ( in_array( $field[1], $wpmem_ut_fields ) ) ) ? $field[1] : '';
+			$us_checked = ( ( $wpmem_us_fields ) && ( in_array( $field[1], $wpmem_us_fields ) ) ) ? $field[1] : '';
 			$field_items[] = array(
 				'order'    => $field[0],
 				'label'    => $field[1],
@@ -406,18 +413,19 @@ function wpmem_a_render_fields_tab_field_table() {
 				'req'      => ( $meta != 'user_email' ) ? wpmem_create_formfield( $meta . "_required", 'checkbox', 'y', $field[5] ) : '',
 				//'profile'  => ( $meta != 'user_email' ) ? wpmem_create_formfield( $meta . "_profile",  'checkbox', true, $field[6] ) : '',
 				'edit'     => wpmem_fields_edit_link( $meta ),
-				'userscrn' => ( ! in_array( $meta, $wpmem_ut_fields_skip ) ) ? wpmem_create_formfield( 'ut_fields[' . $meta . ']', 'checkbox', $field[1], $ut_checked ) : '',			 
+				'userscrn' => ( ! in_array( $meta, $wpmem_ut_fields_skip ) ) ? wpmem_create_formfield( 'ut_fields[' . $meta . ']', 'checkbox', $field[1], $ut_checked ) : '',
+				'usearch'  => ( ! in_array( $meta, $wpmem_us_fields_skip ) ) ? wpmem_create_formfield( 'us_fields[' . $meta . ']', 'checkbox', $field[1], $us_checked ) : '',
 				'sort'     => '<span class="ui-icon ui-icon-grip-dotted-horizontal" title="' . __( 'Drag and drop to reorder fields', 'wp-members' ) . '"></span>',
 			);
 		}
 	}
 	
 	$extra_user_screen_items = array( 
-		'user_registered' => 'Registration Date',
-		'active' => 'Active',
-		'wpmem_reg_ip' => 'Registration IP',
-		'exp_type' => 'Subscription Type',
-		'expires' => 'Expires',
+		'user_registered' => __( 'Registration Date', 'wp-members' ),
+		'active'          => __( 'Active',            'wp-members' ),
+		'wpmem_reg_ip'    => __( 'Registration IP',   'wp-members' ),
+		'exp_type'        => __( 'Subscription Type', 'wp-members' ),
+		'expires'         => __( 'Expires',           'wp-members' ),
 	);
 	
 	foreach ( $extra_user_screen_items as $key => $item ) {
@@ -428,18 +436,19 @@ function wpmem_a_render_fields_tab_field_table() {
 			);
 		}
 	}
-	
+
 	foreach ( $user_screen_items as $screen_item ) {
 		$field_items[] = array(
-			'label' => $screen_item['label'],
-			'meta'  => $screen_item['meta'],
-			'type'  => '',
-			'display' => '',
-			'req' => '',
-			'profile' => '',
-			'edit' => '',
+			'label'    => $screen_item['label'],
+			'meta'     => $screen_item['meta'],
+			'type'     => '',
+			'display'  => '',
+			'req'      => '',
+			'profile'  => '',
+			'edit'     => '',
 			'userscrn' => $screen_item['userscrn'],
-			'sort' => '',
+			'usearch'  => '',
+			'sort'     => '',
 		);
 	}
 
@@ -506,6 +515,7 @@ class WP_Members_Fields_Table extends WP_List_Table {
 			//'profile'  => __( 'Profile Only',  'wp-members' ),
 			'edit'     => __( 'Edit',          'wp-members' ),
 			'userscrn' => __( 'Users Screen',  'wp-members' ),
+			'usearch'  => __( 'Users Search',  'wp-members' ),
 			'sort'     => '',
 		);
 	}
@@ -617,8 +627,7 @@ class WP_Members_Fields_Table extends WP_List_Table {
  */ 
 add_action( 'admin_footer', 'wpmem_bulk_fields_action'   );
 function wpmem_bulk_fields_action() { 
-	// if ( isset( $_GET['tab'] ) && $_GET['tab'] == 'fields' ) { 
-	if ( isset( $_GET['tab'] ) && $_GET['tab'] == 'fields' ) { 
+	if ( 'wpmem-settings' == wpmem_get( 'page', false, 'get' ) && 'fields' == wpmem_get( 'tab', false, 'get' ) ) {
 	?><script type="text/javascript">
 		(function($) {
 			$(document).ready(function() {
@@ -647,7 +656,7 @@ function wpmem_admin_fields_update() {
 	
 	global $wpmem, $did_update, $delete_action;
 
-	if ( isset( $_GET['tab'] ) && $_GET['tab'] == 'fields' ) {
+	if ( 'wpmem-settings' == wpmem_get( 'page', false, 'get' ) && 'fields' == wpmem_get( 'tab', false, 'get' ) ) {
 		// Get the current fields.
 		$wpmem_fields    = get_option( 'wpmembers_fields' );
 
@@ -664,6 +673,10 @@ function wpmem_admin_fields_update() {
 			// Update user table fields.
 			$arr = ( isset( $_POST['ut_fields'] ) ) ? $_POST['ut_fields'] : '';
 			update_option( 'wpmembers_utfields', $arr );
+			
+			// Update user search fields.
+			$arr = ( isset( $_POST['us_fields'] ) ) ? $_POST['us_fields'] : '';
+			update_option( 'wpmembers_usfields', $arr );
 
 			// Update display/required settings
 			foreach ( $wpmem_fields as $key => $field ) {
@@ -734,12 +747,12 @@ function wpmem_admin_fields_update() {
 			$arr[6] = ( $us_option == 'user_nicename' || $us_option == 'display_name' || $us_option == 'nickname' ) ? 'y' : 'n';
 
 			if ( 'text' == $type || 'email' == $type || 'textarea' == $type || 'password' == $type || 'url' == $type || 'number' == $type || 'date' == $type ) {
-				$arr['placeholder'] = wpmem_get( 'add_placeholder' );
+				$arr['placeholder'] = stripslashes( wpmem_get( 'add_placeholder' ) );
 			}
 
 			if ( 'text' == $type || 'email' == $type || 'password' == $type || 'url' == $type || 'number' == $type || 'date' == $type ) {
-				$arr['pattern'] = wpmem_get( 'add_pattern' );
-				$arr['title']   = wpmem_get( 'add_title' );
+				$arr['pattern'] = stripslashes( wpmem_get( 'add_pattern' ) );
+				$arr['title']   = stripslashes( wpmem_get( 'add_title' ) );
 			}
 
 			if ( 'number' == $type || 'date' == $type ) {
@@ -799,7 +812,7 @@ function wpmem_admin_fields_update() {
 						}
 					}
 				}
-				$did_update =  sprintf( __( '%s was updated', 'wp-members' ), $add_name );
+				$did_update =  sprintf( __( '%s was updated', 'wp-members' ), stripslashes( $add_name ) );
 				$did_update.= '<p><a href="' . add_query_arg( array( 'page' => 'wpmem-settings', 'tab' => 'fields' ), get_admin_url() . 'options-general.php' ) . '">&laquo; ' . __( 'Return to Fields Table', 'wp-members' ) . '</a></p>';
 			}
 

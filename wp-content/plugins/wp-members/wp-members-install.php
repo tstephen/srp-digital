@@ -22,7 +22,11 @@
  * - wpmem_upgrade_captcha
  */
 
- 
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit();
+}
+
 /**
  * Installs or upgrades the plugin.
  *
@@ -84,6 +88,11 @@ function wpmem_upgrade_settings() {
 
 	// If install is 3.0 or higher.
 	if ( $is_three ) {
+		
+		// reCAPTCHA v1 is obsolete.
+		if ( isset( $wpmem_settings['captcha'] ) && 1 == $wpmem_settings['captcha'] ) {
+			$wpmem_settings['captcha'] = 3;
+		}
 	
 		// If old auto excerpt settings exists, update it.
 		if ( isset( $wpmem_settings['autoex']['auto_ex'] ) ) {
@@ -151,7 +160,7 @@ function wpmem_upgrade_settings() {
 			),
 			'notify'     => $wpmem_settings[4],
 			'mod_reg'    => $wpmem_settings[5],
-			'captcha'    => $wpmem_settings[6],
+			'captcha'    => ( 1 == $wpmem_settings[6] ) ? 3 : $wpmem_settings[6], // reCAPTCHA v1 is obsolete, move to v2.
 			'use_exp'    => $wpmem_settings[9],
 			'use_trial'  => $wpmem_settings[10],
 			'warnings'   => $wpmem_settings[11],

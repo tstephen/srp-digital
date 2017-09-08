@@ -11,6 +11,11 @@
  * @since 3.0.0
  */
 
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit();
+}
+
 class WP_Members {
 	
 	/**
@@ -121,6 +126,24 @@ class WP_Members {
 	 */
 	public $warnings;
 	
+	/**
+	 * Enable drop-ins setting.
+	 *
+	 * @since  3.1.9
+	 * @access public
+	 * @var    string
+	 */
+	public $dropins = 0;
+	
+	/**
+	 * Container for enabled dropins.
+	 *
+	 * @since  3.1.9
+	 * @access public
+	 * @var    array
+	 */
+	public $dropins_enabled = array();
+
 	/**
 	 * Current plugin action container.
 	 *
@@ -242,6 +265,11 @@ class WP_Members {
 		
 		// Load contants.
 		$this->load_constants();
+		
+		// Load dropins.
+		if ( $this->dropins ) {
+			$this->load_dropins();
+		}
 	}
 
 	/**
@@ -357,11 +385,18 @@ class WP_Members {
 		 *
 		 * @param string $folder The drop-in file folder.
 		 */
-		$folder = apply_filters( 'wpmem_dropin_folder', WP_PLUGIN_DIR . '/wp-members-dropins/' );
+		$folder = apply_filters( 'wpmem_dropin_folder', WPMEM_DROPIN_DIR );
 		
 		// Load any drop-ins.
-		foreach ( glob( $folder . '*.php' ) as $filename ) {
-			include_once( $filename );
+		$settings = get_option( 'wpmembers_dropins' );
+		$this->dropins_enabled = ( $settings ) ? $settings : array();
+		if ( ! empty( $this->dropins_enabled ) ) {
+			foreach ( $this->dropins_enabled as $filename ) {
+				$dropin = $folder . $filename;
+				if ( file_exists( $dropin ) ) {
+					include_once( $dropin );
+				}
+			}
 		}
 
 		/**
@@ -393,6 +428,8 @@ class WP_Members {
 		( ! defined( 'WPMEM_MSURL'  ) ) ? define( 'WPMEM_MSURL',  $this->user_pages['profile']  ) : '';
 		( ! defined( 'WPMEM_REGURL' ) ) ? define( 'WPMEM_REGURL', $this->user_pages['register'] ) : '';
 		( ! defined( 'WPMEM_LOGURL' ) ) ? define( 'WPMEM_LOGURL', $this->user_pages['login']    ) : '';
+		
+		( ! defined( 'WPMEM_DROPIN_DIR' ) ) ? define( 'WPMEM_DROPIN_DIR', WP_PLUGIN_DIR . '/wp-members-dropins/' ) : '';
 		
 		define( 'WPMEM_CSSURL', $this->cssurl );
 	}
@@ -431,7 +468,7 @@ class WP_Members {
 		require_once( WPMEM_PATH . 'inc/sidebar.php' );
 		require_once( WPMEM_PATH . 'inc/shortcodes.php' );
 		require_once( WPMEM_PATH . 'inc/email.php' );
-		require_once( WPMEM_PATH . 'inc/users.php' );
+		//require_once( WPMEM_PATH . 'inc/users.php' ); @deprecated 3.1.9
 		require_once( WPMEM_PATH . 'inc/deprecated.php' );
 	}
 
@@ -814,6 +851,11 @@ class WP_Members {
 				case 'multiselect':
 				case 'multicheckbox':
 				case 'radio':
+					// Correct a malformed value (if last value is empty due to a trailing comma).
+					if ( '' == end( $val[7] ) ) {
+						array_pop( $val[7] );
+						$this->fields[ $meta_key ][7] = $val[7];
+					}
 					$this->fields[ $meta_key ]['values']    = $val[7];
 					$this->fields[ $meta_key ]['delimiter'] = ( isset( $val[8] ) ) ? $val[8] : '|';
 					$this->fields[ $meta_key ]['options']   = array();
