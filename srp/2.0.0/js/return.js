@@ -135,7 +135,7 @@ var $r = (function ($, ractive, $auth) {
    * Last category are calculations that need to be hidden.
    */
   function _hideCalcs() {
-    //ractive.splice('q.categories', ractive.get('q.categories').length-1, 1);
+    ractive.splice('q.categories', ractive.get('q.categories').length-1, 1);
   }
 
   /**
@@ -205,6 +205,24 @@ var $r = (function ($, ractive, $auth) {
           $r.rtn.answers.push( { question: q, response: newValue, applicablePeriod: _period, status: 'Draft', revision: 1 } );
         }
         $r.dirty = true;
+      }
+      // apply inter-question dependencies
+      switch(q.name) {
+      case 'ECLASS_USER':
+        if (newValue=='0-E-Class') {
+          $('section#Procurement.category li:not(:first)').slideDown();
+        } else {
+          $('section#Procurement.category li:not(:first)').slideUp();
+        }
+        break;
+      case 'SDMP_CRMP':
+        if (newValue=='true') {
+          $('section#Policy.category li:hidden').slideDown();
+        } else {
+          $('section#Policy.category li:gt(0):lt(3)').slideUp();
+        }
+        console.error('yippee');
+        break;
       }
     });
   };
@@ -323,6 +341,7 @@ var $r = (function ($, ractive, $auth) {
   ractive.loadStandardPartials(ractive.get('stdPartials'));
 
   $('head').append('<link href="'+_server+'/css/sdu-1.0.0.css" rel="stylesheet">');
+  $('head').append('<link rel="icon" type="image/png" href="/srp/images/icon/sdu-icon-16x16.png">');
 
   setInterval(me.submit, 5000);
 

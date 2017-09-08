@@ -30,14 +30,19 @@
           <p class="help-block col-xs-offset-4">Select from the list or leave blank for a simple text control</p>
         </li>
         <li>
-          <label class="col-md-4">Placeholder:</label>
-          <input class="form-control" id="curPlaceholder" value="{{current.placeholder}}"/>
-          <p class="help-block col-xs-offset-4">Text that will be displayed in an empty control</p>
+          <label class="col-md-4">Options:</label>
+          <input class="form-control" id="curOptionNames" placeholder="Comma-separated list of values" value="{{current.optionNames}}"/>
+          <p class="help-block col-xs-offset-4">If the question's type is radio buttons or checkboxes specify options here</p>
         </li>
       </ul>
     </div>
     <div class="currentBody col-md-6 col-sm-12 col-xs-12">
       <ul class="form edit-form">
+        <li>
+          <label class="col-md-4">Placeholder:</label>
+          <input class="form-control" id="curPlaceholder" value="{{current.placeholder}}"/>
+          <p class="help-block col-xs-offset-4">Text that will be displayed in an empty control</p>
+        </li>
         <li>
           <label class="col-md-4">Required:</label>
           <input class="form-control" id="curRequired" type="checkbox" value="{{current.required}}"/>
