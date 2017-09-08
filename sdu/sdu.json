@@ -63,6 +63,7 @@
     { "url": "/srp/explorer.html", "icon": "glyphicon-globe", "role": "analyst", "title": "Data Explorer", "description": "Create arbitrary reports on the SDU report and ERIC data" },
     { "url": "/srp/parameters.html", "icon": "glyphicon-equalizer", "role": "analyst", "title": "Parameters", "description": "Manage the parameters that change over time to keep calculations up to date" },
     { "url": "/srp/questions.html", "icon": "glyphicon-question-sign", "role": "analyst", "description": "Manage survey questions", "name": "Survey Questions" },
+    { "url": "/srp/work.html", "icon": "glyphicon-inbox", "description": "View your list of active tasks here", "feature":"workManagement", "name": "Work Management" },
     { "url": "/srp/accounts.html", "icon": "omny-icon-address-book", "role": "analyst", "description": "Find a particular health or social care provider", "name": "Organisations" },
     { "url": "/srp/memo.html", "icon": "glyphicon-envelope", "role": "admin", "name": "Templates", "description": "Create and edit your message templates"  },
     { "url": "/srp/definitions.html", "icon": "omny-icon-process-model", "role": "admin", "description": "View your process definitions here", "name": "Process Definitions" },
@@ -157,6 +158,13 @@
         {  "name": "Models of Care"  },
         {  "name": "Procurement"  },
         {  "name": "Travel"  }
+      ]
+    },{ "name": "contactStages", "ref": "#curStage", "values": [
+        {  "idx":0, "id": "No contact", "name": "No contact"  },
+        {  "idx":1, "id": "Registered", "name": "Registered"  },
+        {  "idx":2, "id": "Partial data entered", "name": "Partial data entered"  },
+        {  "idx":3, "id": "Data submitted", "name": "Data submitted"  },
+        {  "idx":-1, "id": "Defunct", "name": "Defunct"  }
       ]
     },{ "ref": "#curEnquiryType", "values": [
         {  "id": "StakeholderShortList", "name": "Stakeholder Short List"  },
