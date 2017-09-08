@@ -20,6 +20,11 @@
           <p class="help-block col-xs-offset-4">A relatively short label to display to the user</p>
         </li>
         <li>
+          <label class="col-md-4 required">Source:</label>
+          <input class="form-control" id="curSource" required value="{{current.source}}"/>
+          <p class="help-block col-xs-offset-4">Where this question comes from</p>
+        </li>
+        <li>
           <label class="col-md-4">Type:</label>
           <input class="form-control" id="curType" list="questionTypes" placeholder="If unspecified, will be a simple text input" value="{{current.type}}"/>
           <p class="help-block col-xs-offset-4">Select from the list or leave blank for a simple text control</p>
