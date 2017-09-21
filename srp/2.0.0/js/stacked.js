@@ -1,20 +1,24 @@
 function renderStacked(selector, csvString, options) {
   var defaultOptions = {
     colors: ["#0B4BE5", "#0072CE", "#0BBDE5", "#0BDBC9", "#00F299"],
-    margin: {top: 20, right: 20, bottom: 50, left: 40},
+    legendWidth: 140,
+    margin: {top: 20, right: 100, bottom: 50, left: 40},
     xAxisLabel: "Financial Years",
     yAxisLabel: "Tonnes CO\u2082e"
   }
   options = $.extend(defaultOptions, options == undefined ? {} : options);
 
+  // first clean up
+  d3.select(selector+' g').remove();
   var svg = d3.select(selector),
       margin = options.margin,
       width = +svg.attr("width") - margin.left - margin.right,
+      chartWidth = width - options.legendWidth,
       height = +svg.attr("height") - margin.top - margin.bottom,
       g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
   var x = d3.scaleBand()
-      .rangeRound([0, width])
+      .rangeRound([0, chartWidth])
       .paddingInner(0.05)
       .align(0.1);
 
@@ -81,6 +85,25 @@ function renderStacked(selector, csvString, options) {
       .attr("text-anchor", "start")
       .text(options.yAxisLabel);
 
+  var legend = g.append("g")
+      .attr("text-anchor", "end")
+    .selectAll("g")
+    .data(keys.slice().reverse())
+    .enter().append("g")
+      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+      legend.append("rect")
+          .attr("x", width - 19)
+          .attr("width", 19)
+          .attr("height", 19)
+          .attr("fill", z);
+
+      legend.append("text")
+          .attr("x", width - 24)
+          .attr("y", 9.5)
+          .attr("dy", "0.32em")
+          .text(function(d) { return d; });
+
   // SDU target lines
   if (data[0]!=undefined && data[0]['Core emissions'] != undefined) {
     // Climate Change Act 2008 target line
@@ -121,12 +144,7 @@ function renderStacked(selector, csvString, options) {
         .attr("stroke", "black")
         .attr("stroke-width", 1);
 
-    var legend = g.append("g")
-        .attr("text-anchor", "end")
-      .selectAll("g")
-      .data(keys.slice().reverse())
-      .enter().append("g")
-        .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
     var trendLines = ["CCA 2008"]; // just in case don't have enough org data
 
     // Organisation's own target - n% reduction in emissions from base year by 2020/21
@@ -152,18 +170,6 @@ function renderStacked(selector, csvString, options) {
           .attr("stroke", "#0B4BE5")
           .attr("stroke-width", 1);
     }
-
-    legend.append("rect")
-        .attr("x", width - 19)
-        .attr("width", 19)
-        .attr("height", 19)
-        .attr("fill", z);
-
-    legend.append("text")
-        .attr("x", width - 24)
-        .attr("y", 9.5)
-        .attr("dy", "0.32em")
-        .text(function(d) { return d; });
 
     var legend2 = g.append("g")
         .attr("text-anchor", "end")

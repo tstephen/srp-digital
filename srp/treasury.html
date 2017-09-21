@@ -70,6 +70,104 @@
           <div class="rpt table" id="sduProfileRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/sdu-carbon-profile.html"></div>
         </section>
       {{/if}}
+
+      <section id="benchmarkingSect">
+        <h2 id="benchmarking">Benchmarking</h2>
+
+        <section id="totalEmissionsSect">
+          <h3>Carbon footprint (tCO<sub>2</sub>e)</h3>
+          <p>
+            <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/co2e.csv"
+                 class="rpt stacked" id="emissionsProfileGraph" width="600" height="400"></svg>
+          </p>
+          <div class="rpt table" id="totalEmissionsTable"
+              data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/co2e.html"></div>
+        </section>
+
+        <section id="totalEmissionsByPopulationSect">
+          <h3>Benchmarking by population (kgCO<sub>2</sub>e/person)</h3>
+          {{#if formatAnswer('NO_POPULATION') == ''}}
+            <p>No population data available</p>
+          {{else}}
+            <p>
+              <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/co2e-by-population.csv"
+                   class="rpt stacked" id="emissionsByPopulationGraph" width="600" height="400"></svg>
+            </p>
+            <div class="rpt table" id="co2eByPopulationRptTable"
+                data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/co2e-by-population.html"></div>
+          {{/if}}
+        </section>
+
+        <section id="totalEmissionsByFloorAreaSect">
+          <h3>Benchmarking by gross internal area (tCO<sub>2</sub>e/m<sup>2</sup>)</h3>
+          {{#if formatAnswer('FLOOR_AREA') == ''}}
+            <p>No floor area data available</p>
+          {{else}}
+            <p>
+              <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/co2e-by-floor-area.csv"
+                   class="rpt stacked" id="emissionsByFloorAreaGraph" width="600" height="400"></svg>
+            </p>
+            <div class="rpt table" id="co2eByFloorAreaRptTable"
+                data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/co2e-by-floor-area.html"></div>
+          {{/if}}
+        </section>
+
+        <section id="totalEmissionsByWteSect">
+          <h3>Benchmarking by number of staff (tCO<sub>2</sub>e/WTE)</h3>
+          {{#if formatAnswer('NO_STAFF') == ''}}
+            <p>No staff data available</p>
+          {{else}}
+            <p>
+              <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/co2e-by-wte.csv"
+                   class="rpt stacked" id="emissionsByWteGraph" width="600" height="400"></svg>
+            </p>
+            <div class="rpt table" id="co2eByWteRptTable"
+                data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/co2e-by-wte.html"></div>
+          {{/if}}
+        </section>
+
+        <section id="totalEmissionsByOccupiedBedsSect">
+          <h3>Benchmarking by number of occupied beds (tCO<sub>2</sub>e/bed)</h3>
+          {{#if formatAnswer('NO_BEDS') == ''}}
+            <p>No bed data available</p>
+          {{else}}
+            <p>
+              <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/co2e-by-beds.csv"
+                   class="rpt stacked" id="emissionsByOccupiedBedsGraph" width="600" height="400"></svg>
+            </p>
+            <div class="rpt table" id="co2eByBedsRptTable"
+                data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/co2e-by-beds.html"></div>
+          {{/if}}
+        </section>
+
+        <section id="totalEmissionsByPatientContactsSect">
+          <h3>Benchmarking by total patient contacts (tCO<sub>2</sub>e/patient contact)</h3>
+          {{#if formatAnswer('NO_PATIENT_CONTACTS') == ''}}
+            <p>No patient contact data available</p>
+          {{else}}
+            <p>
+              <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/co2e-by-patient-contacts.csv"
+                   class="rpt stacked" id="emissionsByPatientContactsGraph" width="600" height="400"></svg>
+            </p>
+            <div class="rpt table" id="co2eByPatientContactsRptTable"
+                data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/co2e-by-patient-contacts.html"></div>
+          {{/if}}
+        </section>
+
+        <section id="totalEmissionsByOpExSect">
+          <h3>Benchmarking by operating expenditure (gCO<sub>2</sub>e/&pound;)</h3>
+          {{#if formatAnswer('OP_EX') == ''}}
+            <p>No operating expenditure data available</p>
+          {{else}}
+            <p>
+              <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/co2e-by-opex.csv"
+                   class="rpt stacked" id="emissionsByOpexGraph" width="600" height="400"></svg>
+            </p>
+            <div class="rpt table" id="co2eByOpexRptTable"
+                data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/co2e-by-opex.html"></div>
+          {{/if}}
+        </section>
+      </section>
     {{else}}
       <section class="loading" id="loadingSect">
         <span class="loading">Your report should load automatically in the next few moments.</span>

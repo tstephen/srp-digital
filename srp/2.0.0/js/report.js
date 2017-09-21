@@ -26,8 +26,12 @@ var ractive = new BaseRactive({
     formatAnswer: function(qName) {
       if (qName==undefined || ractive.get('surveyReturn')==undefined) return '';
       else {
-        var answer = ractive.getAnswer(qName);
-        return answer == undefined ? '' : answer;
+        try {
+          var answer = ractive.getAnswer(qName);
+          return answer == undefined ? '' : answer;
+        } catch (e) {
+          return '';
+        }
       }
     },
     isCcg: function() {
@@ -38,6 +42,14 @@ var ractive = new BaseRactive({
     stdPartials: [
       { "name": "loginSect", "url": $env.server+"/webjars/auth/1.0.0/partials/login-sect.html"}
     ],
+  },
+  partials: {
+    'loginSect': '',
+    'shareCtrl': '<div class="controls pull-right" style="display:none">'
+                +'  <span class="glyphicon glyphicon-btn glyphicon-share"></span>'
+                +'  <!--span class="glyphicon glyphicon-btn glyphicon-link"></span-->'
+                +'  <!--span class="glyphicon glyphicon-btn glyphicon-copy"></span-->'
+                +'</div>'
   },
   enter: function () {
     console.log('enter...');
@@ -67,6 +79,22 @@ var ractive = new BaseRactive({
           ractive.fetchCsv(d, renderPie);
         });
         $('.rpt.stacked').each(function(i,d) {
+          switch (true) {
+          case (window.innerWidth < 480):
+            $(d).attr('width',440).attr('height', window.innerHeight* .4);
+            break;
+          case (window.innerWidth < 768):
+            $(d).attr('width',720).attr('height', window.innerHeight* .4);
+            break;
+          case (window.innerWidth < 980):
+            $(d).attr('width',720).attr('height', window.innerHeight* .4);
+            break;
+          case (window.innerWidth < 1200):
+            $(d).attr('width',window.innerWidth* .8).attr('height', window.innerHeight* .4);
+            break;
+          default:
+            $(d).attr('width',1140).attr('height', window.innerHeight* .4);
+          }
           ractive.fetchCsv(d, renderStacked);
         });
         $('.rpt.table').each(function(i,d) {
@@ -77,9 +105,12 @@ var ractive = new BaseRactive({
     });
   },
   fetchCsv: function(ctrl, callback) {
-    var url = $(ctrl).data('src').indexOf('//')==-1
-        ? ractive.getServer()+$(ctrl).data('src')
-        : $(ctrl).data('src').replace(/host:port/,window.location.host);
+    var url = $(ctrl)
+        .data('src').indexOf('//')==-1
+            ? ractive.getServer()+$(ctrl).data('src')
+            : $(ctrl).data('src').replace(/host:port/,window.location.host)
+        .attr('width', '1024')
+        .attr('width', '400')
     $.ajax({
       dataType: "text",
       url: url,
@@ -96,6 +127,15 @@ var ractive = new BaseRactive({
         if ($(ctrl).data('colors') != undefined) options.colors = $(ctrl).data('colors').split(',');
         if ($(ctrl).data('x-axis-label') != undefined) options.xAxisLabel = $(ctrl).data('x-axis-label');
         if ($(ctrl).data('y-axis-label') != undefined) options.yAxisLabel = $(ctrl).data('y-axis-label');
+
+        $(ctrl)
+          .on('mouseover', function(ev) {
+            $('#'+ev.currentTarget.id+' .controls').show();
+          })
+          .on('mouseout', function(ev) {
+            $('#'+ev.currentTarget.id+' .controls').hide();
+          });
+        $('#'+ctrl.id+' .controls .glyphicon-share').wrap('<a href="'+ractive.getServer()+$(ctrl).data('src')+'" target="_blank"></a>');
         callback('#'+ctrl.id, data, options);
         ractive.set('saveObserver', true);
       }
@@ -177,6 +217,5 @@ $(document).ready(function() {
   } else if (Object.keys(getSearchParameters()).indexOf('logout')!=-1) {
     ractive.showMessage('You have been successfully logged out');
   }
-  ractive.fetch();
   $auth.addLoginCallback(ractive.fetch);
 })
