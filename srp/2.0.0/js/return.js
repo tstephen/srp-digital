@@ -44,6 +44,11 @@ var $r = (function ($, ractive, $auth) {
   }
 
   function _fetchLists() {
+    if ($auth.loginInProgress) {
+      console.info('skip fetch lists while logging in');
+      $auth.addLoginCallback(_fetchLists);
+      return;
+    }
     $.getJSON(_server+'/sdu/accounts/', function(data) {
       ractive.set('orgs', data);
       ractive.addDataList({ name: 'orgs' },data);
@@ -59,6 +64,12 @@ var $r = (function ($, ractive, $auth) {
 
   // load return (fetching blank if needed)
   function _fetchReturn() {
+    if ($auth.loginInProgress) {
+      console.info('skip fetch return while logging in');
+      $auth.addLoginCallback(_fetchReturn);
+      return;
+    }
+
     $.getJSON(_server+'/returns/findCurrentBySurveyNameAndOrg/'+_surveyName+'/'+$auth.getClaim('org'),function(data) {
       me.rtn = data;
       if (_survey!=undefined) _fill(_survey);
@@ -100,7 +111,11 @@ var $r = (function ($, ractive, $auth) {
               break;
             case 'ORG_TYPE':
               ractive.set('q.categories.'+i+'.questions.'+j+'.response', me.rtn.answers[k].response);
-              if (me.rtn.answers[k].response == 'Clinical Commissioning Groups') _isCcg = true;
+              if (me.rtn.answers[k].response == 'Clinical Commissioning Groups') {
+                _isCcg = true;
+                console.warn('Detected org is a CCG: '+_isCcg);
+                _hideNotApplicable();
+              }
               $('#ORG_TYPE').attr('list','orgTypes');
               break;
             default:
@@ -142,8 +157,9 @@ var $r = (function ($, ractive, $auth) {
    * Adapt questions according to whether CCG or provider.
    */
   function _hideNotApplicable() {
+    console.info('hideNotApplicable'+_isCcg);
     if (_isCcg) {
-      $('#CCG1_SERVED,#CCG2_SERVED,#CCG3_SERVED,#CCG4_SERVED,#CCG5_SERVED,#CCG6_SERVED,#NO_PATIENT_CONTACTS,#PATIENT_CONTACT_MEASURE,#DESFLURANE,#ISOFLURANE,#SEVOFLURANE,#NITROUS_OXIDE,#PORTABLE_NITROUS_OXIDE_MIX,#PORTABLE_NITROUS_OXIDE_MIX_MATERNITY,#CHP_ELECTRICAL_OUTPUT,#EXPORTED_THERMAL_ENERGY,#WOOD_LOGS_OWNED_RENEWABLE_CONSUMPTION,#WOOD_CHIPS_OWNED_RENEWABLE_CONSUMPTION,#WOOD_PELLETS_OWNED_RENEWABLE_CONSUMPTION,#ELEC_OWNED_RENEWABLE_CONSUMPTION').parent().parent().hide();
+      $('#CCG1_SERVED,#CCG2_SERVED,#CCG3_SERVED,#CCG4_SERVED,#CCG5_SERVED,#CCG6_SERVED,#NO_PATIENT_CONTACTS,#PATIENT_CONTACT_MEASURE,#DESFLURANE,#ISOFLURANE,#SEVOFLURANE,#NITROUS_OXIDE,#PORTABLE_NITROUS_OXIDE_MIX,#PORTABLE_NITROUS_OXIDE_MIX_MATERNITY,#CHP_ELECTRICAL_OUTPUT,#EXPORTED_THERMAL_ENERGY,#WOOD_LOGS_OWNED_RENEWABLE_CONSUMPTION,#WOOD_CHIPS_OWNED_RENEWABLE_CONSUMPTION,#WOOD_PELLETS_OWNED_RENEWABLE_CONSUMPTION,#ELEC_OWNED_RENEWABLE_CONSUMPTION,#NO_BEDS,#NO_PATIENT_CONTACTS,#PATIENT_CONTACT_MEASURE').parent().parent().hide();
       for (var idx in ractive.get('q.categories')) {
         if (ractive.get('q.categories.'+idx+'.name')=='Gases') {
           ractive.splice('q.categories', idx, 1);
@@ -277,9 +293,8 @@ var $r = (function ($, ractive, $auth) {
   }
 
   me.submit = function() {
-    //console.info('submit return');
-    if ($r.dirty == false) {
-      //console.debug('skip save, not dirty');
+    if ($r.dirty == false || $auth.loginInProgress) {
+      console.info('skip save, dirty: '+$r.dirty+', loginInProgress: '+$auth.loginInProgress);
       return;
     } else if (me.rtn == undefined) {
       ractive.fetch();
