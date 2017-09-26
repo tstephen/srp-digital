@@ -1,0 +1,16 @@
+<table>
+  <tbody>
+    <tr><th>Status: </th><td>{{surveyReturn.status}}</td></tr>
+    <tr><th>Created: </th><td>{{formatDateTime(surveyReturn.created)}}</td></tr>
+    <tr><th>Updated: </th><td>{{formatDateTime(surveyReturn.lastUpdated)}}</td></tr>
+    <tr><th>Submitted: </th><td>{{formatDateTime(surveyReturn.submitted)}}</td></tr>
+    <tr><th>Actions: </th>
+      <td><button class="btn btn-default" on-click="calculate()">
+        <span class="glyphicon glyphicon-btn glyphicon-stats"></span> Calculate</button>
+      </td>
+      <td><button class="btn btn-default" on-click="fetch()">
+        <span class="glyphicon glyphicon-btn glyphicon-stats" on-click="calculate()"></span> Refresh</button>
+      </td>
+    </tr>
+  </tbody>
+</table>

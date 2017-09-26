@@ -34,13 +34,19 @@ var ractive = new BaseRactive({
         }
       }
     },
+    formatDateTime: function(timeString) {
+      // console.log('formatDate: '+timeString);
+      if (timeString==undefined) return 'n/a';
+      return new Date(timeString).toLocaleString(navigator.languages);
+    },
     isCcg: function() {
       if (ractive.get('surveyReturn')==undefined) return '';
       if (ractive.getAnswer('ORG_TYPE')=='Clinical Commissioning Groups') return true;
       else return false;
     },
     stdPartials: [
-      { "name": "loginSect", "url": $env.server+"/webjars/auth/1.0.0/partials/login-sect.html"}
+      { "name": "loginSect", "url": $env.server+"/webjars/auth/1.0.0/partials/login-sect.html"},
+      { "name": "statusSect", "url": "/srp/2.0.0/partials/status-sect.html"}
     ],
   },
   partials: {
@@ -51,8 +57,26 @@ var ractive = new BaseRactive({
                 +'  <!--span class="glyphicon glyphicon-btn glyphicon-copy"></span-->'
                 +'</div>'
   },
+  calculate: function () {
+    console.info('calculate...');
+    $.ajax({
+      dataType: "json",
+      type: 'POST',
+      url: ractive.getServer()+'/calculations/'+ractive.get('survey')+'/'+ractive.get('org'),
+      crossDomain: true,
+      headers: {
+        "X-Requested-With": "XMLHttpRequest",
+        "X-Authorization": "Bearer "+localStorage['token'],
+        "Cache-Control": "no-cache"
+      },
+      success: function( data ) {
+        console.info('calculation requested, returns: '+ data);
+        // ractive.fetch();
+      }
+    });
+  },
   enter: function () {
-    console.log('enter...');
+    console.info('enter...');
     ractive.login();
   },
   fetch: function() {

@@ -111,7 +111,7 @@ var $r = (function ($, ractive, $auth) {
               break;
             case 'ORG_TYPE':
               ractive.set('q.categories.'+i+'.questions.'+j+'.response', me.rtn.answers[k].response);
-              if (me.rtn.answers[k].response == 'Clinical Commissioning Groups') {
+              if (me.rtn.answers[k].response == 'Clinical Commissioning Group') {
                 _isCcg = true;
                 console.warn('Detected org is a CCG: '+_isCcg);
                 _hideNotApplicable();
@@ -159,7 +159,7 @@ var $r = (function ($, ractive, $auth) {
   function _hideNotApplicable() {
     console.info('hideNotApplicable'+_isCcg);
     if (_isCcg) {
-      $('#CCG1_SERVED,#CCG2_SERVED,#CCG3_SERVED,#CCG4_SERVED,#CCG5_SERVED,#CCG6_SERVED,#NO_PATIENT_CONTACTS,#PATIENT_CONTACT_MEASURE,#DESFLURANE,#ISOFLURANE,#SEVOFLURANE,#NITROUS_OXIDE,#PORTABLE_NITROUS_OXIDE_MIX,#PORTABLE_NITROUS_OXIDE_MIX_MATERNITY,#CHP_ELECTRICAL_OUTPUT,#EXPORTED_THERMAL_ENERGY,#WOOD_LOGS_OWNED_RENEWABLE_CONSUMPTION,#WOOD_CHIPS_OWNED_RENEWABLE_CONSUMPTION,#WOOD_PELLETS_OWNED_RENEWABLE_CONSUMPTION,#ELEC_OWNED_RENEWABLE_CONSUMPTION,#NO_BEDS,#NO_PATIENT_CONTACTS,#PATIENT_CONTACT_MEASURE').parent().parent().hide();
+      $('#CCG1_SERVED,#CCG2_SERVED,#CCG3_SERVED,#CCG4_SERVED,#CCG5_SERVED,#CCG6_SERVED,#NO_PATIENT_CONTACTS,#PATIENT_CONTACT_MEASURE,#DESFLURANE,#ISOFLURANE,#SEVOFLURANE,#NITROUS_OXIDE,#PORTABLE_NITROUS_OXIDE_MIX,#PORTABLE_NITROUS_OXIDE_MIX_MATERNITY,#CHP_ELECTRICAL_OUTPUT,#EXPORTED_THERMAL_ENERGY,#WOOD_LOGS_OWNED_RENEWABLE_CONSUMPTION,#WOOD_CHIPS_OWNED_RENEWABLE_CONSUMPTION,#WOOD_PELLETS_OWNED_RENEWABLE_CONSUMPTION,#ELEC_OWNED_RENEWABLE_CONSUMPTION,#OCCUPIED_BEDS,#NO_BEDS,#NO_PATIENT_CONTACTS,#PATIENT_CONTACT_MEASURE').parent().parent().hide();
       for (var idx in ractive.get('q.categories')) {
         if (ractive.get('q.categories.'+idx+'.name')=='Gases') {
           ractive.splice('q.categories', idx, 1);
@@ -237,7 +237,6 @@ var $r = (function ($, ractive, $auth) {
         } else {
           $('section#Policy.category li:gt(0):lt(3)').slideUp();
         }
-        console.error('yippee');
         break;
       }
     });

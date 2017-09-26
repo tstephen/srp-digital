@@ -18,55 +18,67 @@
     <section id="currentSect">
     {{#if surveyReturn}}
       <section id="introSect">
-        <h1>Treasury Report for {{formatAnswer('ORG_NAME')}} ({{formatAnswer('ORG_CODE')}})</h1>
+        <h1>Full Treasury and Benchmarking Report for {{formatAnswer('ORG_NAME')}} ({{formatAnswer('ORG_CODE')}})</h1>
+        {{>statusSect}}
       </section>
 
       <section id="overallSect">
         <h2>Overall Progress</h2>
+        <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
         <div class="rpt table" id="overallRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/scope-summary.html"></div>
       </section>
       <section id="scope1Sect">
         <h2>Scope 1 - Direct</h2>
+        <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
         <div class="rpt table" id="scope1RptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/scope-1.html"></div>
       </section>
       <section id="scope2Sect">
         <h2>Scope 2 - Indirect</h2>
+        <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
         <div class="rpt table" id="scope2RptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/scope-2.html"></div>
       </section>
       <section id="scope3Sect">
         <h2>Scope 3 - Indirect</h2>
+        <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
         <div class="rpt table" id="scope3RptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/scope-3.html"></div>
         <section id="scope3TravelSect">
           <h3>Scope 3 Breakdown - Travel</h3>
+          <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
           <div class="rpt table" id="travelRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/travel-co2e.html"></div>
         </section>
         <section id="scope3WaterSect">
           <h3>Scope 3 Breakdown - Water</h3>
+          <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
           <div class="rpt table" id="waterRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/water-co2e.html"></div>
         </section>
         <section id="scope3WasteSect">
           <h3>Scope 3 Breakdown - Waste</h3>
+          <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
           <div class="rpt table" id="wasteRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/waste-co2e.html"></div>
         </section>
         <section id="scope3BiomassSect">
           <h3>Scope 3 Breakdown - Biomass (well to tank)</h3>
+          <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
           <div class="rpt table" id="biomassRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/biomass-co2e-wtt.html"></div>
         </section>
       </section>
 
       <section id="outsideScopesSect">
         <h3>Outside Scopes - Biomass (total)</h3>
+        <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
         <div class="rpt table" id="biomassRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/biomass-co2e-noscope.html"></div>
       </section>
 
       {{#if formatAnswer('ECLASS_USER') == '0-E-Class'}}
         <section id="eclassCarbonProfileSect">
           <h2>E-Class Procurement Profile</h2>
+          <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
           <div class="rpt table" id="eclassProfileRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/eclass-carbon-profile.html"></div>
         </section>
       {{else}}
         <section id="sduCarbonProfileSect">
           <h2>SDU Whole organisation carbon profile</h2>
+          <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
           <div class="rpt table" id="sduProfileRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/sdu-carbon-profile.html"></div>
         </section>
       {{/if}}
