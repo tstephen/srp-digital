@@ -59,10 +59,10 @@ section h2 .glyphicon-search {
   bottom: 5px;
 }
 small {
-	font-size: 75%;
+  font-size: 75%;
 }
 #messages p {
-	line-height: 3em;
+  line-height: 3em;
   padding-left: 20px !imp ortant;
   font-style: italic;
 }
@@ -70,9 +70,9 @@ small {
   padding:6px;
 }
 .navbar-brand {
-	padding-top: 0;
-	position: relative;
-	top: -26px;
+  padding-top: 0;
+  position: relative;
+  top: -26px;
 }
 .navbar.navbar.navbar-fixed-top {
   border-bottom-color: #ec9300;
@@ -84,7 +84,7 @@ small {
   line-height: 1em;
 }
 .navbar.navbar-fixed-bottom p {
-	line-height: 1em;
+  line-height: 1em;
 }
 .site-sub-footer {
   color: #efefef;
@@ -95,7 +95,7 @@ small {
   vertical-align: middle;
 }
 th {
-	font-weight: bold;
+  font-weight: bold;
 }
 .glyphicon-search {
   font-size: 20px;
@@ -122,15 +122,15 @@ th {
   padding: 12px
 }
 .scorecardicon {
-	font-size: 3em;
-	color: #ec9300;
+  font-size: 3em;
+  color: #ec9300;
 }
 .search {
-	border-radius:15px;
-	width:100px;
-	display:inline;
-	position:relative;
-	bottom:5px;
+  border-radius:15px;
+  width:100px;
+  display:inline;
+  position:relative;
+  bottom:5px;
 }
 .text-danger {
   font-style: italic;
@@ -149,7 +149,7 @@ a.glyphicon:hover,
 h2 a.glyphicon:focus,
 h2 a.glyphicon:hover {
   color: #ec9300;
-	cursor: pointer;
+  cursor: pointer;
 }
 form .criteria {
   width: 100%;
@@ -158,16 +158,19 @@ form .criteria input {
   margin: 2px 3px;
 }
 .form {
-	display: block;
-	list-style: none;
+  display: block;
+  list-style: none;
 }
 .form li {
-	margin: 5px 0 5px;
+  margin: 5px 0 5px;
 }
 .form label, .form input {
   display:block;
 }
-
+.form input[type='radio'] {
+  display: inline-block;
+  top: 4px;
+}
 .form input {
   margin-left: 0px;
 }
@@ -180,7 +183,7 @@ form .criteria input {
   width:83% /* equiv of col-10 */
 }
 .navbar-sticky .profile {
-	top: -32px;
+  top: -32px;
 }
 .navbar-sticky .profile-img img {
   margin-top: -6px;
@@ -232,17 +235,17 @@ form .criteria input {
 /***************** CHARTS INC MACC *****************/
 
 rect.scorecard.bar:nth-child(odd) {
-	fill:#ec9300;
+  fill:#ec9300;
 }
 rect.charts.bar:nth-child(even) {
   fill:#949699;
 }
 text {
-	fill: #333;
-	font-family: Ubuntu, sans-serif;
+  fill: #333;
+  font-family: Ubuntu, sans-serif;
   font-size: 16px;
 /* TODO MACC expects this but SRP not...
-	stroke-width: 1px;
+  stroke-width: 1px;
   stroke: #333;*/
   shape-rendering: crisp-edges;
 }
@@ -251,18 +254,19 @@ text.inverse {
 }
 
 #dataSetSelectors .radio-inline {
-  padding-left: 0;
+  display: inline-block;
   margin-right: 20px;
-  padding-top: 0;
+  padding-left: 0;
+  padding-top: 4px;
 }
 .axis path,
 .axis .tick line {
-	fill:none;
-	stroke: #666666;
+  fill:none;
+  stroke: #666666;
   shape-rendering: crisp-edges;
 }
 .axis .tick text {
-	font-size:12px;
+  font-size:12px;
 }
 .hidden {
   display:none;
