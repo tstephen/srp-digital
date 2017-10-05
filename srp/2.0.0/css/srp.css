@@ -290,3 +290,12 @@ text.inverse {
   list-style: none;
 }
 /************* END CHARTS INC MACC *****************/
+
+/************* START PRINT MEDIA *******************/
+@media print {
+  .no-print, .no-print * {
+    display: none !important;
+  }
+}
+/************* END PRINT MEDIA *********************/
+
