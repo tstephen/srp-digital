@@ -293,6 +293,7 @@ text.inverse {
 
 /************* START PRINT MEDIA *******************/
 @media print {
+  .controls,
   .no-print, .no-print * {
     display: none !important;
   }

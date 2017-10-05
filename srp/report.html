@@ -279,13 +279,15 @@
           </p>
 
           <h4>Energy used</h4>
+          <p>Energy consumption in kWh</p>
           <div class="rpt table" id="energyRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/energy.html?maxPeriods=4"></div>
-          <h4>Carbon emissions resulting</h4>
+          <h4>Carbon emissions resulting</h4> 
+          <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
           <div class="rpt table" id="energyCo2eRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/energy-co2e.html?maxPeriods=4"></div>
 
           <p>{{formatAnswer('ENERGY_PERF')}}</p>
           <p>
-            {{! to calculate, perhaps server side }}
+            {{! TODO to calculate, perhaps server side }}
             {{#if formatAnswer('ELEC_USED_3RD_PTY_PCT')}}
               {{formatAnswer('ELEC_USED_3RD_PTY_PCT')}}
             {{else}}
@@ -303,8 +305,10 @@
           <p>Every action counts and we are a lean organisation trying to realise efficiencies across the board for cost and carbon (CO<sub>2</sub>e) reductions. We support a culture for active travel to improve staff wellbeing and reduce sickness. Air pollution, accidents and noise all cause health problems for our local population, patients, staff and visitors and are caused by cars, as well as other forms of transport.</p>
 
           <h4>Travel undertaken</h4>
+          <p>All travel is shown in miles.</p>
           <div class="rpt table" id="travelRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/travel.html?maxPeriods=4"></div>
           <h4>Carbon emissions resulting</h4>
+          <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
           <div class="rpt table" id="travelCo2eRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/travel-co2e.html?maxPeriods=4"></div>
           <p>{{formatAnswer('travelPerf')}}</p>
         </section>
@@ -316,22 +320,20 @@
                  class="rpt stacked" id="wasteGraph" width="600" height="400"></svg>
           </p>
           <h4>Waste produced</h4>
+          <p>Waste in tonnes</p>
           <div class="rpt table" id="wasteRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/waste.html?maxPeriods=4"></div>
           <h4>Carbon emissions resulting</h4>
+          <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
           <div class="rpt table" id="wasteCo2eRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/waste-co2e.html?maxPeriods=4"></div>
-          <p>
-            {{formatAnswer('WASTE_PERF')}}
-          <p>
-            {{formatAnswer('WASTE_CONTEXT')}}
+          <p>{{formatAnswer('WASTE_PERF')}}</p>
+          <p>{{formatAnswer('WASTE_CONTEXT')}}</p>
         </section>
 
         <section id="waterSect">
           <h3>Finite resource use - Water</h3>
           <div class="rpt table" id="waterRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/water.html?maxPeriods=4"></div>
-          <p>
-            {{formatAnswer('WATER_PERF')}}
-          <p>
-            {{formatAnswer('WATER_CONTEXT')}}
+          <p>{{formatAnswer('WATER_PERF')}}</p>
+          <p>{{formatAnswer('WATER_CONTEXT')}}</p>
         </section>
 
         <section id="carbonFootprintSect">
@@ -359,8 +361,8 @@
               <div class="rpt table" id="sduProfileRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/sdu-carbon-profile.html?maxPeriods=4"></div>
             </section>
           {{/if}}
-          <!-- TODO sdu carbon profile above and the one below differ only by the inclusion of energy in the below -->
-          <div class="rpt table" id="emissionsRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-emissions-profile.html?maxPeriods=4"></div>
+          <!-- TODO sdu carbon profile above and the one below differ only by the inclusion of energy in the below
+          <div class="rpt table" id="emissionsRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-emissions-profile.html?maxPeriods=4"></div> -->
         </section>
 
         <section id="trajectorySect">
@@ -373,16 +375,6 @@
                 class="rpt stacked" id="carbonTrajectoryGraph" width="600" height="400"></svg>
           </p>
           <div class="rpt table" id="trajectoryRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-trajectory.html?maxPeriods=4"></div>
-        </section>
-
-        <section id="benchmarkSect">
-          <h3>Benchmarking</h3>
-          <p>{{formatAnswer('BENCHMARK_PERF')}}</p>
-          <p>
-            <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-by-expenditure.csv"
-                 class="rpt stacked" id="carbonByExpenditureGraph" width="600" height="400"></svg>
-          </p>
-          <div class="rpt table" id="carbonExpenditureRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-by-expenditure.html?maxPeriods=4"></div>
         </section>
       </section>
 
