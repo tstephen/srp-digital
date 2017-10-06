@@ -99,7 +99,6 @@ var ractive = new BaseRactive({
   },
   enter: function () {
     console.info('enter...');
-    ractive.login();
   },
   fetch: function() {
     console.info('fetch...');
