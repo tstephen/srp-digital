@@ -26,10 +26,17 @@ function renderPie(selector, csvString) {
       .outerRadius(radius - 40)
       .innerRadius(radius - 40);
 
+  var other = 0;
   var data = d3.csvParse(csvString, function(d) {
-    d.percentage = +d.percentage;
-    return d;
+    if (d.percentage > 5) {
+      d.percentage = +d.percentage;
+      return d;
+    } else {
+      other+=parseFloat(d.percentage);
+      return;
+    }
   });
+  if (other > 0) data.push({ classification: 'Other', percentage: other });
 
   var arc = g.selectAll(".arc")
     .data(pie(data))
