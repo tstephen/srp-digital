@@ -104,7 +104,7 @@
           {{else}}
             We do not currently use the Good Corporate Citizenship (GCC) tool or run awareness campaigns promoting sustainability.
           {{/if}}
-
+        </p>
         <p>
           Climate change brings new challenges to our business both in direct
           effects to the healthcare estates, but also to patient health.
@@ -119,21 +119,31 @@
             board approved plan for future climate change risks affecting our
             area.
           {{/if}}
-
+        </p>
         <p>
           {{#if formatAnswer('QUANT_ES_IMPACTS')}}
             {{formatAnswer('QUANT_ES_IMPACTS')}}
           {{else}}
-            We have not assessed the social and environmental impacts for the trust.
+            We have not assessed the social and environmental impacts for the organisation.
           {{/if}}
-
+        </p>
         <p>
           {{#if formatAnswer('MOD_SLAVERY')}}
-            {{formatAnswer('MOD_SLAVERY')}}
+            Statement on Modern Slavery
+            <blockquote>{{formatAnswer('MOD_SLAVERY')}}</blockquote>
           {{else}}
             We have not currently issued a statement on Modern Slavery.
           {{/if}}
-
+        </p>
+        <p>
+          {{#if formatAnswer('SOCIAL_VALUE')}}
+            Statement on Public Services (Social Value) Act
+            <blockquote>{{formatAnswer('SOCIAL_VALUE')}}</blockquote>
+          {{else}}
+            We have not currently issued a statement on meeting the requirements
+            of the Public Services (Social Value) Act.
+          {{/if}}
+        </p>
       </section>
 
       <section id="partnershipsSect">
@@ -318,7 +328,7 @@
           </p>
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
           <div class="rpt table" id="travelCo2eRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/travel-co2e.html?maxPeriods=4"></div>
-          <p>{{formatAnswer('travelPerf')}}</p>
+          <p>{{formatAnswer('TRAVEL_PERF')}}</p>
         </section>
 
         <section id="wasteSect">
@@ -377,7 +387,7 @@
 
         <section id="trajectorySect">
           <h3>Modelled trajectory</h3>
-          <p>{{formatAnswer('trajectoryPerf')}}</p>
+          <p>{{formatAnswer('TRAJECTORY_PERF')}}</p>
           <p>
             <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-trajectory.csv"
                 data-colors="#0072ce,#0BBDE5,#0BDBC9"
