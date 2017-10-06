@@ -338,6 +338,8 @@ var ractive = new BaseRactive({
         return true;
       } else if (a.question.name == qName && a.response=='false') {
         return false;
+      } else if (a.question.name == qName && a.question.type == 'number') {
+        return parseFloat(a.response).sigFigs(3);
       } else if (a.question.name == qName) {
         return a.response;
       }
@@ -376,9 +378,6 @@ var ractive = new BaseRactive({
 
 $(document).ready(function() {
   $('head').append('<link href="'+ractive.getServer()+'/css/sdu-1.0.0.css" rel="stylesheet">');
-
-  // $('.btn-calc').off().on('click', ractive.calculate);
-  // $('.btn-refresh').off().on('click', ractive.fetch);
 
   if (Object.keys(getSearchParameters()).indexOf('error')!=-1) {
     ractive.showError('The username and password provided do not match a valid account');
