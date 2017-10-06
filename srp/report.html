@@ -76,7 +76,7 @@
             <tr><td>Travel</td><td>{{#formatAnswer('HEALTHY_TRANSPORT_PLAN').indexOf('0')!=-1}}Yes{{else}}No{{/}}</td></tr>
             <tr><td>Procurement (environmental)</td><td>{{#formatAnswer('PROC_SUPPLIER_SUSTAINABILITY').indexOf('0')!=-1}}Yes{{else}}No{{/}}</td></tr>
             <tr><td>Procurement (social impact)</td><td>{{#formatAnswer('PROC_SUPPLIER_SUSTAINABILITY').indexOf('1')!=-1}}Yes{{else}}No{{/}}</td></tr>
-            <tr><td>Suppliers' impact</td><td>{{#formatAnswer('PROC_SUPPLIER_SUSTAINABILITY').indexOf('2')!=-1}}Yes{{else}}No{{/}}</td></tr>
+            <tr><td>Suppliers&apos; impact</td><td>{{#formatAnswer('PROC_SUPPLIER_SUSTAINABILITY').indexOf('2')!=-1}}Yes{{else}}No{{/}}</td></tr>
           </tbody>
         </table>
         <p>One of the ways in which an organisation can embed sustainability is
@@ -112,7 +112,7 @@
           temperatures and prolonged periods of cold, floods, droughts etc.
           {{#if formatAnswer('ADAPTATION_PLAN_INC')}}
             Our board approved plans address the potential need to adapt the
-            delivery the organisation's activities and infrastructure to climate
+            delivery the organisation&apos;s activities and infrastructure to climate
             change and adverse weather events
           {{else}}
             The organisation has identified the need for the development of a
@@ -161,14 +161,19 @@
               </tr>
             </thead>
             <tbody>
-              {{! TODO lookup provider scores}}
-              {{# providers:i}}
+              {{# surveyReturn.providers:i}}
                 <tr>
-                  <td>{{sdmp}}</td><td>{{onTrack}}</td><td>{{gcc}}</td><td>{{healthyTravelPlan}}</td><td>{{adaptation}}</td><td>{{sduScore}}</td>
+                  <td>{{formatProviderAnswer(i,'ORG_NAME')}}</td>
+                  <td>{{#if formatProviderAnswer(i,'SDMP_CRMP')==true}}Yes{{elseif formatProviderAnswer(i,'SDMP_CRMP')=='n/a'}}n/a{{else}}No{{/if}}</td>
+                  <td>{{#if formatProviderAnswer(i,'ON_TRACK')==true}}Yes{{elseif formatProviderAnswer(i,'ON_TRACK')=='n/a'}}n/a{{else}}No{{/if}}</td>
+                  <td>{{#if formatProviderAnswer(i,'LAST_GCC_SCORE')}}{{formatProviderAnswer(i,'LAST_GCC_SCORE')}}{{else}}-{{/if}}</td>
+                  <td>{{#if formatProviderAnswer(i,'HEALTHY_TRANSPORT_PLAN')==true}}Yes{{elseif formatProviderAnswer(i,'HEALTHY_TRANSPORT_PLAN')=='n/a'}}n/a{{else}}No{{/if}}</td>
+                  <td>{{#if formatProviderAnswer(i,'ADAPTATION_PLAN_INC')==true}}Yes{{elseif formatProviderAnswer(i,'ADAPTATION_PLAN_INC')=='n/a'}}n/a{{else}}No{{/if}}</td>
+                  <td>{{#if formatProviderAnswer(i,'SDU_RPT_SCORE')}}{{formatProviderAnswer(i,'SDU_RPT_SCORE')}}{{else}}-{{/if}}</td>
                 </tr>
               {{/}}
-              {{^providers}}
-                <tr><td colspan="5">No provider data specified</td></tr>
+              {{^surveyReturn.providers}}
+                <tr><td colspan="7">No provider data specified</td></tr>
               {{/}}
             </tbody>
           </table>
@@ -182,14 +187,17 @@
               </tr>
             </thead>
             <tbody>
-              {{!TODO lookup CCG scores}}
-              {{# ccgs:i}}
+              {{# surveyReturn.commissioners:i}}
                 <tr>
-                  <td>{{sdmp}}</td><td>{{gcc}}</td><td>{{adaptation}}</td><td>{{sduScore}}</td>
+                  <td>{{formatCommissionerAnswer(i,'ORG_NAME')}}</td>
+                  <td>{{#if formatCommissionerAnswer(i,'SDMP_CRMP')==true}}Yes{{elseif formatCommissionerAnswer(i,'SDMP_CRMP')=='n/a'}}n/a{{else}}No{{/if}}</td>
+                  <td>{{#if formatCommissionerAnswer(i,'LAST_GCC_SCORE')}}{{formatCommissionerAnswer(i,'LAST_GCC_SCORE')}}{{else}}-{{/if}}</td>
+                  <td>{{#if formatCommissionerAnswer(i,'ADAPTATION_PLAN_INC')==true}}Yes{{elseif formatCommissionerAnswer(i,'ADAPTATION_PLAN_INC')=='n/a'}}n/a{{else}}No{{/if}}</td>
+                  <td>{{#if formatCommissionerAnswer(i,'SDU_RPT_SCORE')}}{{formatCommissionerAnswer(i,'SDU_RPT_SCORE')}}{{else}}-{{/if}}</td>
                 </tr>
               {{/}}
-              {{^ccgs}}
-                <tr><td colspan="5">No CCG data specified</td></tr>
+              {{^surveyReturn.commissioners}}
+                <tr><td colspan="5">No commissioner data specified</td></tr>
               {{/}}
             </tbody>
           </table>
@@ -238,33 +246,30 @@
         {{#if isCcg()}}
           <section id="commissionedActivitySect">
             <h3>Commissioned Activity</h3>
-
             <table class="table table-striped">
               <thead>
                 <tr>
                   <th>Organisation Name</th>
-                  <th>Building energy use</th>
-                  <th>Building energy use per FTE</th>
+                  <th>Energy use</th>
+                  <th>Energy use per WTE</th>
                   <th>Water</th>
-                  <th>Water use per FTE</th>
-                  <th>Percent high cost waste</th>
-                  <th>Waste cost increase</th>
+                  <th>Water use per WTE</th>
+                  <!--th>Percent high cost waste</th>
+                  <th>Waste cost increase</th-->
                 </tr>
               </thead>
               <tbody>
-                {{# providers:i}}
+                {{# surveyReturn.providers:i}}
                   <tr>
-                    <td>{{orgName}}</td>
-                    <td>{{buildingEnergyUse}}</td>
-                    <td>{{buildingEnergyUsePerFte}}</td>
-                    <td>{{water}}</td>
-                    <td>{{waterUsePerFte}}</td>
-                    <td>{{percentHighCostWaste}}</td>
-                    <td>{{wasteCostIncrease}}</td>
+                    <td>{{formatProviderAnswer(i,'ORG_NAME')}}</td>
+                    <td>{{formatProviderAnswer(i,'TOTAL_ENERGY')}}</td>
+                    <td>{{formatProviderAnswer(i,'TOTAL_ENERGY_BY_WTE')}}</td>
+                    <td>{{formatProviderAnswer(i,'WATER_VOL')}}</td>
+                    <td>{{formatProviderAnswer(i,'WATER_VOL_BY_WTE')}}</td>
                   </tr>
                 {{/}}
-                {{^providers}}
-                  <tr><td colspan="8">TODO lookup provider scores</td></tr>
+                {{^surveyReturn.providers}}
+                  <tr><td colspan="8">No provider data specified</td></tr>
                 {{/}}
               </tbody>
             </table>

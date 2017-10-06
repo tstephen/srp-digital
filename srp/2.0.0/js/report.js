@@ -34,15 +34,35 @@ var ractive = new BaseRactive({
         }
       }
     },
+    formatCommissionerAnswer: function(idx,qName) {
+      if (qName==undefined || ractive.get('surveyReturn.commissioners.'+idx)==undefined) return '';
+      else {
+        try {
+          var answer = ractive.getAnswer(qName, ractive.get('surveyReturn.commissioners.'+idx+'.answers'));
+          return answer;
+        } catch (e) {
+          return '';
+        }
+      }
+    },
     formatDateTime: function(timeString) {
       // console.log('formatDate: '+timeString);
       if (timeString==undefined) return 'n/a';
       return new Date(timeString).toLocaleString(navigator.languages);
     },
+    formatProviderAnswer: function(idx,qName) {
+      if (qName==undefined || ractive.get('surveyReturn.providers.'+idx)==undefined) return '';
+      else {
+        try {
+          var answer = ractive.getAnswer(qName, ractive.get('surveyReturn.providers.'+idx+'.answers'));
+          return answer;
+        } catch (e) {
+          return '';
+        }
+      }
+    },
     isCcg: function() {
-      if (ractive.get('surveyReturn')==undefined) return '';
-      if (ractive.getAnswer('ORG_TYPE')=='Clinical Commissioning Group') return true;
-      else return false;
+      return ractive.isCcg();
     },
     stdPartials: [
       { "name": "loginSect", "url": $env.server+"/webjars/auth/1.0.0/partials/login-sect.html"},
@@ -59,6 +79,7 @@ var ractive = new BaseRactive({
   },
   calculate: function () {
     console.info('calculate...');
+    $('#ajax-loader').show();
     $.ajax({
       dataType: "json",
       type: 'POST',
@@ -71,7 +92,8 @@ var ractive = new BaseRactive({
       },
       success: function( data ) {
         console.info('calculation requested, returns: '+ data);
-        // ractive.fetch();
+        $('#ajax-loader').hide();
+        ractive.fetch();
       }
     });
   },
@@ -95,6 +117,8 @@ var ractive = new BaseRactive({
         ractive.set('saveObserver', false);
         if (Array.isArray(data)) ractive.set('surveyReturn', data[0]);
         else ractive.set('surveyReturn', data);
+        if (ractive.isCcg()) ractive.fetchProviderData();
+        else ractive.fetchCommissionerData();
         //if (ractive.hasRole('admin')) $('.admin').show();
         //if (ractive.hasRole('power-user')) $('.power-user').show();
         if (ractive.fetchCallbacks!=null) ractive.fetchCallbacks.fire();
@@ -127,6 +151,56 @@ var ractive = new BaseRactive({
         ractive.set('saveObserver', true);
       }
     });
+  },
+  fetchCommissionerData: function() {
+    console.info('fetchCommissionerData');
+    $( "#ajax-loader" ).show();
+    ractive.set('surveyReturn.commissioners',[]);
+    for (var idx = 1 ; idx < 9 ; idx++) {
+      var commissioner = ractive.getAnswer('CCG'+idx+'_SERVED');
+      if (commissioner == undefined) continue;
+      $.ajax({
+        dataType: "json",
+        url: ractive.getServer()+'/returns/findCurrentBySurveyNameAndOrg/'+ractive.get('survey')+'/'+commissioner,
+        crossDomain: true,
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+          "X-Authorization": "Bearer "+localStorage['token'],
+          "Cache-Control": "no-cache"
+        },
+        success: function( data ) {
+          ractive.set('saveObserver', false);
+          for (j = 0 ; j < ractive.get('surveyReturn.commissioners').length ; j++) {
+            if (ractive.get('surveyReturn.commissioners.'+j+'.org') == data.org) {
+              ractive.splice('surveyReturn.commissioners',j,1);
+            }
+          }
+          ractive.push('surveyReturn.commissioners', data);
+          $( "#ajax-loader" ).hide();
+          ractive.set('saveObserver', true);
+        },
+        error: function(jqXHR, textStatus, errorThrown ) {
+          var commissioner = this.url.substring(this.url.lastIndexOf('/')+1);
+          console.warn('Unable to fetch data for '+commissioner+'.'+jqXHR.status+':'+textStatus+','+errorThrown);
+          for (j = 0 ; j < ractive.get('surveyReturn.commissioners').length ; j++) {
+            if (ractive.get('surveyReturn.commissioners.'+j+'.orgName') == commissioner) {
+              ractive.splice('surveyReturn.commissioners',j,1);
+            }
+          }
+          ractive.push('surveyReturn.commissioners', {
+                orgName: commissioner, answers: [
+                  { question: { name: 'ORG_NAME' }, response: commissioner },
+                  { question: { name: 'SDMP_CRMP' }, response: 'n/a' },
+                  { question: { name: 'LAST_GCC_SCORE' }, response: 'n/a' },
+                  { question: { name: 'ADAPTATION_PLAN_INC' }, response: 'n/a' },
+                  { question: { name: 'SDU_RPT_SCORE' }, response: 'n/a' }
+                ]
+              });
+          $( "#ajax-loader" ).hide();
+          ractive.set('saveObserver', true);
+        }
+      });
+    }
   },
   fetchCsv: function(ctrl, callback) {
     var url = $(ctrl)
@@ -165,6 +239,67 @@ var ractive = new BaseRactive({
       }
     });
   },
+  fetchProviderData: function() {
+    console.info('fetchProviderData');
+    $( "#ajax-loader" ).show();
+    ractive.set('saveObserver', false);
+    ractive.set('surveyReturn.providers', []);
+    for (var idx = 1 ; idx < 9 ; idx++) {
+      try {
+        var provider = ractive.getAnswer('PROVIDER'+idx+'_COMMISSIONED');
+        if (provider == undefined) continue;
+        $.ajax({
+          dataType: "json",
+          url: ractive.getServer()+'/returns/findCurrentBySurveyNameAndOrg/'+ractive.get('survey')+'/'+provider,
+          crossDomain: true,
+          headers: {
+            "X-Requested-With": "XMLHttpRequest",
+            "X-Authorization": "Bearer "+localStorage['token'],
+            "Cache-Control": "no-cache"
+          },
+          success: function( data ) {
+            ractive.set('saveObserver', false);
+            for (j = 0 ; j < ractive.get('surveyReturn.providers').length ; j++) {
+              if (ractive.get('surveyReturn.providers.'+j+'.org') == data.org) {
+                ractive.splice('surveyReturn.providers',j,1);
+              }
+            }
+            ractive.push('surveyReturn.providers', data);
+            $( "#ajax-loader" ).hide();
+            ractive.set('saveObserver', true);
+          },
+          error: function(jqXHR, textStatus, errorThrown ) {
+            var provider = this.url.substring(this.url.lastIndexOf('/')+1);
+            console.warn('Unable to fetch data for '+provider+'.'+jqXHR.status+':'+textStatus+','+errorThrown);
+            for (j = 0 ; j < ractive.get('surveyReturn.providers').length ; j++) {
+              if (ractive.get('surveyReturn.providers.'+j+'.orgName') == provider) {
+                ractive.splice('surveyReturn.providers',j,1);
+              }
+            }
+            ractive.push('surveyReturn.providers', {
+                  orgName: provider, answers: [
+                    { question: { name: 'ORG_NAME' }, response: provider },
+                    { question: { name: 'SDMP_CRMP' }, response: 'n/a' },
+                    { question: { name: 'ON_TRACK' }, response: 'n/a' },
+                    { question: { name: 'LAST_GCC_SCORE' }, response: 'n/a' },
+                    { question: { name: 'HEALTHY_TRANSPORT_PLAN' }, response: 'n/a' },
+                    { question: { name: 'ADAPTATION_PLAN_INC' }, response: 'n/a' },
+                    { question: { name: 'SDU_RPT_SCORE' }, response: 'n/a' },
+                    { question: { name: 'TOTAL_ENERGY' }, response: 'n/a' },
+                    { question: { name: 'TOTAL_ENERGY_BY_WTE' }, response: 'n/a' },
+                    { question: { name: 'WATER_VOL' }, response: 'n/a' },
+                    { question: { name: 'WATER_VOL_BY_WTE' }, response: 'n/a' }
+                  ]
+                });
+            $( "#ajax-loader" ).hide();
+            ractive.set('saveObserver', true);
+          }
+        });
+      } catch (e) {
+        console.info('Assume no provider at idx: '+idx);
+      }
+    }
+  },
   fetchTable: function(ctrl) {
     $.ajax({
       dataType: "html",
@@ -195,9 +330,10 @@ var ractive = new BaseRactive({
       d.innerText = a.replace(new RegExp("^(\\d{" + (a.length%3?a.length%3:0) + "})(\\d{3})", "g"), "$1,$2").replace(/(\d{3})+?/gi, "$1,").replace(/^,/,'').slice(0,-1);
     });
   },
-  getAnswer: function(qName) {
-    for (idx in ractive.get('surveyReturn.answers')) {
-      var a = ractive.get('surveyReturn.answers.'+idx);
+  getAnswer: function(qName, answers) {
+    if (answers == undefined) answers = ractive.get('surveyReturn.answers');
+    for (var idx = 0 ; idx < answers.length ; idx++) {
+      var a = answers[idx];
       if (a.question.name == qName && a.response=='true') {
         return true;
       } else if (a.question.name == qName && a.response=='false') {
@@ -207,6 +343,11 @@ var ractive = new BaseRactive({
       }
     }
     return undefined;
+  },
+  isCcg: function() {
+    if (ractive.get('surveyReturn')==undefined) return false;
+    if (ractive.getAnswer('ORG_TYPE')=='Clinical Commissioning Group') return true;
+    else return false;
   },
   reset: function() {
     console.info('reset');
@@ -235,6 +376,9 @@ var ractive = new BaseRactive({
 
 $(document).ready(function() {
   $('head').append('<link href="'+ractive.getServer()+'/css/sdu-1.0.0.css" rel="stylesheet">');
+
+  // $('.btn-calc').off().on('click', ractive.calculate);
+  // $('.btn-refresh').off().on('click', ractive.fetch);
 
   if (Object.keys(getSearchParameters()).indexOf('error')!=-1) {
     ractive.showError('The username and password provided do not match a valid account');

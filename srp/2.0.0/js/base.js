@@ -54,7 +54,7 @@ var BaseRactive = Ractive.extend({
           $('link[rel="icon"]').attr('href',ractive.get('tenant.theme.iconUrl'));
       }
       // ajax loader
-      if ($('#ajax-loader').length==0) $('body').append('<div id="ajax-loader"><img class="ajax-loader" src="'+ractive.getServer()+'/images/ajax-loader.gif" style="width:10%" alt="Loading..."/></div>');
+      if ($('#ajax-loader').length==0) $('body').append('<div id="ajax-loader"><img class="ajax-loader" src="'+ractive.getServer()+'/images/ajax-loader.gif" alt="Loading..."/></div>');
       $( document ).ajaxStart(function() {
         $( "#ajax-loader" ).show();
       });

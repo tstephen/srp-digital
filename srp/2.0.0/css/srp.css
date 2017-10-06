@@ -137,8 +137,12 @@ th {
 }
 /* END BOOTSTRAP OVERRIDES */
 
+#ajax-loader {
+  position: fixed;
+  left: 45%;
+  top: 45%
+}
 #ajax-loader img.ajax-loader {
-  left: 55%;
   width: 80px;
 }
 
@@ -299,4 +303,3 @@ text.inverse {
   }
 }
 /************* END PRINT MEDIA *********************/
-
