@@ -194,6 +194,7 @@ form .criteria input {
 }
 .number {
   text-align: right;
+  width: 8em;
 }
 .beta,
 .omny-bar {
