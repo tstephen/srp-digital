@@ -100,12 +100,12 @@
         <h1>Sustainability Report for {{formatAnswer('ORG_NAME')}} ({{formatAnswer('ORG_CODE')}})</h1>
 
         <section id="trajectorySect">
-          <h3>Modelled trajectory</h3>
+          <h3>Carbon emissions progress</h3>
           <p>{{formatAnswer('trajectoryPerf')}}</p>
 
             <svg data-src="//host:port/srp/examples/carbon-trajectory.csv"
                  data-colors="#0072ce,#0BBDE5,#0BDBC9"
-                 data-y-axis-label="Emissions (TCO&#x2082;e)"
+                 data-y-axis-label="Emissions (tCO&#x2082;e)"
                  class="rpt stacked" id="carbonTrajectoryGraph" width="600" height="400"></svg>
           <p>
             In this example the organisation target is 32% reduction from the 2011-12 baseline.

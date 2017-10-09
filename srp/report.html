@@ -386,12 +386,12 @@
         </section>
 
         <section id="trajectorySect">
-          <h3>Modelled trajectory</h3>
+          <h3>Carbon emissions progress</h3>
           <p>{{formatAnswer('TRAJECTORY_PERF')}}</p>
           <p>
             <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-trajectory.csv"
                 data-colors="#0072ce,#0BBDE5,#0BDBC9"
-                data-y-axis-label="Emissions (TCO&#x2082;e)"
+                data-y-axis-label="Emissions (tCO&#x2082;e)"
                 class="rpt stacked" id="carbonTrajectoryGraph" width="600" height="400"></svg>
           </p>
           <div class="rpt table" id="trajectoryRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-trajectory.html?maxPeriods=4"></div>
