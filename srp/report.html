@@ -41,15 +41,17 @@
             {{else}}
               {{formatAnswer('ORG_NAME')}}
             {{/if}}
-            has the following sustainability mission statement located in our
-            sustainable development management plan (SDMP):</p>
+            has created a sustainable development management plan (SDMP).
+          </p>
+          {{#if formatAnswer('SDMP_MISSION_STATEMENT')}}
+            <p>Our sustainiability mission statement is... {{formatAnswer('SDMP_MISSION_STATEMENT')}}</p>
+          {{/if}}
         {{else}}
           <p>
             We acknowledge this responsibility to our patients, local
             communities and the environment by working hard to minimise our footprint.</p>
         {{/if}}
 
-        {{#if formatAnswer('SDMP_MISSION_STATEMENT')}}<h5>{{formatAnswer('SDMP_MISSION_STATEMENT')}}</h5>{{/if}}
 
         <p>
           As a part of the NHS, public health and social care system, it is our
@@ -129,16 +131,14 @@
         </p>
         <p>
           {{#if formatAnswer('MOD_SLAVERY')}}
-            Statement on Modern Slavery
-            <blockquote>{{formatAnswer('MOD_SLAVERY')}}</blockquote>
+            Our statement on Modern Slavery is... {{formatAnswer('MOD_SLAVERY')}}
           {{else}}
             We have not currently issued a statement on Modern Slavery.
           {{/if}}
         </p>
         <p>
           {{#if formatAnswer('SOCIAL_VALUE')}}
-            Statement on Public Services (Social Value) Act
-            <blockquote>{{formatAnswer('SOCIAL_VALUE')}}</blockquote>
+            Our statement on Public Services (Social Value) Act {{formatAnswer('SOCIAL_VALUE')}}
           {{else}}
             We have not currently issued a statement on meeting the requirements
             of the Public Services (Social Value) Act.
