@@ -9,7 +9,7 @@
   <link rel="icon" type="image/png" href="2.0.0/images/icon/srp-icon-32x32.png" />
 <head>
 <body>
-
+  <div class="clearfix" id="messages"></div>
   <section id="container" class="container"></section>
 
   <script id='template' type='text/ractive'>
@@ -299,7 +299,7 @@
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
           <div class="rpt table" id="energyCo2eRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/energy-co2e.html?maxPeriods=4"></div>
 
-          <p>{{formatAnswer('ENERGY_PERF')}}</p>
+          <p class="narrative" contenteditable data-q="ENERGY_PERF">{{formatAnswer('ENERGY_PERF')}}</p>
           <p>
             {{! TODO to calculate, perhaps server side }}
             {{#if formatAnswer('ELEC_USED_3RD_PTY_PCT')}}
@@ -309,7 +309,7 @@
             {{/if}}
             % of our electricity use comes from renewable sources.
           </p>
-          <p>{{formatAnswer('energyContext')}}</p>
+          <p class="narrative" contenteditable data-q="ENERGY_CTXT">{{formatAnswer('ENERGY_CTXT')}}</p>
         </section>
 
         <section id="travelSect">
@@ -328,7 +328,7 @@
           </p>
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
           <div class="rpt table" id="travelCo2eRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/travel-co2e.html?maxPeriods=4"></div>
-          <p>{{formatAnswer('TRAVEL_PERF')}}</p>
+          <p class="narrative" contenteditable data-q="TRAVEL_PERF">{{formatAnswer('TRAVEL_PERF')}}TEST</p>
         </section>
 
         <section id="wasteSect">

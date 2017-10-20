@@ -18,7 +18,7 @@ var ractive = new BaseRactive({
   lazy: true,
   template: '#template',
   data: {
-    org: 'RDR',
+    requiredAnswers: ['ORG_CODE', 'ORG_NAME', 'ORG_TYPE', 'SDMP_CRMP', 'HEALTHY_TRANSPORT_PLAN', 'PROMOTE_HEALTHY_TRAVEL'],
     server: $env.server,
     survey: 'SDU-2016-17',
     tenant: { id: 'sdu' },
@@ -90,11 +90,7 @@ var ractive = new BaseRactive({
         "X-Authorization": "Bearer "+localStorage['token'],
         "Cache-Control": "no-cache"
       },
-      success: function( data ) {
-        console.info('calculation requested, returns: '+ data);
-        $('#ajax-loader').hide();
-        ractive.fetch();
-      }
+      success: ractive.fetchSuccessHandler
     });
   },
   enter: function () {
@@ -112,43 +108,7 @@ var ractive = new BaseRactive({
         "X-Authorization": "Bearer "+localStorage['token'],
         "Cache-Control": "no-cache"
       },
-      success: function( data ) {
-        ractive.set('saveObserver', false);
-        if (Array.isArray(data)) ractive.set('surveyReturn', data[0]);
-        else ractive.set('surveyReturn', data);
-        if (ractive.isCcg()) ractive.fetchProviderData();
-        else ractive.fetchCommissionerData();
-        //if (ractive.hasRole('admin')) $('.admin').show();
-        //if (ractive.hasRole('power-user')) $('.power-user').show();
-        if (ractive.fetchCallbacks!=null) ractive.fetchCallbacks.fire();
-        //ractive.set('searchMatched',$('#contactsTable tbody tr:visible').length);
-        $('.rpt.pie').each(function(i,d) {
-          ractive.fetchCsv(d, renderPie);
-        });
-        $('.rpt.stacked').each(function(i,d) {
-          switch (true) {
-          case (window.innerWidth < 480):
-            $(d).attr('width',440).attr('height', window.innerHeight* .4);
-            break;
-          case (window.innerWidth < 768):
-            $(d).attr('width',720).attr('height', window.innerHeight* .4);
-            break;
-          case (window.innerWidth < 980):
-            $(d).attr('width',720).attr('height', window.innerHeight* .4);
-            break;
-          case (window.innerWidth < 1200):
-            $(d).attr('width',window.innerWidth* .8).attr('height', window.innerHeight* .4);
-            break;
-          default:
-            $(d).attr('width',1140).attr('height', window.innerHeight* .4);
-          }
-          ractive.fetchCsv(d, renderStacked);
-        });
-        $('.rpt.table').each(function(i,d) {
-          ractive.fetchTable(d);
-        });
-        ractive.set('saveObserver', true);
-      }
+      success: ractive.fetchSuccessHandler
     });
   },
   fetchCommissionerData: function() {
@@ -195,6 +155,7 @@ var ractive = new BaseRactive({
                   { question: { name: 'SDU_RPT_SCORE' }, response: 'n/a' }
                 ]
               });
+          ractive.showMessage('foo');
           $( "#ajax-loader" ).hide();
           ractive.set('saveObserver', true);
         }
@@ -299,6 +260,84 @@ var ractive = new BaseRactive({
       }
     }
   },
+  fetchSuccessHandler: function( data ) {
+    ractive.set('saveObserver', false);
+    if (Array.isArray(data)) ractive.set('surveyReturn', data[0]);
+    else ractive.set('surveyReturn', data);
+    if (ractive.isCcg()) ractive.fetchProviderData();
+    else ractive.fetchCommissionerData();
+    //if (ractive.hasRole('admin')) $('.admin').show();
+    //if (ractive.hasRole('power-user')) $('.power-user').show();
+    if (ractive.fetchCallbacks!=null) ractive.fetchCallbacks.fire();
+    //ractive.set('searchMatched',$('#contactsTable tbody tr:visible').length);
+    $('.rpt.pie').each(function(i,d) {
+      ractive.fetchCsv(d, renderPie);
+    });
+    $('.rpt.stacked').each(function(i,d) {
+      switch (true) {
+      case (window.innerWidth < 480):
+        $(d).attr('width',440).attr('height', window.innerHeight* .4);
+        break;
+      case (window.innerWidth < 768):
+        $(d).attr('width',720).attr('height', window.innerHeight* .4);
+        break;
+      case (window.innerWidth < 980):
+        $(d).attr('width',720).attr('height', window.innerHeight* .4);
+        break;
+      case (window.innerWidth < 1200):
+        $(d).attr('width',window.innerWidth* .8).attr('height', window.innerHeight* .4);
+        break;
+      default:
+        $(d).attr('width',1140).attr('height', window.innerHeight* .4);
+      }
+      ractive.fetchCsv(d, renderStacked);
+    });
+    $('.rpt.table').each(function(i,d) {
+      ractive.fetchTable(d);
+    });
+    if (data.status == 'Draft') {
+      $('.btn-calc').removeAttr('disabled');
+      $('.btn-refresh').removeAttr('disabled');
+      $('.btn-submit').removeAttr('disabled');
+      $('.btn-restate').attr('disabled','disabled');
+    }
+    if (data.status == 'Submitted') {
+      $('.btn-calc').attr('disabled','disabled');
+      $('.btn-refresh').attr('disabled','disabled');
+      $('.btn-submit').attr('disabled','disabled');
+      $('.btn-restate').removeAttr('disabled');
+    }
+    var qs=0;
+    var coreQs=0;
+    var answeredCoreQs=0;
+    var answeredQs=0;
+    var periods = [];
+    for (idx = 0 ; idx < ractive.get('surveyReturn.answers').length ; idx++) {
+      qs++;
+      if (ractive.get('surveyReturn.answers.'+idx+'.question.required')==true) coreQs++;
+      if (ractive.get('surveyReturn.answers.'+idx+'.response')!=undefined
+          && ractive.get('surveyReturn.answers.'+idx+'.response')!=''
+          && ractive.get('surveyReturn.answers.'+idx+'.derived')==false
+          && ractive.get('surveyReturn.answers.'+idx+'.status')!='Superseded') {
+        answeredQs++;
+        if (ractive.get('surveyReturn.answers.'+idx+'.question.required')==true) answeredCoreQs++;
+        periods.push(ractive.get('surveyReturn.answers.'+idx+'.applicablePeriod'));
+      }
+    }
+    ractive.set('surveyReturn.completeness.qs',qs);
+    ractive.set('surveyReturn.completeness.coreQs',coreQs);
+    ractive.set('surveyReturn.completeness.answeredCoreQs',answeredCoreQs);
+    ractive.set('surveyReturn.completeness.answeredQs',answeredQs);
+    ractive.set('surveyReturn.completeness.periods',periods.uniq());
+    var requiredMissing = [];
+    for (idx = 0 ; idx < ractive.get('requiredAnswers').length ; idx++) {
+      if (ractive.getAnswer(ractive.get('requiredAnswers.'+idx)) != undefined) {
+        requiredMissing.push(ractive.get('requiredAnswers.'+idx));
+      }
+    }
+    ractive.set('surveyReturn.completeness.missingrequired',requiredMissing);
+    ractive.set('saveObserver', true);
+  },
   fetchTable: function(ctrl) {
     $.ajax({
       dataType: "html",
@@ -345,6 +384,23 @@ var ractive = new BaseRactive({
     }
     return undefined;
   },
+  initNarrative: function() {
+    $('.narrative:empty').html('<em>Please click to insert a commentary on your performance in this area.</em>')
+        .click(function(ev) {
+          if ($(ev.target).hasClass('narrative')) {
+            console.info('Edit... '+$(ev.target).data('q'));
+          } else {
+            console.info('Edit: '+ev.target.tagName+$(ev.target).closest('contenteditable').data('q'));
+          }
+        })
+        .blur(function(ev) {
+          if ($(ev.target).hasClass('narrative')) {
+            console.info('Save... '+$(ev.target).data('q'));
+          } else {
+            console.info('Save: '+$(ev.target).closest('contenteditable').data('q'));
+          }
+        });
+  },
   isCcg: function() {
     if (ractive.get('surveyReturn')==undefined) return false;
     if (ractive.getAnswer('ORG_TYPE')=='Clinical Commissioning Group') return true;
@@ -369,9 +425,65 @@ var ractive = new BaseRactive({
       ractive.showError('Please enter the email address you registered with');
     }
   },
+  restate: function () {
+    console.info('restate...');
+    $('#ajax-loader').show();
+    var instanceToStart = {
+      businessKey: 'Sustainability report '+ractive.get('surveyReturn.revision')+' for '+ractive.get('surveyReturn.org')+' '+ractive.get('surveyReturn.applicablePeriod'),
+      processDefinitionKey: 'RestateSustainabilityReturn',
+      processVariables: {
+        applicablePeriod: ractive.get('surveyReturn.applicablePeriod'),
+        initiator: $auth.getClaim('sub'),
+        org: ractive.get('surveyReturn.org'),
+        returnId: ractive.get('surveyReturn.id'),
+        tenantId: ractive.get('tenant.id')
+      }
+    };
+    ractive.showMessage('Restating your return, this may take a little while...');
+    $.ajax({
+      url: ractive.getServer()+'/'+ractive.get('tenant.id')+'/process-instances/',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify(instanceToStart),
+      success: function(data, textStatus, jqXHR) {
+        console.log('response: '+ jqXHR.status+", Location: "+jqXHR.getResponseHeader('Location'));
+        ractive.showMessage('Created a new, draft revision of your return');
+        $('#ajax-loader').hide();
+        ractive.fetch();
+      }
+    });
+  },
   showReset: function() {
     $('#loginSect').slideUp();
     $('#resetSect').slideDown();
+  },
+  submit: function () {
+    console.info('submit...');
+    $('#ajax-loader').show();
+    var instanceToStart = {
+      businessKey: 'Sustainability report '+ractive.get('surveyReturn.revision')+' for '+ractive.get('surveyReturn.org')+' '+ractive.get('surveyReturn.applicablePeriod'),
+      processDefinitionKey: 'SubmitSustainabilityReturn',
+      processVariables: {
+        applicablePeriod: ractive.get('surveyReturn.applicablePeriod'),
+        initiator: $auth.getClaim('sub'),
+        org: ractive.get('surveyReturn.org'),
+        returnId: ractive.get('surveyReturn.id'),
+        tenantId: ractive.get('tenant.id')
+      }
+    };
+    ractive.showMessage('Submitting your return...');
+    $.ajax({
+      url: ractive.getServer()+'/'+ractive.get('tenant.id')+'/process-instances/',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify(instanceToStart),
+      success: function(data, textStatus, jqXHR) {
+        console.log('response: '+ jqXHR.status+", Location: "+jqXHR.getResponseHeader('Location'));
+        ractive.showMessage('Your return has been received');
+        $('#ajax-loader').hide();
+        ractive.fetch();
+      }
+    });
   }
 });
 

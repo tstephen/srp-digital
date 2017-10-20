@@ -360,6 +360,10 @@ var BaseRactive = Ractive.extend({
         .prop('height', window.innerHeight*0.8);
     $('#helpModal').modal({});
   },
+  showLogin: function() {
+    console.info('showLogin');
+    $('#loginSect').slideDown();
+  },
   showMessage: function(msg, additionalClass) {
     console.log('showMessage: '+msg);
     if (additionalClass == undefined) additionalClass = 'bg-info text-info';
@@ -702,7 +706,9 @@ Array.uniq = function(fieldName, arr) {
   }
   return list;
 }
-
+Array.prototype.uniq = function() {
+  return this.sort().filter(function(el,i,a){if(i==a.indexOf(el))return 1;return 0});
+}
 /******************************** Polyfills **********************************/
 // ref https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/endsWith
 if (!String.prototype.endsWith) {

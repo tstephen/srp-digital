@@ -78,6 +78,9 @@ var $r = (function ($, ractive, $auth) {
 
   function _fill(survey) {
     _survey = survey;
+    if ($r.rtn.status != 'Draft') {
+      ractive.showError('This return has been submitted and cannot be changed. If you detect a problem you may create a new version from the report pages');
+    }
     for(i in survey.categories) {
 
       for(j in survey.categories[i].questions) {
@@ -117,6 +120,11 @@ var $r = (function ($, ractive, $auth) {
                 _hideNotApplicable();
               }
               $('#ORG_TYPE').attr('list','orgTypes');
+              if ('Submitted'==me.rtn.answers[k].status || 'Published'==me.rtn.answers[k].status) {
+                $('#'+me.rtn.answers[k].question.name).attr('readonly','readonly').attr('disabled','disabled');
+              } else {
+                $('#'+me.rtn.answers[k].question.name).removeAttr('readonly').removeAttr('disabled');
+              }
               break;
             default:
               if ('Submitted'==me.rtn.answers[k].status || 'Published'==me.rtn.answers[k].status) {
@@ -292,7 +300,7 @@ var $r = (function ($, ractive, $auth) {
   }
 
   me.submit = function() {
-    if ($r.dirty == false || $auth.loginInProgress) {
+    if ($r.dirty == false || $r.rtn.status != 'Draft' || $auth.loginInProgress) {
       console.info('skip save, dirty: '+$r.dirty+', loginInProgress: '+$auth.loginInProgress);
       return;
     } else if (me.rtn == undefined) {

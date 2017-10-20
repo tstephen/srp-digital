@@ -155,6 +155,12 @@ h2 a.glyphicon:hover {
   color: #ec9300;
   cursor: pointer;
 }
+.glyphicon-btn {
+  border: 1px solid;
+  border-radius: 5px;
+  padding: 6px;
+  font-style: normal;
+}
 form .criteria {
   width: 100%;
 }
@@ -170,6 +176,10 @@ form .criteria input {
 }
 .form label, .form input {
   display:block;
+}
+.form label.required::after {
+  color: red;
+  content: '*';
 }
 .form input[type='radio'] {
   display: inline-block;
