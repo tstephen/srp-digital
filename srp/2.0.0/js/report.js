@@ -18,6 +18,7 @@ var ractive = new BaseRactive({
   lazy: true,
   template: '#template',
   data: {
+    narrativePrompt: 'Please click to insert a commentary on your performance in this area.',
     requiredAnswers: ['ORG_CODE', 'ORG_NAME', 'ORG_TYPE', 'SDMP_CRMP', 'HEALTHY_TRANSPORT_PLAN', 'PROMOTE_HEALTHY_TRAVEL'],
     server: $env.server,
     survey: 'SDU-2016-17',
@@ -336,6 +337,7 @@ var ractive = new BaseRactive({
       }
     }
     ractive.set('surveyReturn.completeness.missingrequired',requiredMissing);
+    ractive.initNarrative();
     ractive.set('saveObserver', true);
   },
   fetchTable: function(ctrl) {
@@ -385,7 +387,13 @@ var ractive = new BaseRactive({
     return undefined;
   },
   initNarrative: function() {
-    $('.narrative:empty').html('<em>Please click to insert a commentary on your performance in this area.</em>')
+    if (ractive.get('surveyReturn.status')!='Draft') {
+      console.info('Skipping initNarrative because status is '+ractive.get('surveyReturn.status'));
+      $('.narrative').removeAttr('contenteditable');
+      return;
+    }
+    $('.narrative')
+        .attr('contenteditable', 'true')
         .click(function(ev) {
           if ($(ev.target).hasClass('narrative')) {
             console.info('Edit... '+$(ev.target).data('q'));
@@ -395,11 +403,14 @@ var ractive = new BaseRactive({
         })
         .blur(function(ev) {
           if ($(ev.target).hasClass('narrative')) {
-            console.info('Save... '+$(ev.target).data('q'));
+            ractive.saveNarrative($(ev.target).data('q'), ev.target.innerText);
           } else {
-            console.info('Save: '+$(ev.target).closest('contenteditable').data('q'));
+            ractive.saveNarrative($(ev.target).closest('contenteditable').data('q'),
+                ev.target.innerText);
           }
         });
+    $('.narrative:empty')
+        .html(ractive.get('narrativePrompt'));
   },
   isCcg: function() {
     if (ractive.get('surveyReturn')==undefined) return false;
@@ -418,7 +429,7 @@ var ractive = new BaseRactive({
         data: { json: JSON.stringify({ email: addr, tenantId: 'srp' }) },
         dataType: 'text',
         success: function(data) {
-          ractive.showMessage('An reset link has been sent to '+addr);
+          ractive.showMessage('A reset link has been sent to '+addr);
         },
       });
     } else {
@@ -452,6 +463,27 @@ var ractive = new BaseRactive({
         ractive.fetch();
       }
     });
+  },
+  saveNarrative: function(q, val) {
+    console.info('saveNarrative of '+q+' as '+val);
+    if (q!=undefined && val!=undefined && val.trim()!=ractive.get('narrativePrompt')) {
+      $('.save-indicator').show();
+      $.ajax({
+        url: ractive.getServer()+'/returns/'+ractive.get('surveyReturn.id')+'/answers/'+q,
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(val),
+        success: function(data) {
+          console.info('...saved');
+          $('.save-indicator span').toggleClass('save-indicator-animation glyphicon-save glyphicon-saved');
+          setTimeout(function() {
+            $('.save-indicator').fadeOut(function() {
+              $('.save-indicator span').toggleClass('save-indicator-animation glyphicon-save glyphicon-saved');
+            });
+          }, 3000);
+        },
+      });
+    }
   },
   showReset: function() {
     $('#loginSect').slideUp();

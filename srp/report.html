@@ -59,7 +59,7 @@
           reducing the carbon footprint of the NHS, public health and social
           care system by 34% (from a 1990 baseline) equivalent to a 28%
           reduction from a 2013 baseline by 2020. It is our aim to
-          {{#if formatAnswer('CARBON_REDUCTION_TARGET')}}supercede{{else}}meet{{/if}}
+          {{#if formatAnswer('CARBON_REDUCTION_TARGET')}}supersede{{else}}meet{{/if}}
           this target by reducing our carbon emissions
           {{#if formatAnswer('CARBON_REDUCTION_TARGET')}}28%{{else}}{{formatAnswer('CARBON_REDUCTION_TARGET_PCT')}}%{{/if}}
           by {{#if formatAnswer('CARBON_REDUCTION_TARGET')}}{{formatAnswer('CARBON_REDUCTION_DEADLINE_YEAR')}}{{else}}2020-21{{/if}}
@@ -75,7 +75,7 @@
             <tr><th>Area</th><th>Is sustainability considered?</th></tr>
           </thead>
           <tbody>
-            <tr><td>Travel</td><td>{{#formatAnswer('HEALTHY_TRANSPORT_PLAN').indexOf('0')!=-1}}Yes{{else}}No{{/}}</td></tr>
+            <tr><td>Travel</td><td>{{#formatAnswer('HEALTHY_TRANSPORT_PLAN')==false || formatAnswer('HEALTHY_TRANSPORT_PLAN').indexOf('0')==-1}}No{{else}}Yes{{/}}</td></tr>
             <tr><td>Procurement (environmental)</td><td>{{#formatAnswer('PROC_SUPPLIER_SUSTAINABILITY').indexOf('0')!=-1}}Yes{{else}}No{{/}}</td></tr>
             <tr><td>Procurement (social impact)</td><td>{{#formatAnswer('PROC_SUPPLIER_SUSTAINABILITY').indexOf('1')!=-1}}Yes{{else}}No{{/}}</td></tr>
             <tr><td>Suppliers&apos; impact</td><td>{{#formatAnswer('PROC_SUPPLIER_SUSTAINABILITY').indexOf('2')!=-1}}Yes{{else}}No{{/}}</td></tr>
@@ -293,13 +293,15 @@
           <div class="rpt table" id="energyRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/energy.html?maxPeriods=4"></div>
           <h4>Carbon emissions resulting</h4>
           <p>
-            <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/energy-co2e.csv"
+            <!-- data-colors="#0078c1,#99C344,#5C840C,#99C344,#BDE46F,#09613B,#03A1FF,#328F67,#82C7AA.#8D810D,#D1C549,#FFF7A7" -->
+            <svg
+                 data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/energy-co2e.csv"
                  class="rpt stacked" id="energyGraph" width="600" height="400"></svg>
           </p>
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
           <div class="rpt table" id="energyCo2eRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/energy-co2e.html?maxPeriods=4"></div>
 
-          <p class="narrative" contenteditable data-q="ENERGY_PERF">{{formatAnswer('ENERGY_PERF')}}</p>
+          <p class="narrative" data-q="ENERGY_PERF">{{formatAnswer('ENERGY_PERF')}}</p>
           <p>
             {{! TODO to calculate, perhaps server side }}
             {{#if formatAnswer('ELEC_USED_3RD_PTY_PCT')}}
@@ -328,7 +330,7 @@
           </p>
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
           <div class="rpt table" id="travelCo2eRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/travel-co2e.html?maxPeriods=4"></div>
-          <p class="narrative" contenteditable data-q="TRAVEL_PERF">{{formatAnswer('TRAVEL_PERF')}}TEST</p>
+          <p class="narrative" data-q="TRAVEL_PERF">{{formatAnswer('TRAVEL_PERF')}}</p>
         </section>
 
         <section id="wasteSect">
@@ -343,7 +345,7 @@
           </p>
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
           <div class="rpt table" id="wasteCo2eRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/waste-co2e.html?maxPeriods=4"></div>
-          <p>{{formatAnswer('WASTE_PERF')}}</p>
+          <p contenteditable>{{formatAnswer('WASTE_PERF')}}</p>
           <p>{{formatAnswer('WASTE_CONTEXT')}}</p>
         </section>
 
