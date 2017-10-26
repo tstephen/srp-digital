@@ -155,7 +155,16 @@ var ractive = new BaseRactive({
     ],
     title: "Survey Questions"
   },
-  add: function () {
+  partials: {
+    'helpModal': '',
+    'loginSect': '',
+    'profileArea': '',
+    'questionListSect': '',
+    'questionCurrentSect': '',
+    'sidebar': '',
+    'titleArea': ''
+  },
+  addQuestion: function () {
     console.log('add...');
     $('h2.edit-form,h2.edit-field').hide();
     $('.create-form,create-field').show();
@@ -320,7 +329,7 @@ ractive.observe('current.*', function(newValue, oldValue, keypath) {
     console.log('current prop change: '+newValue +','+oldValue+' '+keypath);
     ractive.save();
   } else {
-    console.warn  ('Skipped question save of '+keypath);
+    console.info('Skipped question save of '+keypath);
     //console.log('current prop change: '+newValue +','+oldValue+' '+keypath);
     //console.log('  saveObserver: '+ractive.get('saveObserver'));
   }

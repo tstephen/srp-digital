@@ -5,6 +5,7 @@ var $r = (function ($, ractive, $auth) {
   };
   // var _org = 'RDR';
   var _isCcg = false;
+  var _orgType;
   var _server = $env.server;
   var _survey;
   var _surveyPeriod = '2016-17'; // TODO read system param
@@ -19,7 +20,7 @@ var $r = (function ($, ractive, $auth) {
   function _bindLists() {
     if ($('#ORG_NAME')!=undefined && $('#ORG_NAME[list]').length!=0) $('#ORG_NAME').attr('list','orgs');
     if ($('#ORG_TYPE option')!=undefined && $('#ORG_TYPE option').length==0 && ractive.get('orgTypes')!=undefined) {
-      ractive.addSelectOptions('#ORG_TYPE', ractive.get('orgTypes'));
+      ractive.addSelectOptions('#ORG_TYPE', ractive.get('orgTypes'), _orgType);
     }
     $('#CCG1_SERVED,#CCG2_SERVED,#CCG3_SERVED,#CCG4_SERVED,#CCG5_SERVED,#CCG6_SERVED').attr('list','orgs');
     $('#PROVIDER1_COMMISSIONED,#PROVIDER2_COMMISSIONED,#PROVIDER3_COMMISSIONED,#PROVIDER4_COMMISSIONED,#PROVIDER5_COMMISSIONED,#PROVIDER6_COMMISSIONED,#PROVIDER7_COMMISSIONED,#PROVIDER8_COMMISSIONED').attr('list','orgs');
@@ -57,7 +58,6 @@ var $r = (function ($, ractive, $auth) {
     });
     $.getJSON(_server+'/sdu/organisation-types/?filter=reportingType', function(data) {
       ractive.set('orgTypes', data);
-      //if (_survey != undefined) ractive.addSelectOptions('#ORG_TYPE', data);
       _bindLists();
     });
   }
@@ -120,6 +120,7 @@ var $r = (function ($, ractive, $auth) {
                 _hideNotApplicable();
               }
               $('#ORG_TYPE').attr('list','orgTypes');
+              _orgType = me.rtn.answers[k].response;
               if ('Submitted'==me.rtn.answers[k].status || 'Published'==me.rtn.answers[k].status) {
                 $('#'+me.rtn.answers[k].question.name).attr('readonly','readonly').attr('disabled','disabled');
               } else {
@@ -147,6 +148,9 @@ var $r = (function ($, ractive, $auth) {
       }
     }
     _bindLists();
+
+    $('#questionnaireForm input, #questionnaireForm select, #questionnaireForm textarea')
+        .off().on('blur', me.submit);
 
     // Set questionnaire details specific to SDU return
     ractive.set('q.about.title', 'SDU return '+_period);
@@ -364,8 +368,6 @@ var $r = (function ($, ractive, $auth) {
 
   $('head').append('<link href="'+_server+'/css/sdu-1.0.0.css" rel="stylesheet">');
   $('head').append('<link rel="icon" type="image/png" href="/srp/images/icon/sdu-icon-16x16.png">');
-
-  setInterval(me.submit, 5000);
 
   // set and load questionnaire
   ractive.set('questionnaireDef',_server+'/surveys/findByName/'+_surveyName);
