@@ -285,8 +285,8 @@ class Elm_DashboardWidget {
 	}
 
 	private function displayConfigurationHelp($problem) {
-
-		$exampleCode = "ini_set('log_errors', 'On');\n" . "ini_set('error_log', '/full/path/to/php-errors.log');";
+		$exampleCode = "ini_set('log_errors', 'On');\n" . "ini_set('error_log', '/full/path/to/php-errors.log');\n"
+			. "error_reporting(E_ALL);";
 		printf('<p><strong>%s</strong></p>', $problem);
 
 		echo '<p>';

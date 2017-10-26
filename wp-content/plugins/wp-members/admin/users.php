@@ -89,8 +89,15 @@ function wpmem_insert_activate_link( $actions, $user_object ) {
  * @since 2.8.2
  *
  * @uses WP_Users_List_Table
+ *
+ * @global object $wpmem
  */
 function wpmem_users_page_load() {
+	
+	global $wpmem;
+	if ( current_user_can( 'list_users' ) ) {
+		$wpmem->admin->user_search = new WP_Members_Admin_User_Search();
+	}
 
 	// If exporting all users, do it, then exit.
 	if ( isset( $_REQUEST['export_all'] ) && $_REQUEST['export_all'] == __( 'Export All Users', 'wp-members' ) ) {
@@ -131,6 +138,7 @@ function wpmem_users_page_load() {
 			// Update the users.
 			$x = 0;
 			foreach ( $users as $user ) {
+				$user = filter_var( $user, FILTER_VALIDATE_INT );
 				// Check to see if the user is already activated, if not, activate.
 				if ( ! get_user_meta( $user, 'active', true ) ) {
 					wpmem_a_activate_user( $user, $chk_pass );
@@ -305,7 +313,7 @@ function wpmem_users_views( $views ) {
 		$arr[] = 'Not Active';
 	}
 	$arr[] = 'Not Exported';
-	$show = ( isset( $_GET['show'] ) ) ? $_GET['show'] : false;
+	$show = ( isset( $_GET['show'] ) ) ? sanitize_text_field( $_GET['show'] ) : false;
 
 	for ( $row = 0; $row < count( $arr ); $row++ ) {
 		$link = "users.php?action=show&amp;show=";
@@ -405,6 +413,9 @@ function wpmem_add_user_column_content( $value, $column_name, $user_id ) {
 			$user_info = get_userdata( $user_id );
 			return $user_info->$column_name;
 			break;
+
+		case 'user_id':
+			return $user_id;
 
 		default:
 			return get_user_meta( $user_id, $column_name, true );

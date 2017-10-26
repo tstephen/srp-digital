@@ -1,12 +1,12 @@
-﻿=== WP-Members: Membership Framework ===
+﻿=== WP-Members Membership Plugin ===
 Contributors: cbutlerjr
 Tags: access, authentication, content, login, member, membership, password, protect, register, registration, restriction, subscriber
 Requires at least: 3.6
 Tested up to: 4.8
-Stable tag: 3.1.9.1
+Stable tag: 3.1.9.3
 License: GPLv2
 
-WP-Members&trade; is a free membership management framework for WordPress&reg; that restricts content to registered users.
+WP-Members membership plugin turns your WordPress site into a membership site.  Restrict premium content, require registration with custom fields, and more.
 
 == Description ==
 
@@ -113,6 +113,7 @@ Premium priority support is available at the plugin's site [RocketGeek.com](http
 == Upgrade Notice ==
 
 WP-Members 3.1.9 is a major update. There are no database changes (rollback is possible). See changelog for important details. Minimum WP version is 3.6.
+WP-Members 3.1.9.3 is a bug fix and security update. All users running 3.1.9 or higher should update.
 
 == Screenshots ==
 
@@ -134,6 +135,18 @@ WP-Members 3.1.9 is a major update. There are no database changes (rollback is p
 
 
 == Changelog ==
+
+= 3.1.9.3 =
+
+* Security update for 3.1.9.
+* Fix for multiple checkbox and multiple select field types if "comma" was selected as the delimiter (previously, this would break the field settings array option assembly).
+* Improvements on field manager add/edit field screen.
+* Improvements to multiple checkbox and radio groups: better handling of non-value selections and span wrapper for group separators.
+
+= 3.1.9.2 =
+
+* Fix for Users > All Users user search if no search meta have been selected in Fields tab.
+* Added User ID as an optional column to add to Users > All Users.
 
 = 3.1.9.1 =
 

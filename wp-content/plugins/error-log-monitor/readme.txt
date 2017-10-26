@@ -2,8 +2,8 @@
 Contributors: whiteshadow
 Tags: dashboard widget, administration, error reporting, admin, maintenance, php
 Requires at least: 4.5
-Tested up to: 4.9-alpha
-Stable tag: 1.5.4
+Tested up to: 4.9-beta2
+Stable tag: 1.5.5
 
 Adds a Dashboard widget that displays the latest messages from your PHP error log. It can also send logged errors to email.
 
@@ -45,6 +45,11 @@ Follow these steps to install the plugin on your site:
 2. Dashboard widget configuration screen.
 
 == Changelog ==
+
+= 1.5.5 =
+* Fixed two PHP notices: "Undefined index: schedule in [...]Cron.php on line 69" and "Undefined index: time in [...]Cron.php on line 76".
+* Added "error_reporting(E_ALL)" to the example code to log all errors and notices.
+* Tested up to WP 4.9-beta2.
 
 = 1.5.4 =
 * Fixed the error "can't use method return value in write context". It was a compatibility issue that only affected PHP versions below 5.5.

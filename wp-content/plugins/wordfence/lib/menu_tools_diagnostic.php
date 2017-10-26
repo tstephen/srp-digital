@@ -357,8 +357,16 @@ if (!isset($sendingDiagnosticEmail)) { $sendingDiagnosticEmail = false; }
 			</tbody>
 		</table>
 		<?php
+		global $wpdb;
 		$wfdb = new wfDB();
-		$q = $wfdb->querySelect("show table status");
+		//This must be done this way because MySQL with InnoDB tables does a full regeneration of all metadata if we don't. That takes a long time with a large table count.
+		$tables = $wfdb->querySelect('SELECT SQL_CALC_FOUND_ROWS TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() ORDER BY TABLE_NAME ASC LIMIT 250');
+		$total = $wfdb->querySingle('SELECT FOUND_ROWS()');
+		foreach ($tables as &$t) {
+			$t = "'" . esc_sql($t['TABLE_NAME']) . "'";
+		}
+		unset($t);
+		$q = $wfdb->querySelect("SHOW TABLE STATUS WHERE Name IN (" . implode(',', $tables) . ')');
 		if ($q):
 			$databaseCols = count($q[0]);
 			?>
@@ -399,7 +407,7 @@ if (!isset($sendingDiagnosticEmail)) { $sendingDiagnosticEmail = false; }
 						if ($count >= 250) {
 							?>
 						<tr>
-							<td colspan="<?php echo $databaseCols; ?>">and <?php echo count($q) - $count; ?> more</td>
+							<td colspan="<?php echo $databaseCols; ?>">and <?php echo $total - $count; ?> more</td>
 						</tr>
 							<?php
 							break;
@@ -440,7 +448,7 @@ if (!isset($sendingDiagnosticEmail)) { $sendingDiagnosticEmail = false; }
 					foreach ($errorLogs as $log => $readable): ?>
 						<tr>
 							<td style="width: 100%"><?php echo esc_html($log) . ' (' . wfUtils::formatBytes(filesize($log)) . ')'; ?></td>
-							<td style="white-space: nowrap; text-align: right;"><?php echo ($readable ? '<a href="#" data-logfile="' . esc_html($log) . '" class="downloadLogFile" target="_blank">Download</a>' : '<em>Requires downloading from the server directly</em>'); ?></td> 
+							<td style="white-space: nowrap; text-align: right;"><?php echo ($readable ? '<a href="#" data-logfile="' . esc_html($log) . '" class="downloadLogFile" target="_blank" rel="noopener noreferrer">Download</a>' : '<em>Requires downloading from the server directly</em>'); ?></td> 
 						</tr>
 					<?php endforeach;
 				endif; ?>
@@ -460,19 +468,19 @@ if (!isset($sendingDiagnosticEmail)) { $sendingDiagnosticEmail = false; }
 	<ul>
 		<li>
 			<a href="<?php echo wfUtils::siteURLRelative(); ?>?_wfsf=sysinfo&nonce=<?php echo wp_create_nonce('wp-ajax'); ?>"
-			   target="_blank">Click to view your system's configuration in a new window</a>
+			   target="_blank" rel="noopener noreferrer">Click to view your system's configuration in a new window</a>
 			<a href="https://docs.wordfence.com/en/Wordfence_diagnostics#Click_to_view_your_system.27s_configuration_in_a_new_window"
-			   target="_blank" class="wfhelp"></a></li>
+			   target="_blank" rel="noopener noreferrer" class="wfhelp"></a></li>
 		<li>
 			<a href="<?php echo wfUtils::siteURLRelative(); ?>?_wfsf=testmem&nonce=<?php echo wp_create_nonce('wp-ajax'); ?>"
-			   target="_blank">Test your WordPress host's available memory</a>
+			   target="_blank" rel="noopener noreferrer">Test your WordPress host's available memory</a>
 			<a href="https://docs.wordfence.com/en/Wordfence_diagnostics#Test_your_WordPress_host.27s_available_memory"
-			   target="_blank" class="wfhelp"></a>
+			   target="_blank" rel="noopener noreferrer" class="wfhelp"></a>
 		</li>
 		<li>
 			Send a test email from this WordPress server to an email address:<a
 				href="https://docs.wordfence.com/en/Wordfence_diagnostics#Send_a_test_email_from_this_WordPress_server_to_an_email_address"
-				target="_blank" class="wfhelp"></a>
+				target="_blank" rel="noopener noreferrer" class="wfhelp"></a>
 			<input type="text" id="testEmailDest" value="" size="20" maxlength="255" class="wfConfigElem"/>
 			<input class="wf-btn wf-btn-default" type="button" value="Send Test Email"
 			       onclick="WFAD.sendTestEmail(jQuery('#testEmailDest').val());"/>
@@ -481,7 +489,7 @@ if (!isset($sendingDiagnosticEmail)) { $sendingDiagnosticEmail = false; }
 
 	<?php if (!WFWAF_SUBDIRECTORY_INSTALL): ?>
 	<div id="updateWAFRules">
-		<h3>Firewall Rules <a href="https://docs.wordfence.com/en/Wordfence_diagnostics#Firewall_Rules" target="_blank" class="wfhelp"></a></h3>
+		<h3>Firewall Rules <a href="https://docs.wordfence.com/en/Wordfence_diagnostics#Firewall_Rules" target="_blank" rel="noopener noreferrer" class="wfhelp"></a></h3>
 
 		<p>
 			<button type="button" onclick="WFAD.wafUpdateRules()" class="wf-btn wf-btn-primary">
@@ -531,7 +539,7 @@ if (!isset($sendingDiagnosticEmail)) { $sendingDiagnosticEmail = false; }
 			<tr>
 				<th>Enable debugging mode (increases database load)<a
 						href="https://docs.wordfence.com/en/Wordfence_diagnostics#Enable_debugging_mode_.28increases_database_load.29"
-						target="_blank" class="wfhelp"></a></th>
+						target="_blank" rel="noopener noreferrer" class="wfhelp"></a></th>
 				<td><input type="checkbox" id="debugOn" class="wfConfigElem" name="debugOn"
 				           value="1" <?php $w->cb('debugOn'); ?> /></td>
 			</tr>
@@ -539,7 +547,7 @@ if (!isset($sendingDiagnosticEmail)) { $sendingDiagnosticEmail = false; }
 			<tr>
 				<th>Start all scans remotely<a
 						href="https://docs.wordfence.com/en/Wordfence_diagnostics#Start_all_scans_remotely"
-						target="_blank" class="wfhelp"></a></th>
+						target="_blank" rel="noopener noreferrer" class="wfhelp"></a></th>
 				<td><input type="checkbox" id="startScansRemotely" class="wfConfigElem" name="startScansRemotely"
 				           value="1" <?php $w->cb('startScansRemotely'); ?> />
 					(Try this if your scans aren't starting and your site is publicly accessible)
@@ -549,7 +557,7 @@ if (!isset($sendingDiagnosticEmail)) { $sendingDiagnosticEmail = false; }
 			<tr>
 				<th><label class="wf-plain" for="ssl_verify">Enable SSL Verification</label><a
 						href="https://docs.wordfence.com/en/Wordfence_diagnostics#Enable_SSL_Verification"
-						target="_blank" class="wfhelp"></a>
+						target="_blank" rel="noopener noreferrer" class="wfhelp"></a>
 				</th>
 				<td style="vertical-align: top;"><input type="checkbox" id="ssl_verify" class="wfConfigElem"
 				                                        name="ssl_verify"
@@ -562,7 +570,7 @@ if (!isset($sendingDiagnosticEmail)) { $sendingDiagnosticEmail = false; }
 			<tr>
 				<th><label class="wf-plain" for="betaThreatDefenseFeed">Enable beta threat defense feed</label><a
 							href="https://docs.wordfence.com/en/Wordfence_diagnostics#Enable_beta_threat_defense_feed"
-							target="_blank" class="wfhelp"></a></th>
+							target="_blank" rel="noopener noreferrer" class="wfhelp"></a></th>
 				<td style="vertical-align: top;"><input type="checkbox" id="betaThreatDefenseFeed"
 				                                        class="wfConfigElem"
 				                                        name="betaThreatDefenseFeed"

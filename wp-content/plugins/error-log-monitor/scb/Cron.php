@@ -66,14 +66,14 @@ class scbCron {
 	 */
 	function reschedule( $args ) {
 
-		if ( $args['schedule'] && $this->schedule != $args['schedule'] ) {
+		if ( !empty($args['schedule']) && $this->schedule != $args['schedule'] ) {
 			$this->schedule = $args['schedule'];
 		} elseif ( $args['interval'] && $this->interval != $args['interval'] ) {
 			$this->schedule = $args['interval'] . 'secs';
 			$this->interval = $args['interval'];
 		}
 
-		$this->time = $args['time'];
+		$this->time = isset($args['time']) ? $args['time'] : null;
 
 		$this->reset();
 	}

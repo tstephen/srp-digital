@@ -1,9 +1,9 @@
 <?php
 /*
 Plugin Name: WP-Members
-Plugin URI:  http://rocketgeek.com
+Plugin URI:  https://rocketgeek.com
 Description: WP access restriction and user registration.  For more information on plugin features, refer to <a href="http://rocketgeek.com/plugins/wp-members/users-guide/">the online Users Guide</a>. A <a href="http://rocketgeek.com/plugins/wp-members/quick-start-guide/">Quick Start Guide</a> is also available. WP-Members(tm) is a trademark of butlerblog.com.
-Version:     3.1.9.1
+Version:     3.1.9.3
 Author:      Chad Butler
 Author URI:  http://butlerblog.com/
 Text Domain: wp-members
@@ -51,7 +51,7 @@ License:     GPLv2
 	derivative work you are developing complies with the license, copyright, 
 	trademark, or if you do not understand the difference between
 	open source and public domain, contact the original author at:
-	http://rocketgeek.com/contact/.
+	https://rocketgeek.com/contact/.
 
 
 	INSTALLATION PROCEDURE:
@@ -66,7 +66,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Initialize constants.
-define( 'WPMEM_VERSION', '3.1.9.1' );
+define( 'WPMEM_VERSION', '3.1.9.3' );
 define( 'WPMEM_DEBUG', false );
 define( 'WPMEM_DIR',  plugin_dir_url ( __FILE__ ) );
 define( 'WPMEM_PATH', plugin_dir_path( __FILE__ ) );
