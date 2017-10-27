@@ -1,93 +1,115 @@
-# Translation of Boardwalk in Japanese
-# This file is distributed under the same license as the Boardwalk package.
+# Translation of WordPress.com - Themes - Boardwalk in Japanese
+# This file is distributed under the same license as the WordPress.com - Themes - Boardwalk package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2015-09-23 03:28:42+0000\n"
+"PO-Revision-Date: 2017-03-23 06:16:58+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: GlotPress/1.0-alpha-1100\n"
-"Project-Id-Version: Boardwalk\n"
+"X-Generator: GlotPress/2.4.0-alpha\n"
+"Language: ja_JP\n"
+"Project-Id-Version: WordPress.com - Themes - Boardwalk\n"
+
+#: inc/wpcom-colors.php:391
+msgid "Accent"
+msgstr "アクセント"
+
+#: inc/wpcom-colors.php:290
+msgid "Background"
+msgstr "背景"
+
+#. translators: used between list items, there is a space after the comma
+#: inc/template-tags.php:113
+msgid "Tagged"
+msgstr "タグ:"
+
+#: inc/customizer.php:76
+msgid "If featured image isn't set, display colored block on blog page."
+msgstr "アイキャッチ画像が設定されていない場合、ブログページにカラーブロックを表示する。"
 
 #: inc/customizer.php:20
 msgid "Theme Options"
 msgstr "テーマオプション"
 
-#: inc/template-tags.php:177
-msgid "Archives: %s"
-msgstr "アーカイブ: %s"
-
 #. translators: 1: Taxonomy singular name, 2: Current taxonomy term
-#: inc/template-tags.php:181
+#: inc/template-tags.php:178
 msgid "%1$s: %2$s"
 msgstr "%1$s: %2$s"
 
-#: inc/template-tags.php:167
-msgctxt "post format archive title"
-msgid "Quotes"
-msgstr "引用"
+#: inc/template-tags.php:174
+msgid "Archives: %s"
+msgstr "アーカイブ: %s"
 
-#: inc/template-tags.php:169
-msgctxt "post format archive title"
-msgid "Links"
-msgstr "リンク"
-
-#: inc/template-tags.php:171
-msgctxt "post format archive title"
-msgid "Statuses"
-msgstr "ステータス"
-
-#: inc/template-tags.php:173
-msgctxt "post format archive title"
-msgid "Audio"
-msgstr "音声"
-
-#: inc/template-tags.php:175
+#: inc/template-tags.php:172
 msgctxt "post format archive title"
 msgid "Chats"
 msgstr "チャット"
 
-#: inc/template-tags.php:157
-msgctxt "daily archives date format"
-msgid "F j, Y"
-msgstr "Y年n月j日"
-
-#: inc/template-tags.php:159
+#: inc/template-tags.php:170
 msgctxt "post format archive title"
-msgid "Asides"
-msgstr "アサイド"
+msgid "Audio"
+msgstr "音声"
 
-#: inc/template-tags.php:161
+#: inc/template-tags.php:168
 msgctxt "post format archive title"
-msgid "Galleries"
-msgstr "ギャラリー"
+msgid "Statuses"
+msgstr "ステータス"
 
-#: inc/template-tags.php:163
+#: inc/template-tags.php:166
 msgctxt "post format archive title"
-msgid "Images"
-msgstr "画像"
+msgid "Links"
+msgstr "リンク"
 
-#: inc/template-tags.php:165
+#: inc/template-tags.php:164
+msgctxt "post format archive title"
+msgid "Quotes"
+msgstr "引用"
+
+#: inc/template-tags.php:162
 msgctxt "post format archive title"
 msgid "Videos"
 msgstr "動画"
 
-#: inc/template-tags.php:149
+#: inc/template-tags.php:160
+msgctxt "post format archive title"
+msgid "Images"
+msgstr "画像"
+
+#: inc/template-tags.php:158
+msgctxt "post format archive title"
+msgid "Galleries"
+msgstr "ギャラリー"
+
+#: inc/template-tags.php:156
+msgctxt "post format archive title"
+msgid "Asides"
+msgstr "アサイド"
+
+#: inc/template-tags.php:154
+msgctxt "daily archives date format"
+msgid "F j, Y"
+msgstr "Y年n月j日"
+
+#: inc/template-tags.php:146
 msgid "Tag: %s"
 msgstr "タグ: %s"
 
-#: inc/customizer.php:41
-msgid "Show author bio on single posts."
-msgstr "個別投稿に投稿者プロフィールを表示する。"
+#: inc/template-tags.php:144
+msgid "Category: %s"
+msgstr "カテゴリー: %s"
 
 #: inc/customizer.php:65
 msgid "Unfixed header when scrolling down."
 msgstr "スクロールダウンする際にヘッダーを固定しない。"
 
-#: inc/template-tags.php:147
-msgid "Category: %s"
-msgstr "カテゴリー: %s"
+#: inc/customizer.php:53
+msgid "Keep title with content on single posts and pages."
+msgstr "個別投稿および固定ページでコンテンツにタイトルをつける。"
+
+#: inc/customizer.php:41
+msgid "Show author bio on single posts."
+msgstr "個別投稿に投稿者プロフィールを表示する。"
 
 #. Description of the plugin/theme
 #: wp-content/themes/pub/boardwalk/style.css
@@ -102,26 +124,22 @@ msgstr "メニュー"
 msgid "Search Results for: %s"
 msgstr "検索結果: %s"
 
-#: inc/template-tags.php:126
+#: inc/template-tags.php:123
 msgid "% Comments"
 msgstr "%件のコメント"
 
-#: inc/template-tags.php:126
+#: inc/template-tags.php:123
 msgid "1 Comment"
 msgstr "1件のコメント"
 
-#: inc/template-tags.php:119
-msgctxt "post author"
-msgid "By %s"
-msgstr "投稿者: %s"
-
-#: inc/template-tags.php:126
+#: inc/template-tags.php:123
 msgid "Leave a comment"
 msgstr "コメントをどうぞ"
 
-#: inc/template-tags.php:115
-msgid "Tagged %1$s"
-msgstr "タグ:  %1$s"
+#: inc/template-tags.php:116
+msgctxt "post author"
+msgid "By %s"
+msgstr "投稿者: %s"
 
 #: inc/template-tags.php:109
 msgid "Posted in %1$s"
@@ -136,19 +154,19 @@ msgstr ", "
 msgid "All %s posts"
 msgstr "すべての%s投稿"
 
-#: inc/template-tags.php:56
-msgctxt "Previous post link"
-msgid "<span class=\"meta-nav\">&larr;</span>&nbsp;%title"
-msgstr "<span class=\"meta-nav\">&larr;</span>&nbsp;%title"
+#: inc/template-tags.php:86
+msgid "Featured"
+msgstr "注目"
 
 #: inc/template-tags.php:57
 msgctxt "Next post link"
 msgid "%title&nbsp;<span class=\"meta-nav\">&rarr;</span>"
 msgstr "%title&nbsp;<span class=\"meta-nav\">&rarr;</span>"
 
-#: inc/template-tags.php:86
-msgid "Featured"
-msgstr "注目"
+#: inc/template-tags.php:56
+msgctxt "Previous post link"
+msgid "<span class=\"meta-nav\">&larr;</span>&nbsp;%title"
+msgstr "<span class=\"meta-nav\">&larr;</span>&nbsp;%title"
 
 #: inc/template-tags.php:52
 msgid "Post navigation"
@@ -166,17 +184,21 @@ msgstr "<span class=\"meta-nav\">&larr;</span> 古い投稿"
 msgid "Posts navigation"
 msgstr "投稿ナビゲーション"
 
+#: inc/extras.php:113
+msgid "Page %s"
+msgstr "ページ %s"
+
 #: inc/customizer.php:30
 msgid "Add a dark filter to featured images"
 msgstr "アイキャッチ画像にダークフィルターを追加する"
 
-#: inc/extras.php:107
-msgid "Page %s"
-msgstr "ページ %s"
-
 #: header.php:33
 msgid "Toggle Sidebar"
 msgstr "サイドバー切り替え"
+
+#: header.php:22
+msgid "Skip to content"
+msgstr "コンテンツへ移動"
 
 #. translators: If there are characters in your language that are not supported
 #. * by Source Code Pro, translate this to 'off'. Do not translate into your
@@ -185,10 +207,6 @@ msgstr "サイドバー切り替え"
 msgctxt "Source Code Pro font: on or off"
 msgid "on"
 msgstr "on"
-
-#: header.php:22
-msgid "Skip to content"
-msgstr "コンテンツへ移動"
 
 #. translators: If there are characters in your language that are not supported
 #. * by Merriweather, translate this to 'off'. Do not translate into your own
@@ -234,7 +252,7 @@ msgstr "http://ja.wordpress.org/"
 msgid "Continue reading <span class=\"meta-nav\">&rarr;</span>"
 msgstr "続きを読む <span class=\"meta-nav\">&rarr;</span>"
 
-#: content-page.php:32 inc/template-tags.php:130
+#: content-page.php:32 inc/template-tags.php:127
 msgid "Edit"
 msgstr "編集"
 
@@ -284,41 +302,41 @@ msgid "One thought on &ldquo;%2$s&rdquo;"
 msgid_plural "%1$s thoughts on &ldquo;%2$s&rdquo;"
 msgstr[0] "「%2$s」への%1$s件のフィードバック"
 
-#: author-bio.php:10
-msgid "Published by %s"
-msgstr "投稿者: %s"
-
 #: author-bio.php:27
 msgid "View all posts by %s"
 msgstr "%s の投稿をすべて表示"
 
-#: inc/template-tags.php:183
+#: author-bio.php:10
+msgid "Published by %s"
+msgstr "投稿者: %s"
+
+#: inc/template-tags.php:180
 msgid "Archives"
 msgstr "アーカイブ"
 
-#: inc/template-tags.php:153
+#: inc/template-tags.php:150
 msgctxt "yearly archives date format"
 msgid "Y"
 msgstr "Y年"
 
-#: inc/template-tags.php:153
+#: inc/template-tags.php:150
 msgid "Year: %s"
 msgstr "﻿年: %s"
 
-#: inc/template-tags.php:155
+#: inc/template-tags.php:152
 msgctxt "monthly archives date format"
 msgid "F Y"
 msgstr "Y年n月"
 
-#: inc/template-tags.php:155
+#: inc/template-tags.php:152
 msgid "Month: %s"
 msgstr "月別: %s"
 
-#: inc/template-tags.php:157
+#: inc/template-tags.php:154
 msgid "Day: %s"
 msgstr "﻿日: %s"
 
-#: inc/template-tags.php:151
+#: inc/template-tags.php:148
 msgid "Author: %s"
 msgstr "作者別: %s"
 

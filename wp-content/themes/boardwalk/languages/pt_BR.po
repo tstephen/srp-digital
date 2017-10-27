@@ -1,85 +1,115 @@
-# Translation of Boardwalk in Portuguese (Brazil)
-# This file is distributed under the same license as the Boardwalk package.
+# Translation of WordPress.com - Themes - Boardwalk in Portuguese (Brazil)
+# This file is distributed under the same license as the WordPress.com - Themes - Boardwalk package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2015-09-23 03:28:42+0000\n"
+"PO-Revision-Date: 2017-03-23 06:16:58+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: GlotPress/1.0-alpha-1100\n"
-"Project-Id-Version: Boardwalk\n"
+"X-Generator: GlotPress/2.4.0-alpha\n"
+"Language: pt_BR\n"
+"Project-Id-Version: WordPress.com - Themes - Boardwalk\n"
+
+#: inc/wpcom-colors.php:391
+msgid "Accent"
+msgstr "Realce"
+
+#: inc/wpcom-colors.php:290
+msgid "Background"
+msgstr "Fundo"
+
+#. translators: used between list items, there is a space after the comma
+#: inc/template-tags.php:113
+msgid "Tagged"
+msgstr "Com a tag"
+
+#: inc/customizer.php:76
+msgid "If featured image isn't set, display colored block on blog page."
+msgstr "Se uma imagem destacada não estiver definida, exibir um bloco colorido na página do blog."
 
 #: inc/customizer.php:20
 msgid "Theme Options"
 msgstr "Opções do tema"
 
-#: inc/template-tags.php:177
-msgid "Archives: %s"
-msgstr "Arquivo: %s"
-
 #. translators: 1: Taxonomy singular name, 2: Current taxonomy term
-#: inc/template-tags.php:181
+#: inc/template-tags.php:178
 msgid "%1$s: %2$s"
 msgstr "%1$s @ %2$s"
 
-#: inc/template-tags.php:167
-msgctxt "post format archive title"
-msgid "Quotes"
-msgstr "Citações"
+#: inc/template-tags.php:174
+msgid "Archives: %s"
+msgstr "Arquivo: %s"
 
-#: inc/template-tags.php:169
-msgctxt "post format archive title"
-msgid "Links"
-msgstr "Links"
-
-#: inc/template-tags.php:171
-msgctxt "post format archive title"
-msgid "Statuses"
-msgstr "Status"
-
-#: inc/template-tags.php:173
-msgctxt "post format archive title"
-msgid "Audio"
-msgstr "Áudio"
-
-#: inc/template-tags.php:175
+#: inc/template-tags.php:172
 msgctxt "post format archive title"
 msgid "Chats"
 msgstr "Chats"
 
-#: inc/template-tags.php:157
-msgctxt "daily archives date format"
-msgid "F j, Y"
-msgstr "F j, Y"
-
-#: inc/template-tags.php:159
+#: inc/template-tags.php:170
 msgctxt "post format archive title"
-msgid "Asides"
-msgstr "Notas"
+msgid "Audio"
+msgstr "Áudio"
 
-#: inc/template-tags.php:161
+#: inc/template-tags.php:168
 msgctxt "post format archive title"
-msgid "Galleries"
-msgstr "Galerias"
+msgid "Statuses"
+msgstr "Status"
 
-#: inc/template-tags.php:163
+#: inc/template-tags.php:166
 msgctxt "post format archive title"
-msgid "Images"
-msgstr "Imagens"
+msgid "Links"
+msgstr "Links"
 
-#: inc/template-tags.php:165
+#: inc/template-tags.php:164
+msgctxt "post format archive title"
+msgid "Quotes"
+msgstr "Citações"
+
+#: inc/template-tags.php:162
 msgctxt "post format archive title"
 msgid "Videos"
 msgstr "Vídeos"
 
-#: inc/template-tags.php:149
+#: inc/template-tags.php:160
+msgctxt "post format archive title"
+msgid "Images"
+msgstr "Imagens"
+
+#: inc/template-tags.php:158
+msgctxt "post format archive title"
+msgid "Galleries"
+msgstr "Galerias"
+
+#: inc/template-tags.php:156
+msgctxt "post format archive title"
+msgid "Asides"
+msgstr "Notas"
+
+#: inc/template-tags.php:154
+msgctxt "daily archives date format"
+msgid "F j, Y"
+msgstr "F j, Y"
+
+#: inc/template-tags.php:146
 msgid "Tag: %s"
 msgstr "Tag: %s"
 
-#: inc/template-tags.php:147
+#: inc/template-tags.php:144
 msgid "Category: %s"
 msgstr "Categoria: %s"
+
+#: inc/customizer.php:65
+msgid "Unfixed header when scrolling down."
+msgstr "Não fixar o cabeçalho ao rolar verticalmente a página."
+
+#: inc/customizer.php:53
+msgid "Keep title with content on single posts and pages."
+msgstr "Manter título da publicação junto ao conteúdo em posts únicos e páginas."
+
+#: inc/customizer.php:41
+msgid "Show author bio on single posts."
+msgstr "Mostrar a biografia do autor em posts únicos."
 
 #. Description of the plugin/theme
 #: wp-content/themes/pub/boardwalk/style.css
@@ -94,26 +124,22 @@ msgstr "Menu"
 msgid "Search Results for: %s"
 msgstr "Resultados da pesquisa por: %s"
 
-#: inc/template-tags.php:126
+#: inc/template-tags.php:123
 msgid "% Comments"
 msgstr "% Comentários"
 
-#: inc/template-tags.php:126
+#: inc/template-tags.php:123
 msgid "1 Comment"
 msgstr "1 comentário"
 
-#: inc/template-tags.php:119
-msgctxt "post author"
-msgid "By %s"
-msgstr "por %s"
-
-#: inc/template-tags.php:126
+#: inc/template-tags.php:123
 msgid "Leave a comment"
 msgstr "Deixe um comentário"
 
-#: inc/template-tags.php:115
-msgid "Tagged %1$s"
-msgstr "Marcado %1$s"
+#: inc/template-tags.php:116
+msgctxt "post author"
+msgid "By %s"
+msgstr "por %s"
 
 #: inc/template-tags.php:109
 msgid "Posted in %1$s"
@@ -132,6 +158,16 @@ msgstr "Todos o conteúdo de tipo %s"
 msgid "Featured"
 msgstr "Destacado"
 
+#: inc/template-tags.php:57
+msgctxt "Next post link"
+msgid "%title&nbsp;<span class=\"meta-nav\">&rarr;</span>"
+msgstr "%title&nbsp;<span class=\"meta-nav\">&rarr;</span>"
+
+#: inc/template-tags.php:56
+msgctxt "Previous post link"
+msgid "<span class=\"meta-nav\">&larr;</span>&nbsp;%title"
+msgstr "<span class=\"meta-nav\">&larr;</span>&nbsp;%title"
+
 #: inc/template-tags.php:52
 msgid "Post navigation"
 msgstr "Navegação de Posts"
@@ -148,13 +184,21 @@ msgstr "<span class=\"meta-nav\"> ← </span> Posts Anteriores"
 msgid "Posts navigation"
 msgstr "Navegação de Posts"
 
-#: inc/extras.php:107
+#: inc/extras.php:113
 msgid "Page %s"
 msgstr "Página %s"
+
+#: inc/customizer.php:30
+msgid "Add a dark filter to featured images"
+msgstr "Adicionar um filtro escuro às imagens destacadas"
 
 #: header.php:33
 msgid "Toggle Sidebar"
 msgstr "Alternar lateral"
+
+#: header.php:22
+msgid "Skip to content"
+msgstr "Pular para o conteúdo"
 
 #. translators: If there are characters in your language that are not supported
 #. * by Source Code Pro, translate this to 'off'. Do not translate into your
@@ -163,10 +207,6 @@ msgstr "Alternar lateral"
 msgctxt "Source Code Pro font: on or off"
 msgid "on"
 msgstr "ligado"
-
-#: header.php:22
-msgid "Skip to content"
-msgstr "Pular para o conteúdo"
 
 #. translators: If there are characters in your language that are not supported
 #. * by Merriweather, translate this to 'off'. Do not translate into your own
@@ -212,7 +252,7 @@ msgstr "http://wordpress.org/"
 msgid "Continue reading <span class=\"meta-nav\">&rarr;</span>"
 msgstr "Continuar lendo <span class=\"meta-nav\">&rarr;</span>"
 
-#: content-page.php:32 inc/template-tags.php:130
+#: content-page.php:32 inc/template-tags.php:127
 msgid "Edit"
 msgstr "Editar"
 
@@ -267,33 +307,37 @@ msgstr[1] "%1$s comentários sobre &ldquo;%2$s&rdquo;"
 msgid "View all posts by %s"
 msgstr "Ver todos os artigos de %s"
 
-#: inc/template-tags.php:183
+#: author-bio.php:10
+msgid "Published by %s"
+msgstr "Publicado por %s"
+
+#: inc/template-tags.php:180
 msgid "Archives"
 msgstr "Arquivos"
 
-#: inc/template-tags.php:153
+#: inc/template-tags.php:150
 msgctxt "yearly archives date format"
 msgid "Y"
 msgstr "Y"
 
-#: inc/template-tags.php:153
+#: inc/template-tags.php:150
 msgid "Year: %s"
 msgstr "Ano: %s"
 
-#: inc/template-tags.php:155
+#: inc/template-tags.php:152
 msgctxt "monthly archives date format"
 msgid "F Y"
 msgstr "F Y"
 
-#: inc/template-tags.php:155
+#: inc/template-tags.php:152
 msgid "Month: %s"
 msgstr "Mês: %s"
 
-#: inc/template-tags.php:157
+#: inc/template-tags.php:154
 msgid "Day: %s"
 msgstr "Dia: %s"
 
-#: inc/template-tags.php:151
+#: inc/template-tags.php:148
 msgid "Author: %s"
 msgstr "Autor: %s"
 

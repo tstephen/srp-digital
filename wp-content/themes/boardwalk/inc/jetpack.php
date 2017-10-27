@@ -7,10 +7,7 @@
  */
 
 function boardwalk_jetpack_setup() {
-	/**
-	 * Add theme support for Infinite Scroll.
-	 * See: http://jetpack.me/support/infinite-scroll/
-	 */
+	// Add theme support for Infinite Scroll.
 	add_theme_support( 'infinite-scroll', array(
 		'type'      => 'click',
 		'container' => 'main',
@@ -18,16 +15,28 @@ function boardwalk_jetpack_setup() {
 		'wrapper'   => false,
 	) );
 
-	/**
-	 * Add theme support for Responsive Videos.
-	 */
+	// Add theme support for Responsive Videos.
 	add_theme_support( 'jetpack-responsive-videos' );
 
-	/**
-	 * Add theme support for Logo upload.
-	 */
+	// Add theme support for Logo upload.
 	add_image_size( 'boardwalk-logo', 444, 96 );
 	add_theme_support( 'site-logo', array( 'size' => 'boardwalk-logo' ) );
+
+	// Add theme support for Content Options.
+	add_theme_support( 'jetpack-content-options', array(
+		'post-details'    => array(
+			'stylesheet' => 'boardwalk-style',
+			'date'       => '.posted-on',
+			'categories' => '.cat-links',
+			'tags'       => '.tags-links',
+			'author'     => '.byline',
+		),
+		'featured-images' => array(
+			'archive'    => true,
+			'post'       => true,
+			'page'       => true,
+		),
+	) );
 }
 add_action( 'after_setup_theme', 'boardwalk_jetpack_setup' );
 

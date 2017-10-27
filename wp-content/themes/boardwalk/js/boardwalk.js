@@ -55,6 +55,11 @@
 		}
 	} );
 
+	$( '.single .format-video' ).find( 'iframe[src*="videopress.com"]' ).each( function() {
+			$( this ).wrap( '<div class="entry-media" />' );
+			$( this ).parent( '.entry-media' ).insertBefore( $( '.entry-header' ) );
+	} );
+
 	/*
 	 * Make sure tables don't overflow in Entry Content.
 	 */
@@ -132,12 +137,39 @@
 		$( 'body' ).toggleClass( 'sidebar-open' )
 		           .trigger( 'resize' );
 		$( '#sidebar' ).attr( 'aria-hidden', $( '#sidebar' ).attr( 'aria-hidden' ) === 'false' ? 'true' : 'false' );
+
+		// Remove mejs players from sidebar
+		$( '#secondary .mejs-container' ).each( function( i, el ) {
+			if ( mejs.players[ el.id ] ) {
+				mejs.players[ el.id ].remove();
+			}
+		} );
+
 		if ( $( 'body' ).hasClass( 'sidebar-open' ) ) {
 			$( '.site-main' ).hide();
 			$( 'html, body' ).animate( {
 				scrollTop: 0,
 				scrollLeft: 0
 			}, 0 );
+
+			// Re-initialize mediaelement players.
+			setTimeout( function() {
+				if ( window.wp && window.wp.mediaelement ) {
+					window.wp.mediaelement.initialize();
+				}
+			} );
+
+			// Trigger resize event to display VideoPress player.
+			setTimeout( function(){
+				if ( typeof( Event ) === 'function' ) {
+					window.dispatchEvent( new Event( 'resize' ) );
+				} else {
+					var event = window.document.createEvent( 'UIEvents' );
+					event.initUIEvent( 'resize', true, false, window, 0 );
+					window.dispatchEvent( event );
+				}
+			} );
+
 		} else {
 			$( '.site-main' ).show();
 			$( 'html, body' ).animate( {
@@ -307,6 +339,19 @@
 			}
 		} );
 	}
+
+	/*
+	 * Force a page to appear after 5 sconds document is ready to avoid
+	 * whitescreen of death with hanging JS.
+	 */
+	$( document ).ready( function() {
+		var body = $( document.body );
+		setTimeout( function() {
+			if (  body.hasClass( 'pace-running' ) ) {
+				body.removeClass( 'pace-running' ).addClass( 'pace-done' )
+			}
+		}, 5000 );
+	} );
 
 	/*
 	 * Load all the functions once it's ready.

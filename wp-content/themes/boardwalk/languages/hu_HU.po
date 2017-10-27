@@ -1,4 +1,4 @@
-# Translation of WordPress.com - Themes - Boardwalk in Turkish
+# Translation of WordPress.com - Themes - Boardwalk in Hungarian
 # This file is distributed under the same license as the WordPress.com - Themes - Boardwalk package.
 msgid ""
 msgstr ""
@@ -6,27 +6,23 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: GlotPress/2.4.0-alpha\n"
-"Language: tr\n"
+"Language: hu\n"
 "Project-Id-Version: WordPress.com - Themes - Boardwalk\n"
-
-#: inc/wpcom-colors.php:391
-msgid "Accent"
-msgstr "Vurgu"
 
 #: inc/wpcom-colors.php:290
 msgid "Background"
-msgstr "Arkaplan"
+msgstr "Háttér"
 
 #. translators: used between list items, there is a space after the comma
 #: inc/template-tags.php:113
 msgid "Tagged"
-msgstr "Etiketler"
+msgstr "Címke"
 
 #: inc/customizer.php:20
 msgid "Theme Options"
-msgstr "Tema Seçenekleri"
+msgstr "Sablon beállítások"
 
 #. translators: 1: Taxonomy singular name, 2: Current taxonomy term
 #: inc/template-tags.php:178
@@ -35,70 +31,70 @@ msgstr "%1$s: %2$s"
 
 #: inc/template-tags.php:174
 msgid "Archives: %s"
-msgstr "Arşivler: %s"
+msgstr "Archívumok: %s"
 
 #: inc/template-tags.php:172
 msgctxt "post format archive title"
 msgid "Chats"
-msgstr "Sohbetler"
+msgstr "Beszélgetés naplók"
 
 #: inc/template-tags.php:170
 msgctxt "post format archive title"
 msgid "Audio"
-msgstr "Ses"
+msgstr "Hangok"
 
 #: inc/template-tags.php:168
 msgctxt "post format archive title"
 msgid "Statuses"
-msgstr "Durumlar"
+msgstr "Állapot üzenetek"
 
 #: inc/template-tags.php:166
 msgctxt "post format archive title"
 msgid "Links"
-msgstr "Bağlantılar"
+msgstr "Hivatkozások"
 
 #: inc/template-tags.php:164
 msgctxt "post format archive title"
 msgid "Quotes"
-msgstr "Alıntılar"
+msgstr "Idézetek"
 
 #: inc/template-tags.php:162
 msgctxt "post format archive title"
 msgid "Videos"
-msgstr "Videolar"
+msgstr "Videók"
 
 #: inc/template-tags.php:160
 msgctxt "post format archive title"
 msgid "Images"
-msgstr "Görseller"
+msgstr "Képek"
 
 #: inc/template-tags.php:158
 msgctxt "post format archive title"
 msgid "Galleries"
-msgstr "Galeriler"
+msgstr "Gallériák"
 
 #: inc/template-tags.php:156
 msgctxt "post format archive title"
 msgid "Asides"
-msgstr "Yan sütun"
+msgstr "Közbevetések"
 
 #: inc/template-tags.php:154
 msgctxt "daily archives date format"
 msgid "F j, Y"
-msgstr "j F Y"
+msgstr "Y-m-d"
 
 #: inc/template-tags.php:146
 msgid "Tag: %s"
-msgstr "Etiket: %s"
+msgstr "Címke: %s"
 
 #: inc/template-tags.php:144
 msgid "Category: %s"
-msgstr "Kategori: %s"
+msgstr "Kategória: %s"
 
 #. Description of the plugin/theme
 #: wp-content/themes/pub/boardwalk/style.css
 msgid "A minimalistic theme with horizontal scrolling."
-msgstr "Yatay kaydırmalı minimalist bir tema."
+msgstr "Minimalista sablon vízszintes görgetéssel."
 
 #: sidebar.php:17
 msgid "Menu"
@@ -106,23 +102,28 @@ msgstr "Menü"
 
 #: search.php:16
 msgid "Search Results for: %s"
-msgstr "Arama sonuçları: %s"
+msgstr "%s kifejezésre történő keresés eredménye"
 
 #: inc/template-tags.php:123
 msgid "% Comments"
-msgstr "% Yorum"
+msgstr "% hozzászólás"
 
 #: inc/template-tags.php:123
 msgid "1 Comment"
-msgstr "1 Yorum"
+msgstr "1 hozzászólás"
 
 #: inc/template-tags.php:123
 msgid "Leave a comment"
-msgstr "Yorum bırakın"
+msgstr "Megjegyzés hozzáfűzése"
+
+#: inc/template-tags.php:116
+msgctxt "post author"
+msgid "By %s"
+msgstr "Szerző: %s"
 
 #: inc/template-tags.php:109
 msgid "Posted in %1$s"
-msgstr "%1$s içinde yayınlandı"
+msgstr "Kategória: %1$s"
 
 #. translators: used between list items, there is a space after the comma
 #: inc/template-tags.php:107 inc/template-tags.php:113
@@ -131,43 +132,45 @@ msgstr ", "
 
 #: inc/template-tags.php:104
 msgid "All %s posts"
-msgstr "Tüm %s yazıları"
+msgstr "Minden %s bejegyzés"
 
 #: inc/template-tags.php:86
 msgid "Featured"
-msgstr "Öne Çıkan"
+msgstr "Kiemelt"
+
+#: inc/template-tags.php:57
+msgctxt "Next post link"
+msgid "%title&nbsp;<span class=\"meta-nav\">&rarr;</span>"
+msgstr "%title&nbsp;<span class=\"meta-nav\">&rarr;</span>"
+
+#: inc/template-tags.php:56
+msgctxt "Previous post link"
+msgid "<span class=\"meta-nav\">&larr;</span>&nbsp;%title"
+msgstr "<span class=\"meta-nav\">&larr;</span>&nbsp;%title"
 
 #: inc/template-tags.php:52
 msgid "Post navigation"
-msgstr "Yazı dolaşımı"
+msgstr "Navigálás a bejegyzések között"
 
 #: inc/template-tags.php:29
 msgid "Newer posts <span class=\"meta-nav\">&rarr;</span>"
-msgstr "Yeni yazılar <span class=\"meta-nav\">&rarr;</span>"
+msgstr "Újabb bejegyzések <span class=\"meta-nav\">&rarr;</span>"
 
 #: inc/template-tags.php:25
 msgid "<span class=\"meta-nav\">&larr;</span> Older posts"
-msgstr "<span class=\"meta-nav\">&larr;</span> Eski yazılar"
+msgstr "<span class=\"meta-nav\">&larr;</span> Régebbi bejegyzések"
 
 #: inc/template-tags.php:21
 msgid "Posts navigation"
-msgstr "Yazı dolaşımı"
+msgstr "Bejegyzés navigáció"
 
 #: inc/extras.php:113
 msgid "Page %s"
-msgstr "Sayfa %s"
+msgstr "%s oldal"
 
 #: header.php:22
 msgid "Skip to content"
-msgstr "İçeriğe geç"
-
-#. translators: If there are characters in your language that are not supported
-#. * by Source Code Pro, translate this to 'off'. Do not translate into your
-#. own language.
-#: functions.php:153
-msgctxt "Source Code Pro font: on or off"
-msgid "on"
-msgstr "on"
+msgstr "Tovább a tartalomra"
 
 #. translators: If there are characters in your language that are not supported
 #. * by Merriweather, translate this to 'off'. Do not translate into your own
@@ -175,7 +178,7 @@ msgstr "on"
 #: functions.php:119
 msgctxt "Merriweather font: on or off"
 msgid "on"
-msgstr "açık"
+msgstr "on"
 
 #. translators: If there are characters in your language that are not supported
 #. * by Lato, translate this to 'off'. Do not translate into your own
@@ -183,27 +186,27 @@ msgstr "açık"
 #: functions.php:114
 msgctxt "Lato font: on or off"
 msgid "on"
-msgstr "off"
+msgstr "on"
 
 #: functions.php:92
 msgid "Sidebar"
-msgstr "Yan Menü"
+msgstr "Oldalsáv"
 
 #: functions.php:56
 msgid "Social Menu"
-msgstr "Sosyal Menü"
+msgstr "Közösségi menü"
 
 #: functions.php:55
 msgid "Primary Menu"
-msgstr "Birincil menü"
+msgstr "Elsődleges menü"
 
 #: footer.php:31
 msgid "Theme: %1$s by %2$s."
-msgstr "Tema: %2$s tarafından %1$s."
+msgstr "Sablon: %1$s Szerző: %2$s."
 
 #: footer.php:29
 msgid "Proudly powered by %s"
-msgstr "%s gururla sunar"
+msgstr "Köszönjük %s!"
 
 #: footer.php:29
 msgid "http://wordpress.org/"
@@ -211,70 +214,66 @@ msgstr "http://wordpress.org/"
 
 #: content.php:28
 msgid "Continue reading <span class=\"meta-nav\">&rarr;</span>"
-msgstr "Okumaya devam et <span class=\"meta-nav\">&rarr;</span>"
+msgstr "Olvasás folytatása <span class=\"meta-nav\">&rarr;</span>"
 
 #: content-page.php:32 inc/template-tags.php:127
 msgid "Edit"
-msgstr "Düzenle"
+msgstr "Szerkesztés"
 
 #: content-page.php:26 content-single.php:29
 msgid "Page"
-msgstr "Sayfa"
+msgstr "Oldal"
 
 #: content-page.php:22 content-single.php:25
 msgid "Pages:"
-msgstr "Sayfalar:"
+msgstr "Oldalak:"
 
 #: content-none.php:28
 msgid "It seems we can&rsquo;t find what you&rsquo;re looking for. Perhaps searching can help."
-msgstr "Aradığınız sayfa bulunamadı. Belki arama kutusu aradığınızı bulma konusunda yardımcı olabilir."
+msgstr "Úgy tűnik, nem található az, amire gondoltunk. Talán, egy újabb keresés segíthet."
 
 #: content-none.php:23
 msgid "Sorry, but nothing matched your search terms. Please try again with some different keywords."
-msgstr "Üzgünüz fakat aradığınız kriterler ile örtüşen sonuç bulunamadı. Lütfen başka kriterler ile tekrar deneyin."
+msgstr "Elnézést, nem találunk a keresési feltételeknek megfelelő eredményt. Másik kulcsszóval, kifejezéssel újra kellene kezdeni egy keresést."
 
 #: content-none.php:19
 msgid "Ready to publish your first post? <a href=\"%1$s\">Get started here</a>."
-msgstr "İlk yazınızı yayınlamaya hazır mısınız? <a href=\"%1$s\">Buradan başlayın</a>."
+msgstr "Készen állunk az első bejegyzés közzétételére? <a href=\"%1$s\">Kezdőlépések</a>."
 
 #: content-none.php:13
 msgid "Nothing Found"
-msgstr "Bulunamadı"
+msgstr "Nincs megfelelő találat"
 
 #: comments.php:63
 msgid "Comments are closed."
-msgstr "Yorumlar kapalı."
+msgstr "Hozzászólások lezárva"
 
 #: comments.php:50
 msgid "Newer Comments &rarr;"
-msgstr "Yeni yorumlar &arr;"
+msgstr "Újabb hozzászólás &rarr;"
 
 #: comments.php:49
 msgid "&larr; Older Comments"
-msgstr "&arr; Eski yorumlar"
+msgstr "&larr; Korábbi hozzászólás"
 
 #: comments.php:48
 msgid "Comment navigation"
-msgstr "Yorum dolaşımı"
+msgstr "Hozzászólás navigáció"
 
 #: comments.php:30
 msgctxt "comments title"
 msgid "One thought on &ldquo;%2$s&rdquo;"
 msgid_plural "%1$s thoughts on &ldquo;%2$s&rdquo;"
-msgstr[0] "&ldquo;%2$s&rdquo; üzerine bir yorum"
-msgstr[1] "&ldquo;%2$s&rdquo; üzerine %1$s yorum"
+msgstr[0] "&ldquo;%2$s&rdquo; bejegyzéshez egy hozzászólás"
+msgstr[1] "&ldquo;%2$s&rdquo; bejegyzéshez %1$ hozzászólás"
 
 #: author-bio.php:27
 msgid "View all posts by %s"
-msgstr "%s tarafından yazılmış tüm yazıları görüntüle"
-
-#: author-bio.php:10
-msgid "Published by %s"
-msgstr "%s tarafından yayımlandı"
+msgstr "Minden bejegyzés megjelenítése: %s"
 
 #: inc/template-tags.php:180
 msgid "Archives"
-msgstr "Arşivler"
+msgstr "Archívum"
 
 #: inc/template-tags.php:150
 msgctxt "yearly archives date format"
@@ -283,38 +282,38 @@ msgstr "Y"
 
 #: inc/template-tags.php:150
 msgid "Year: %s"
-msgstr "Yıl: %s"
+msgstr "Év: %s"
 
 #: inc/template-tags.php:152
 msgctxt "monthly archives date format"
 msgid "F Y"
-msgstr "F Y"
+msgstr "Y F"
 
 #: inc/template-tags.php:152
 msgid "Month: %s"
-msgstr "Ay: %s"
+msgstr "Hónap: %s"
 
 #: inc/template-tags.php:154
 msgid "Day: %s"
-msgstr "Gün: %s"
+msgstr "Nap: %s"
 
 #: inc/template-tags.php:148
 msgid "Author: %s"
-msgstr "Yazar: %s"
+msgstr "Szerző: %s"
 
 #. translators: %1$s: smiley
 #: 404.php:44
 msgid "Try looking in the monthly archives. %1$s"
-msgstr "Aylık arşivlere bakmayı deneyin. %1$s"
+msgstr "Próbáljunk betekinteni a hónap bejegyzéseibe: %1$s"
 
 #: 404.php:27
 msgid "Most Used Categories"
-msgstr "En çok Kullanılan Kategoriler"
+msgstr "Leggyakoribb kategóriák"
 
 #: 404.php:19
 msgid "It looks like nothing was found at this location. Maybe try one of the links below or a search?"
-msgstr "Burada hiçbir şeyin bulunmadığı görülüyor. Belki alttaki bağlantılardan birini veya bir arama yapmayı denemelisin?"
+msgstr "A keresett oldal vagy bejegyzés nem található. Próbálkozzunk meg az alábbi hivatkozásokkal vagy esetleg egy kereséssel."
 
 #: 404.php:15
 msgid "Oops! That page can&rsquo;t be found."
-msgstr "Üzgünüz! Bu sayfa bulunamıyor."
+msgstr "Hoppá! A keresett oldal nem található."

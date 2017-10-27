@@ -66,12 +66,19 @@ add_filter( 'body_class', 'boardwalk_body_classes' );
  * @return array
  */
 function boardwalk_post_classes( $classes ) {
+	$featured_image = false;
+
 	if ( 1 != get_theme_mod( 'boardwalk_no_featured_image' ) ) {
 		$featured_image = boardwalk_get_image( get_the_ID(), 'boardwalk-featured-image' );
 	}
 
 	if ( ( post_password_required() && has_post_thumbnail() ) || ( $featured_image && ! is_singular() ) ) {
 		$classes[] = 'has-post-thumbnail';
+	}
+
+	$postTitle = get_the_title();
+	if ( empty( $postTitle ) ) {
+		$classes[] = 'no-post-title';
 	}
 
 	return $classes;

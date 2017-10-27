@@ -1,4 +1,4 @@
-# Translation of WordPress.com - Themes - Boardwalk in Turkish
+# Translation of WordPress.com - Themes - Boardwalk in Romanian
 # This file is distributed under the same license as the WordPress.com - Themes - Boardwalk package.
 msgid ""
 msgstr ""
@@ -6,27 +6,31 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2);\n"
 "X-Generator: GlotPress/2.4.0-alpha\n"
-"Language: tr\n"
+"Language: ro\n"
 "Project-Id-Version: WordPress.com - Themes - Boardwalk\n"
 
 #: inc/wpcom-colors.php:391
 msgid "Accent"
-msgstr "Vurgu"
+msgstr "Accent"
 
 #: inc/wpcom-colors.php:290
 msgid "Background"
-msgstr "Arkaplan"
+msgstr "Fundal"
 
 #. translators: used between list items, there is a space after the comma
 #: inc/template-tags.php:113
 msgid "Tagged"
-msgstr "Etiketler"
+msgstr "Etichetat"
+
+#: inc/customizer.php:76
+msgid "If featured image isn't set, display colored block on blog page."
+msgstr "Dacă imaginea reprezentativă nu este setată, se afișează un bloc colorat pe pagina de blog."
 
 #: inc/customizer.php:20
 msgid "Theme Options"
-msgstr "Tema Seçenekleri"
+msgstr "Opțiuni temă"
 
 #. translators: 1: Taxonomy singular name, 2: Current taxonomy term
 #: inc/template-tags.php:178
@@ -35,52 +39,52 @@ msgstr "%1$s: %2$s"
 
 #: inc/template-tags.php:174
 msgid "Archives: %s"
-msgstr "Arşivler: %s"
+msgstr "Arhive: %s"
 
 #: inc/template-tags.php:172
 msgctxt "post format archive title"
 msgid "Chats"
-msgstr "Sohbetler"
+msgstr "Conversații"
 
 #: inc/template-tags.php:170
 msgctxt "post format archive title"
 msgid "Audio"
-msgstr "Ses"
+msgstr "Audio"
 
 #: inc/template-tags.php:168
 msgctxt "post format archive title"
 msgid "Statuses"
-msgstr "Durumlar"
+msgstr "Stări"
 
 #: inc/template-tags.php:166
 msgctxt "post format archive title"
 msgid "Links"
-msgstr "Bağlantılar"
+msgstr "Legături"
 
 #: inc/template-tags.php:164
 msgctxt "post format archive title"
 msgid "Quotes"
-msgstr "Alıntılar"
+msgstr "Citat"
 
 #: inc/template-tags.php:162
 msgctxt "post format archive title"
 msgid "Videos"
-msgstr "Videolar"
+msgstr "Videouri"
 
 #: inc/template-tags.php:160
 msgctxt "post format archive title"
 msgid "Images"
-msgstr "Görseller"
+msgstr "Imagini"
 
 #: inc/template-tags.php:158
 msgctxt "post format archive title"
 msgid "Galleries"
-msgstr "Galeriler"
+msgstr "Galerii"
 
 #: inc/template-tags.php:156
 msgctxt "post format archive title"
 msgid "Asides"
-msgstr "Yan sütun"
+msgstr "Note"
 
 #: inc/template-tags.php:154
 msgctxt "daily archives date format"
@@ -89,40 +93,57 @@ msgstr "j F Y"
 
 #: inc/template-tags.php:146
 msgid "Tag: %s"
-msgstr "Etiket: %s"
+msgstr "Etichetă: %s"
 
 #: inc/template-tags.php:144
 msgid "Category: %s"
-msgstr "Kategori: %s"
+msgstr "Categorie: %s"
+
+#: inc/customizer.php:65
+msgid "Unfixed header when scrolling down."
+msgstr "Antet nefixat când derulezi în jos."
+
+#: inc/customizer.php:53
+msgid "Keep title with content on single posts and pages."
+msgstr "Păstrează titlu cu conținut în articole și pagini singulare."
+
+#: inc/customizer.php:41
+msgid "Show author bio on single posts."
+msgstr "Arată biografie autor în articole singulare."
 
 #. Description of the plugin/theme
 #: wp-content/themes/pub/boardwalk/style.css
 msgid "A minimalistic theme with horizontal scrolling."
-msgstr "Yatay kaydırmalı minimalist bir tema."
+msgstr "O temă minimalistă cu derulare orizontală."
 
 #: sidebar.php:17
 msgid "Menu"
-msgstr "Menü"
+msgstr "Meniu"
 
 #: search.php:16
 msgid "Search Results for: %s"
-msgstr "Arama sonuçları: %s"
+msgstr "Rezultatele căutării pentru: %s"
 
 #: inc/template-tags.php:123
 msgid "% Comments"
-msgstr "% Yorum"
+msgstr "% comentarii"
 
 #: inc/template-tags.php:123
 msgid "1 Comment"
-msgstr "1 Yorum"
+msgstr "Un comentariu"
 
 #: inc/template-tags.php:123
 msgid "Leave a comment"
-msgstr "Yorum bırakın"
+msgstr "Scrie un comentariu"
+
+#: inc/template-tags.php:116
+msgctxt "post author"
+msgid "By %s"
+msgstr "De %s"
 
 #: inc/template-tags.php:109
 msgid "Posted in %1$s"
-msgstr "%1$s içinde yayınlandı"
+msgstr "Publicat în %1$s"
 
 #. translators: used between list items, there is a space after the comma
 #: inc/template-tags.php:107 inc/template-tags.php:113
@@ -131,35 +152,53 @@ msgstr ", "
 
 #: inc/template-tags.php:104
 msgid "All %s posts"
-msgstr "Tüm %s yazıları"
+msgstr "Toate cele %s de articole "
 
 #: inc/template-tags.php:86
 msgid "Featured"
-msgstr "Öne Çıkan"
+msgstr "Reprezentativ"
+
+#: inc/template-tags.php:57
+msgctxt "Next post link"
+msgid "%title&nbsp;<span class=\"meta-nav\">&rarr;</span>"
+msgstr "%title&nbsp;<span class=\"meta-nav\">&rarr;</span>"
+
+#: inc/template-tags.php:56
+msgctxt "Previous post link"
+msgid "<span class=\"meta-nav\">&larr;</span>&nbsp;%title"
+msgstr "<span class=\"meta-nav\">&larr;</span>&nbsp;%title"
 
 #: inc/template-tags.php:52
 msgid "Post navigation"
-msgstr "Yazı dolaşımı"
+msgstr "Navigare articole"
 
 #: inc/template-tags.php:29
 msgid "Newer posts <span class=\"meta-nav\">&rarr;</span>"
-msgstr "Yeni yazılar <span class=\"meta-nav\">&rarr;</span>"
+msgstr "Articole mai noi <span class=\"meta-nav\">&rarr;</span>"
 
 #: inc/template-tags.php:25
 msgid "<span class=\"meta-nav\">&larr;</span> Older posts"
-msgstr "<span class=\"meta-nav\">&larr;</span> Eski yazılar"
+msgstr "<span class=\"meta-nav\">&larr;</span> Articole mai vechi"
 
 #: inc/template-tags.php:21
 msgid "Posts navigation"
-msgstr "Yazı dolaşımı"
+msgstr "Navigarea articolelor"
 
 #: inc/extras.php:113
 msgid "Page %s"
-msgstr "Sayfa %s"
+msgstr "Pagina %s"
+
+#: inc/customizer.php:30
+msgid "Add a dark filter to featured images"
+msgstr "Adaugă un filtru întunecat la imagini reprezentative"
+
+#: header.php:33
+msgid "Toggle Sidebar"
+msgstr "Comută bară laterală"
 
 #: header.php:22
 msgid "Skip to content"
-msgstr "İçeriğe geç"
+msgstr "Sări la conţinut"
 
 #. translators: If there are characters in your language that are not supported
 #. * by Source Code Pro, translate this to 'off'. Do not translate into your
@@ -175,7 +214,7 @@ msgstr "on"
 #: functions.php:119
 msgctxt "Merriweather font: on or off"
 msgid "on"
-msgstr "açık"
+msgstr "on"
 
 #. translators: If there are characters in your language that are not supported
 #. * by Lato, translate this to 'off'. Do not translate into your own
@@ -183,27 +222,27 @@ msgstr "açık"
 #: functions.php:114
 msgctxt "Lato font: on or off"
 msgid "on"
-msgstr "off"
+msgstr "pornit"
 
 #: functions.php:92
 msgid "Sidebar"
-msgstr "Yan Menü"
+msgstr "Bară laterală"
 
 #: functions.php:56
 msgid "Social Menu"
-msgstr "Sosyal Menü"
+msgstr "Meniu social"
 
 #: functions.php:55
 msgid "Primary Menu"
-msgstr "Birincil menü"
+msgstr "Meniu principal"
 
 #: footer.php:31
 msgid "Theme: %1$s by %2$s."
-msgstr "Tema: %2$s tarafından %1$s."
+msgstr "Tema: %1$s de %2$s."
 
 #: footer.php:29
 msgid "Proudly powered by %s"
-msgstr "%s gururla sunar"
+msgstr "Propulsat cu mândrie de %s"
 
 #: footer.php:29
 msgid "http://wordpress.org/"
@@ -211,70 +250,71 @@ msgstr "http://wordpress.org/"
 
 #: content.php:28
 msgid "Continue reading <span class=\"meta-nav\">&rarr;</span>"
-msgstr "Okumaya devam et <span class=\"meta-nav\">&rarr;</span>"
+msgstr "Continuarea <span class=\"meta-nav\">&rarr;</span>"
 
 #: content-page.php:32 inc/template-tags.php:127
 msgid "Edit"
-msgstr "Düzenle"
+msgstr "Editare"
 
 #: content-page.php:26 content-single.php:29
 msgid "Page"
-msgstr "Sayfa"
+msgstr "Pagină"
 
 #: content-page.php:22 content-single.php:25
 msgid "Pages:"
-msgstr "Sayfalar:"
+msgstr "Pagini:"
 
 #: content-none.php:28
 msgid "It seems we can&rsquo;t find what you&rsquo;re looking for. Perhaps searching can help."
-msgstr "Aradığınız sayfa bulunamadı. Belki arama kutusu aradığınızı bulma konusunda yardımcı olabilir."
+msgstr "Nu s-a putut găsi conținutul căutat. Probabil o căutare sau una dintre legăturile de mai jos pot ajuta."
 
 #: content-none.php:23
 msgid "Sorry, but nothing matched your search terms. Please try again with some different keywords."
-msgstr "Üzgünüz fakat aradığınız kriterler ile örtüşen sonuç bulunamadı. Lütfen başka kriterler ile tekrar deneyin."
+msgstr "Ne pare rau, căutarea nu are nici un rezultat. Vă rugăm să încercați din nou cu unele cuvinte cheie diferite."
 
 #: content-none.php:19
 msgid "Ready to publish your first post? <a href=\"%1$s\">Get started here</a>."
-msgstr "İlk yazınızı yayınlamaya hazır mısınız? <a href=\"%1$s\">Buradan başlayın</a>."
+msgstr "Pregătit să publici primul articol? <a href=\"%1$s\">Începe de aici</a>."
 
 #: content-none.php:13
 msgid "Nothing Found"
-msgstr "Bulunamadı"
+msgstr "Nu a fost găsit nimic"
 
 #: comments.php:63
 msgid "Comments are closed."
-msgstr "Yorumlar kapalı."
+msgstr "Comentariile nu sunt permise."
 
 #: comments.php:50
 msgid "Newer Comments &rarr;"
-msgstr "Yeni yorumlar &arr;"
+msgstr "Comentarii mai noi &rarr;"
 
 #: comments.php:49
 msgid "&larr; Older Comments"
-msgstr "&arr; Eski yorumlar"
+msgstr "&larr; comentarii mai vechi"
 
 #: comments.php:48
 msgid "Comment navigation"
-msgstr "Yorum dolaşımı"
+msgstr "Navigare comentarii"
 
 #: comments.php:30
 msgctxt "comments title"
 msgid "One thought on &ldquo;%2$s&rdquo;"
 msgid_plural "%1$s thoughts on &ldquo;%2$s&rdquo;"
-msgstr[0] "&ldquo;%2$s&rdquo; üzerine bir yorum"
-msgstr[1] "&ldquo;%2$s&rdquo; üzerine %1$s yorum"
+msgstr[0] "Un gând despre &8222;%2$s&8221;"
+msgstr[1] "%1$s gânduri despre &8222;%2$s&8221;"
+msgstr[2] "%1$s de gânduri despre &8222;%2$s&8221;"
 
 #: author-bio.php:27
 msgid "View all posts by %s"
-msgstr "%s tarafından yazılmış tüm yazıları görüntüle"
+msgstr "Vezi toate posturile scrise de %s"
 
 #: author-bio.php:10
 msgid "Published by %s"
-msgstr "%s tarafından yayımlandı"
+msgstr "Publicat de %s"
 
 #: inc/template-tags.php:180
 msgid "Archives"
-msgstr "Arşivler"
+msgstr "Arhive"
 
 #: inc/template-tags.php:150
 msgctxt "yearly archives date format"
@@ -283,7 +323,7 @@ msgstr "Y"
 
 #: inc/template-tags.php:150
 msgid "Year: %s"
-msgstr "Yıl: %s"
+msgstr "An: %s"
 
 #: inc/template-tags.php:152
 msgctxt "monthly archives date format"
@@ -292,29 +332,29 @@ msgstr "F Y"
 
 #: inc/template-tags.php:152
 msgid "Month: %s"
-msgstr "Ay: %s"
+msgstr "Lună: %s"
 
 #: inc/template-tags.php:154
 msgid "Day: %s"
-msgstr "Gün: %s"
+msgstr "Zi: %s"
 
 #: inc/template-tags.php:148
 msgid "Author: %s"
-msgstr "Yazar: %s"
+msgstr "Autor: %s"
 
 #. translators: %1$s: smiley
 #: 404.php:44
 msgid "Try looking in the monthly archives. %1$s"
-msgstr "Aylık arşivlere bakmayı deneyin. %1$s"
+msgstr "Încearcă să cauți în arhiva lunară. %1$s"
 
 #: 404.php:27
 msgid "Most Used Categories"
-msgstr "En çok Kullanılan Kategoriler"
+msgstr "Cele mai folosite categorii"
 
 #: 404.php:19
 msgid "It looks like nothing was found at this location. Maybe try one of the links below or a search?"
-msgstr "Burada hiçbir şeyin bulunmadığı görülüyor. Belki alttaki bağlantılardan birini veya bir arama yapmayı denemelisin?"
+msgstr "Se pare că nu a fost găsit nimic la această locație. Poate încerci una din legăturile de mai jos sau o căutare?"
 
 #: 404.php:15
 msgid "Oops! That page can&rsquo;t be found."
-msgstr "Üzgünüz! Bu sayfa bulunamıyor."
+msgstr "Hopa! Pagina nu a fost găsită."

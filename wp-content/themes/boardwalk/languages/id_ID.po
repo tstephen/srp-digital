@@ -1,83 +1,97 @@
-# Translation of Boardwalk in Indonesian
-# This file is distributed under the same license as the Boardwalk package.
+# Translation of WordPress.com - Themes - Boardwalk in Indonesian
+# This file is distributed under the same license as the WordPress.com - Themes - Boardwalk package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2015-09-23 03:28:42+0000\n"
+"PO-Revision-Date: 2017-03-23 06:16:58+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: GlotPress/1.0-alpha-1100\n"
-"Project-Id-Version: Boardwalk\n"
+"X-Generator: GlotPress/2.4.0-alpha\n"
+"Language: id\n"
+"Project-Id-Version: WordPress.com - Themes - Boardwalk\n"
+
+#: inc/wpcom-colors.php:391
+msgid "Accent"
+msgstr "Aksen"
+
+#: inc/wpcom-colors.php:290
+msgid "Background"
+msgstr "Latar belakang"
+
+#. translators: used between list items, there is a space after the comma
+#: inc/template-tags.php:113
+msgid "Tagged"
+msgstr "Dengan kaitkata"
 
 #: inc/customizer.php:20
 msgid "Theme Options"
 msgstr "Opsi Tema"
 
-#: inc/template-tags.php:177
-msgid "Archives: %s"
-msgstr "Arsip: %s"
-
 #. translators: 1: Taxonomy singular name, 2: Current taxonomy term
-#: inc/template-tags.php:181
+#: inc/template-tags.php:178
 msgid "%1$s: %2$s"
 msgstr "%1$s: %2$s"
 
-#: inc/template-tags.php:167
-msgctxt "post format archive title"
-msgid "Quotes"
-msgstr "Kutipan"
+#: inc/template-tags.php:174
+msgid "Archives: %s"
+msgstr "Arsip: %s"
 
-#: inc/template-tags.php:169
-msgctxt "post format archive title"
-msgid "Links"
-msgstr "Tautan"
-
-#: inc/template-tags.php:171
-msgctxt "post format archive title"
-msgid "Statuses"
-msgstr "Status"
-
-#: inc/template-tags.php:173
-msgctxt "post format archive title"
-msgid "Audio"
-msgstr "Audio"
-
-#: inc/template-tags.php:175
+#: inc/template-tags.php:172
 msgctxt "post format archive title"
 msgid "Chats"
 msgstr "Obrolan"
 
-#: inc/template-tags.php:157
-msgctxt "daily archives date format"
-msgid "F j, Y"
-msgstr "F j, Y"
-
-#: inc/template-tags.php:159
+#: inc/template-tags.php:170
 msgctxt "post format archive title"
-msgid "Asides"
-msgstr "Samping"
+msgid "Audio"
+msgstr "Audio"
 
-#: inc/template-tags.php:161
+#: inc/template-tags.php:168
 msgctxt "post format archive title"
-msgid "Galleries"
-msgstr "Galeri"
+msgid "Statuses"
+msgstr "Status"
 
-#: inc/template-tags.php:163
+#: inc/template-tags.php:166
 msgctxt "post format archive title"
-msgid "Images"
-msgstr "Gambar"
+msgid "Links"
+msgstr "Tautan"
 
-#: inc/template-tags.php:165
+#: inc/template-tags.php:164
+msgctxt "post format archive title"
+msgid "Quotes"
+msgstr "Kutipan"
+
+#: inc/template-tags.php:162
 msgctxt "post format archive title"
 msgid "Videos"
 msgstr "Video"
 
-#: inc/template-tags.php:149
+#: inc/template-tags.php:160
+msgctxt "post format archive title"
+msgid "Images"
+msgstr "Gambar"
+
+#: inc/template-tags.php:158
+msgctxt "post format archive title"
+msgid "Galleries"
+msgstr "Galeri"
+
+#: inc/template-tags.php:156
+msgctxt "post format archive title"
+msgid "Asides"
+msgstr "Samping"
+
+#: inc/template-tags.php:154
+msgctxt "daily archives date format"
+msgid "F j, Y"
+msgstr "F j, Y"
+
+#: inc/template-tags.php:146
 msgid "Tag: %s"
 msgstr "Kaitkata: %s"
 
-#: inc/template-tags.php:147
+#: inc/template-tags.php:144
 msgid "Category: %s"
 msgstr "Kategori: %s"
 
@@ -89,21 +103,17 @@ msgstr "Menu"
 msgid "Search Results for: %s"
 msgstr "Hasil Pencarian untuk: %s"
 
-#: inc/template-tags.php:126
+#: inc/template-tags.php:123
 msgid "% Comments"
 msgstr "% Komentar"
 
-#: inc/template-tags.php:126
+#: inc/template-tags.php:123
 msgid "1 Comment"
 msgstr "1 Komentar"
 
-#: inc/template-tags.php:126
+#: inc/template-tags.php:123
 msgid "Leave a comment"
 msgstr "Tinggalkan komentar"
-
-#: inc/template-tags.php:115
-msgid "Tagged %1$s"
-msgstr "Ditandai %1$s"
 
 #: inc/template-tags.php:109
 msgid "Posted in %1$s"
@@ -138,9 +148,13 @@ msgstr "<span class=\"meta-nav\">&larr;</span> Pos-pos sebelumnya"
 msgid "Posts navigation"
 msgstr "Navigasi pos"
 
-#: inc/extras.php:107
+#: inc/extras.php:113
 msgid "Page %s"
 msgstr "Halaman %s"
+
+#: header.php:22
+msgid "Skip to content"
+msgstr "Lanjut ke konten"
 
 #. translators: If there are characters in your language that are not supported
 #. * by Source Code Pro, translate this to 'off'. Do not translate into your
@@ -149,10 +163,6 @@ msgstr "Halaman %s"
 msgctxt "Source Code Pro font: on or off"
 msgid "on"
 msgstr "on"
-
-#: header.php:22
-msgid "Skip to content"
-msgstr "Lanjut ke konten"
 
 #. translators: If there are characters in your language that are not supported
 #. * by Merriweather, translate this to 'off'. Do not translate into your own
@@ -198,7 +208,7 @@ msgstr "http://id.wordpress.org/"
 msgid "Continue reading <span class=\"meta-nav\">&rarr;</span>"
 msgstr "Baca lebih lanjut <span class=\"meta-nav\">&rarr;</span>"
 
-#: content-page.php:32 inc/template-tags.php:130
+#: content-page.php:32 inc/template-tags.php:127
 msgid "Edit"
 msgstr "Sunting"
 
@@ -253,33 +263,37 @@ msgstr[1] "%1$s pemikiran pada &ldquo;%2$s&rdquo;"
 msgid "View all posts by %s"
 msgstr "Lihat semua pos milik %s"
 
-#: inc/template-tags.php:183
+#: author-bio.php:10
+msgid "Published by %s"
+msgstr "Diterbitkan oleh %s"
+
+#: inc/template-tags.php:180
 msgid "Archives"
 msgstr "Arsip"
 
-#: inc/template-tags.php:153
+#: inc/template-tags.php:150
 msgctxt "yearly archives date format"
 msgid "Y"
 msgstr "Y"
 
-#: inc/template-tags.php:153
+#: inc/template-tags.php:150
 msgid "Year: %s"
 msgstr "Tahun: %s"
 
-#: inc/template-tags.php:155
+#: inc/template-tags.php:152
 msgctxt "monthly archives date format"
 msgid "F Y"
 msgstr "F Y"
 
-#: inc/template-tags.php:155
+#: inc/template-tags.php:152
 msgid "Month: %s"
 msgstr "Bulan: %s"
 
-#: inc/template-tags.php:157
+#: inc/template-tags.php:154
 msgid "Day: %s"
 msgstr "Hari: %s"
 
-#: inc/template-tags.php:151
+#: inc/template-tags.php:148
 msgid "Author: %s"
 msgstr "Penulis: %s"
 

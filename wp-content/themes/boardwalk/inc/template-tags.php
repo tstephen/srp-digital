@@ -110,10 +110,7 @@ function boardwalk_entry_footer() {
 		}
 
 		/* translators: used between list items, there is a space after the comma */
-		$tags_list = get_the_tag_list( '', __( ', ', 'boardwalk' ) );
-		if ( $tags_list ) {
-			printf( '<span class="tags-links">' . __( 'Tagged %1$s', 'boardwalk' ) . '</span>', $tags_list );
-		}
+		the_tags( sprintf( '<span class="tags-links">%s ', esc_html__( 'Tagged', 'boardwalk' ) ), esc_html__( ', ', 'boardwalk' ), '</span>' );
 
 		if ( 1 != get_theme_mod( 'boardwalk_author_bio' ) ) {
 			$byline = sprintf( '<span class="byline">' . _x( 'By %s', 'post author', 'boardwalk' ) . '</span>', '<span class="author vcard"><a class="url fn n" href="' . esc_url( get_author_posts_url( get_the_author_meta( 'ID' ) ) ) . '">' . esc_html( get_the_author() ) . '</a></span>' );

@@ -1,83 +1,97 @@
-# Translation of Boardwalk in German
-# This file is distributed under the same license as the Boardwalk package.
+# Translation of WordPress.com - Themes - Boardwalk in German
+# This file is distributed under the same license as the WordPress.com - Themes - Boardwalk package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2015-09-23 03:28:42+0000\n"
+"PO-Revision-Date: 2017-03-23 06:16:58+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: GlotPress/1.0-alpha-1100\n"
-"Project-Id-Version: Boardwalk\n"
+"X-Generator: GlotPress/2.4.0-alpha\n"
+"Language: de\n"
+"Project-Id-Version: WordPress.com - Themes - Boardwalk\n"
+
+#: inc/wpcom-colors.php:391
+msgid "Accent"
+msgstr "Accent"
+
+#: inc/wpcom-colors.php:290
+msgid "Background"
+msgstr "Hintergrund"
+
+#. translators: used between list items, there is a space after the comma
+#: inc/template-tags.php:113
+msgid "Tagged"
+msgstr "Verschlagwortet mit"
 
 #: inc/customizer.php:20
 msgid "Theme Options"
 msgstr "Theme-Optionen"
 
-#: inc/template-tags.php:177
-msgid "Archives: %s"
-msgstr "Archive: %s"
-
 #. translators: 1: Taxonomy singular name, 2: Current taxonomy term
-#: inc/template-tags.php:181
+#: inc/template-tags.php:178
 msgid "%1$s: %2$s"
 msgstr "%1$s @ %2$s"
 
-#: inc/template-tags.php:167
-msgctxt "post format archive title"
-msgid "Quotes"
-msgstr "Zitate"
+#: inc/template-tags.php:174
+msgid "Archives: %s"
+msgstr "Archive: %s"
 
-#: inc/template-tags.php:169
-msgctxt "post format archive title"
-msgid "Links"
-msgstr "Links"
-
-#: inc/template-tags.php:171
-msgctxt "post format archive title"
-msgid "Statuses"
-msgstr "Status"
-
-#: inc/template-tags.php:173
-msgctxt "post format archive title"
-msgid "Audio"
-msgstr "Audio"
-
-#: inc/template-tags.php:175
+#: inc/template-tags.php:172
 msgctxt "post format archive title"
 msgid "Chats"
 msgstr "Chats"
 
-#: inc/template-tags.php:157
-msgctxt "daily archives date format"
-msgid "F j, Y"
-msgstr "j. F Y"
-
-#: inc/template-tags.php:159
+#: inc/template-tags.php:170
 msgctxt "post format archive title"
-msgid "Asides"
-msgstr "Kurzmitteilungen"
+msgid "Audio"
+msgstr "Audio"
 
-#: inc/template-tags.php:161
+#: inc/template-tags.php:168
 msgctxt "post format archive title"
-msgid "Galleries"
-msgstr "Galerien"
+msgid "Statuses"
+msgstr "Status"
 
-#: inc/template-tags.php:163
+#: inc/template-tags.php:166
 msgctxt "post format archive title"
-msgid "Images"
-msgstr "Bilder"
+msgid "Links"
+msgstr "Links"
 
-#: inc/template-tags.php:165
+#: inc/template-tags.php:164
+msgctxt "post format archive title"
+msgid "Quotes"
+msgstr "Zitate"
+
+#: inc/template-tags.php:162
 msgctxt "post format archive title"
 msgid "Videos"
 msgstr "Videos"
 
-#: inc/template-tags.php:149
+#: inc/template-tags.php:160
+msgctxt "post format archive title"
+msgid "Images"
+msgstr "Bilder"
+
+#: inc/template-tags.php:158
+msgctxt "post format archive title"
+msgid "Galleries"
+msgstr "Galerien"
+
+#: inc/template-tags.php:156
+msgctxt "post format archive title"
+msgid "Asides"
+msgstr "Kurzmitteilungen"
+
+#: inc/template-tags.php:154
+msgctxt "daily archives date format"
+msgid "F j, Y"
+msgstr "j. F Y"
+
+#: inc/template-tags.php:146
 msgid "Tag: %s"
 msgstr "Tag: %s"
 
-#: inc/template-tags.php:147
+#: inc/template-tags.php:144
 msgid "Category: %s"
 msgstr "Kategorie: %s"
 
@@ -94,26 +108,22 @@ msgstr "Menü"
 msgid "Search Results for: %s"
 msgstr "Suchergebnisse für: %s"
 
-#: inc/template-tags.php:126
+#: inc/template-tags.php:123
 msgid "% Comments"
 msgstr "% Kommentare"
 
-#: inc/template-tags.php:126
+#: inc/template-tags.php:123
 msgid "1 Comment"
 msgstr "1 Kommentar"
 
-#: inc/template-tags.php:119
-msgctxt "post author"
-msgid "By %s"
-msgstr "von %s"
-
-#: inc/template-tags.php:126
+#: inc/template-tags.php:123
 msgid "Leave a comment"
 msgstr "Hinterlasse einen Kommentar"
 
-#: inc/template-tags.php:115
-msgid "Tagged %1$s"
-msgstr "Getaggt mit %1$s"
+#: inc/template-tags.php:116
+msgctxt "post author"
+msgid "By %s"
+msgstr "von %s"
 
 #: inc/template-tags.php:109
 msgid "Posted in %1$s"
@@ -148,7 +158,7 @@ msgstr "<span class=\"meta-nav\">&larr;</span> Ältere Beiträge"
 msgid "Posts navigation"
 msgstr "Beiträge-Navigation"
 
-#: inc/extras.php:107
+#: inc/extras.php:113
 msgid "Page %s"
 msgstr "Seite %s"
 
@@ -204,7 +214,7 @@ msgstr "http://wordpress.org/"
 msgid "Continue reading <span class=\"meta-nav\">&rarr;</span>"
 msgstr "Weiterlesen <span class=\"meta-nav\">&rarr;</span>"
 
-#: content-page.php:32 inc/template-tags.php:130
+#: content-page.php:32 inc/template-tags.php:127
 msgid "Edit"
 msgstr "Bearbeiten"
 
@@ -259,33 +269,37 @@ msgstr[1] "%1$s Gedanken zu &ldquo;%2$s&rdquo;"
 msgid "View all posts by %s"
 msgstr "Zeige alle Beiträge von %s"
 
-#: inc/template-tags.php:183
+#: author-bio.php:10
+msgid "Published by %s"
+msgstr "Veröffentlicht von %s"
+
+#: inc/template-tags.php:180
 msgid "Archives"
 msgstr "Archive"
 
-#: inc/template-tags.php:153
+#: inc/template-tags.php:150
 msgctxt "yearly archives date format"
 msgid "Y"
 msgstr "Y"
 
-#: inc/template-tags.php:153
+#: inc/template-tags.php:150
 msgid "Year: %s"
 msgstr "Jahr: %s"
 
-#: inc/template-tags.php:155
+#: inc/template-tags.php:152
 msgctxt "monthly archives date format"
 msgid "F Y"
 msgstr "F Y"
 
-#: inc/template-tags.php:155
+#: inc/template-tags.php:152
 msgid "Month: %s"
 msgstr "Monat: %s"
 
-#: inc/template-tags.php:157
+#: inc/template-tags.php:154
 msgid "Day: %s"
 msgstr "Tag: %s"
 
-#: inc/template-tags.php:151
+#: inc/template-tags.php:148
 msgid "Author: %s"
 msgstr "Autor: %s"
 

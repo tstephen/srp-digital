@@ -1,83 +1,97 @@
-# Translation of Boardwalk in Hebrew
-# This file is distributed under the same license as the Boardwalk package.
+# Translation of WordPress.com - Themes - Boardwalk in Hebrew
+# This file is distributed under the same license as the WordPress.com - Themes - Boardwalk package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2015-09-23 03:28:42+0000\n"
+"PO-Revision-Date: 2017-03-23 06:16:58+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: GlotPress/1.0-alpha-1100\n"
-"Project-Id-Version: Boardwalk\n"
+"X-Generator: GlotPress/2.4.0-alpha\n"
+"Language: he_IL\n"
+"Project-Id-Version: WordPress.com - Themes - Boardwalk\n"
+
+#: inc/wpcom-colors.php:391
+msgid "Accent"
+msgstr "דגש"
+
+#: inc/wpcom-colors.php:290
+msgid "Background"
+msgstr "רקע"
+
+#. translators: used between list items, there is a space after the comma
+#: inc/template-tags.php:113
+msgid "Tagged"
+msgstr "מתויג"
 
 #: inc/customizer.php:20
 msgid "Theme Options"
 msgstr "אפשרויות"
 
-#: inc/template-tags.php:177
-msgid "Archives: %s"
-msgstr "ארכיון: %s"
-
 #. translators: 1: Taxonomy singular name, 2: Current taxonomy term
-#: inc/template-tags.php:181
+#: inc/template-tags.php:178
 msgid "%1$s: %2$s"
 msgstr "%1$s: %2$s"
 
-#: inc/template-tags.php:167
-msgctxt "post format archive title"
-msgid "Quotes"
-msgstr "ציטוטים"
+#: inc/template-tags.php:174
+msgid "Archives: %s"
+msgstr "ארכיון: %s"
 
-#: inc/template-tags.php:169
-msgctxt "post format archive title"
-msgid "Links"
-msgstr "לינקים"
-
-#: inc/template-tags.php:171
-msgctxt "post format archive title"
-msgid "Statuses"
-msgstr "סטטוסים"
-
-#: inc/template-tags.php:173
-msgctxt "post format archive title"
-msgid "Audio"
-msgstr "אודיו"
-
-#: inc/template-tags.php:175
+#: inc/template-tags.php:172
 msgctxt "post format archive title"
 msgid "Chats"
 msgstr "צ'אטים"
 
-#: inc/template-tags.php:157
-msgctxt "daily archives date format"
-msgid "F j, Y"
-msgstr "j בF Y"
-
-#: inc/template-tags.php:159
+#: inc/template-tags.php:170
 msgctxt "post format archive title"
-msgid "Asides"
-msgstr "הערות"
+msgid "Audio"
+msgstr "אודיו"
 
-#: inc/template-tags.php:161
+#: inc/template-tags.php:168
 msgctxt "post format archive title"
-msgid "Galleries"
-msgstr "גלריות"
+msgid "Statuses"
+msgstr "סטטוסים"
 
-#: inc/template-tags.php:163
+#: inc/template-tags.php:166
 msgctxt "post format archive title"
-msgid "Images"
-msgstr "תמונות"
+msgid "Links"
+msgstr "לינקים"
 
-#: inc/template-tags.php:165
+#: inc/template-tags.php:164
+msgctxt "post format archive title"
+msgid "Quotes"
+msgstr "ציטוטים"
+
+#: inc/template-tags.php:162
 msgctxt "post format archive title"
 msgid "Videos"
 msgstr "סרטונים"
 
-#: inc/template-tags.php:149
+#: inc/template-tags.php:160
+msgctxt "post format archive title"
+msgid "Images"
+msgstr "תמונות"
+
+#: inc/template-tags.php:158
+msgctxt "post format archive title"
+msgid "Galleries"
+msgstr "גלריות"
+
+#: inc/template-tags.php:156
+msgctxt "post format archive title"
+msgid "Asides"
+msgstr "הערות"
+
+#: inc/template-tags.php:154
+msgctxt "daily archives date format"
+msgid "F j, Y"
+msgstr "j בF Y"
+
+#: inc/template-tags.php:146
 msgid "Tag: %s"
 msgstr "תג: %s"
 
-#: inc/template-tags.php:147
+#: inc/template-tags.php:144
 msgid "Category: %s"
 msgstr "קטגוריה: %s"
 
@@ -89,26 +103,22 @@ msgstr "תפריט"
 msgid "Search Results for: %s"
 msgstr "תוצאות החיפוש: %s"
 
-#: inc/template-tags.php:126
+#: inc/template-tags.php:123
 msgid "% Comments"
 msgstr "% תגובות"
 
-#: inc/template-tags.php:126
+#: inc/template-tags.php:123
 msgid "1 Comment"
 msgstr "תגובה אחת"
 
-#: inc/template-tags.php:119
-msgctxt "post author"
-msgid "By %s"
-msgstr "מאת %s"
-
-#: inc/template-tags.php:126
+#: inc/template-tags.php:123
 msgid "Leave a comment"
 msgstr "השארת תגובה"
 
-#: inc/template-tags.php:115
-msgid "Tagged %1$s"
-msgstr "%1$s תוייג"
+#: inc/template-tags.php:116
+msgctxt "post author"
+msgid "By %s"
+msgstr "מאת %s"
 
 #: inc/template-tags.php:109
 msgid "Posted in %1$s"
@@ -143,9 +153,13 @@ msgstr "<span class=\"meta-nav\">&rarr;</span> רשומות ישנות יותר"
 msgid "Posts navigation"
 msgstr "ניווט בין הרשומות"
 
-#: inc/extras.php:107
+#: inc/extras.php:113
 msgid "Page %s"
 msgstr "עמוד %s"
+
+#: header.php:22
+msgid "Skip to content"
+msgstr "דילוג לתוכן"
 
 #. translators: If there are characters in your language that are not supported
 #. * by Source Code Pro, translate this to 'off'. Do not translate into your
@@ -154,10 +168,6 @@ msgstr "עמוד %s"
 msgctxt "Source Code Pro font: on or off"
 msgid "on"
 msgstr "on"
-
-#: header.php:22
-msgid "Skip to content"
-msgstr "דילוג לתוכן"
 
 #. translators: If there are characters in your language that are not supported
 #. * by Merriweather, translate this to 'off'. Do not translate into your own
@@ -203,7 +213,7 @@ msgstr "http://he.wordpress.org/"
 msgid "Continue reading <span class=\"meta-nav\">&rarr;</span>"
 msgstr "להמשיך לקרוא <span class=\"meta-nav\">&larr;</span>"
 
-#: content-page.php:32 inc/template-tags.php:130
+#: content-page.php:32 inc/template-tags.php:127
 msgid "Edit"
 msgstr "עריכה"
 
@@ -258,33 +268,37 @@ msgstr[1] "%1$s מחשבות על &ldquo;%2$s&rdquo;"
 msgid "View all posts by %s"
 msgstr "הצגת הרשומות של %s"
 
-#: inc/template-tags.php:183
+#: author-bio.php:10
+msgid "Published by %s"
+msgstr "פורסם על ידי %s"
+
+#: inc/template-tags.php:180
 msgid "Archives"
 msgstr "ארכיון"
 
-#: inc/template-tags.php:153
+#: inc/template-tags.php:150
 msgctxt "yearly archives date format"
 msgid "Y"
 msgstr "Y"
 
-#: inc/template-tags.php:153
+#: inc/template-tags.php:150
 msgid "Year: %s"
 msgstr "שנה: %s"
 
-#: inc/template-tags.php:155
+#: inc/template-tags.php:152
 msgctxt "monthly archives date format"
 msgid "F Y"
 msgstr "F Y"
 
-#: inc/template-tags.php:155
+#: inc/template-tags.php:152
 msgid "Month: %s"
 msgstr "חודש: %s"
 
-#: inc/template-tags.php:157
+#: inc/template-tags.php:154
 msgid "Day: %s"
 msgstr "יום: %s"
 
-#: inc/template-tags.php:151
+#: inc/template-tags.php:148
 msgid "Author: %s"
 msgstr "מחבר: %s"
 

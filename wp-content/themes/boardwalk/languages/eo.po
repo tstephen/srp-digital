@@ -1,97 +1,102 @@
-# Translation of Boardwalk in Esperanto
-# This file is distributed under the same license as the Boardwalk package.
+# Translation of WordPress.com - Themes - Boardwalk in Esperanto
+# This file is distributed under the same license as the WordPress.com - Themes - Boardwalk package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2015-09-23 03:28:42+0000\n"
+"PO-Revision-Date: 2017-03-23 06:16:58+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: GlotPress/1.0-alpha-1100\n"
-"Project-Id-Version: Boardwalk\n"
+"X-Generator: GlotPress/2.4.0-alpha\n"
+"Language: eo\n"
+"Project-Id-Version: WordPress.com - Themes - Boardwalk\n"
+
+#: inc/wpcom-colors.php:290
+msgid "Background"
+msgstr "Fono"
 
 #: inc/customizer.php:20
 msgid "Theme Options"
 msgstr "Etosaj opcioj"
 
-#: inc/template-tags.php:177
-msgid "Archives: %s"
-msgstr "Arkivoj: %s"
-
 #. translators: 1: Taxonomy singular name, 2: Current taxonomy term
-#: inc/template-tags.php:181
+#: inc/template-tags.php:178
 msgid "%1$s: %2$s"
 msgstr "%1$s: %2$s"
 
-#: inc/template-tags.php:167
-msgctxt "post format archive title"
-msgid "Quotes"
-msgstr "Citaĵoj"
+#: inc/template-tags.php:174
+msgid "Archives: %s"
+msgstr "Arkivoj: %s"
 
-#: inc/template-tags.php:169
-msgctxt "post format archive title"
-msgid "Links"
-msgstr "Ligiloj"
-
-#: inc/template-tags.php:171
-msgctxt "post format archive title"
-msgid "Statuses"
-msgstr "Statoj"
-
-#: inc/template-tags.php:173
-msgctxt "post format archive title"
-msgid "Audio"
-msgstr "Aŭdaĵoj"
-
-#: inc/template-tags.php:175
+#: inc/template-tags.php:172
 msgctxt "post format archive title"
 msgid "Chats"
 msgstr "Babiloj"
 
-#: inc/template-tags.php:157
-msgctxt "daily archives date format"
-msgid "F j, Y"
-msgstr "j F Y"
-
-#: inc/template-tags.php:159
+#: inc/template-tags.php:170
 msgctxt "post format archive title"
-msgid "Asides"
-msgstr "Mencioj"
+msgid "Audio"
+msgstr "Aŭdaĵoj"
 
-#: inc/template-tags.php:161
+#: inc/template-tags.php:168
 msgctxt "post format archive title"
-msgid "Galleries"
-msgstr "Galerioj"
+msgid "Statuses"
+msgstr "Statoj"
 
-#: inc/template-tags.php:163
+#: inc/template-tags.php:166
 msgctxt "post format archive title"
-msgid "Images"
-msgstr "Bildoj"
+msgid "Links"
+msgstr "Ligiloj"
 
-#: inc/template-tags.php:165
+#: inc/template-tags.php:164
+msgctxt "post format archive title"
+msgid "Quotes"
+msgstr "Citaĵoj"
+
+#: inc/template-tags.php:162
 msgctxt "post format archive title"
 msgid "Videos"
 msgstr "Videoj"
 
-#: inc/template-tags.php:149
+#: inc/template-tags.php:160
+msgctxt "post format archive title"
+msgid "Images"
+msgstr "Bildoj"
+
+#: inc/template-tags.php:158
+msgctxt "post format archive title"
+msgid "Galleries"
+msgstr "Galerioj"
+
+#: inc/template-tags.php:156
+msgctxt "post format archive title"
+msgid "Asides"
+msgstr "Mencioj"
+
+#: inc/template-tags.php:154
+msgctxt "daily archives date format"
+msgid "F j, Y"
+msgstr "j F Y"
+
+#: inc/template-tags.php:146
 msgid "Tag: %s"
 msgstr "Etikedo: %s"
 
-#: inc/customizer.php:41
-msgid "Show author bio on single posts."
-msgstr "Montru la aŭtoran biografion ĉe unuopaj afiŝoj."
-
-#: inc/customizer.php:53
-msgid "Keep title with content on single posts and pages."
-msgstr "Lasu la titolon kun enhavo ĉe unuopaj afiŝoj kaj paĝoj."
+#: inc/template-tags.php:144
+msgid "Category: %s"
+msgstr "Kategorio: %s"
 
 #: inc/customizer.php:65
 msgid "Unfixed header when scrolling down."
 msgstr "Nefiksita kapo dum rulumado suben."
 
-#: inc/template-tags.php:147
-msgid "Category: %s"
-msgstr "Kategorio: %s"
+#: inc/customizer.php:53
+msgid "Keep title with content on single posts and pages."
+msgstr "Lasu la titolon kun enhavo ĉe unuopaj afiŝoj kaj paĝoj."
+
+#: inc/customizer.php:41
+msgid "Show author bio on single posts."
+msgstr "Montru la aŭtoran biografion ĉe unuopaj afiŝoj."
 
 #. Description of the plugin/theme
 #: wp-content/themes/pub/boardwalk/style.css
@@ -106,26 +111,22 @@ msgstr "Menuo"
 msgid "Search Results for: %s"
 msgstr "Serĉrezultoj por: %s"
 
-#: inc/template-tags.php:126
+#: inc/template-tags.php:123
 msgid "% Comments"
 msgstr "% Komentoj"
 
-#: inc/template-tags.php:126
+#: inc/template-tags.php:123
 msgid "1 Comment"
 msgstr "1 komento"
 
-#: inc/template-tags.php:119
-msgctxt "post author"
-msgid "By %s"
-msgstr "de %s"
-
-#: inc/template-tags.php:126
+#: inc/template-tags.php:123
 msgid "Leave a comment"
 msgstr "Komenti"
 
-#: inc/template-tags.php:115
-msgid "Tagged %1$s"
-msgstr "Etikedita per %1$s"
+#: inc/template-tags.php:116
+msgctxt "post author"
+msgid "By %s"
+msgstr "de %s"
 
 #: inc/template-tags.php:109
 msgid "Posted in %1$s"
@@ -140,19 +141,19 @@ msgstr ", "
 msgid "All %s posts"
 msgstr "Ĉiuj %s-afiŝoj"
 
-#: inc/template-tags.php:56
-msgctxt "Previous post link"
-msgid "<span class=\"meta-nav\">&larr;</span>&nbsp;%title"
-msgstr "<span class=\"meta-nav\">&larr;</span>&nbsp;%title"
+#: inc/template-tags.php:86
+msgid "Featured"
+msgstr "Elstarigita"
 
 #: inc/template-tags.php:57
 msgctxt "Next post link"
 msgid "%title&nbsp;<span class=\"meta-nav\">&rarr;</span>"
 msgstr "%title&nbsp;<span class=\"meta-nav\">&rarr;</span>"
 
-#: inc/template-tags.php:86
-msgid "Featured"
-msgstr "Elstarigita"
+#: inc/template-tags.php:56
+msgctxt "Previous post link"
+msgid "<span class=\"meta-nav\">&larr;</span>&nbsp;%title"
+msgstr "<span class=\"meta-nav\">&larr;</span>&nbsp;%title"
 
 #: inc/template-tags.php:52
 msgid "Post navigation"
@@ -170,17 +171,21 @@ msgstr "<span class=\"meta-nav\">&larr;</span> Pli malnovaj afiŝoj"
 msgid "Posts navigation"
 msgstr "Navigado tra afiŝoj"
 
+#: inc/extras.php:113
+msgid "Page %s"
+msgstr "Paĝo %s"
+
 #: inc/customizer.php:30
 msgid "Add a dark filter to featured images"
 msgstr "Aldonu malhelan filtron al elstarigitaj bildoj"
 
-#: inc/extras.php:107
-msgid "Page %s"
-msgstr "Paĝo %s"
-
 #: header.php:33
 msgid "Toggle Sidebar"
 msgstr "Baskuligi flankpanelon"
+
+#: header.php:22
+msgid "Skip to content"
+msgstr "Iri rekte al enhavo"
 
 #. translators: If there are characters in your language that are not supported
 #. * by Source Code Pro, translate this to 'off'. Do not translate into your
@@ -189,10 +194,6 @@ msgstr "Baskuligi flankpanelon"
 msgctxt "Source Code Pro font: on or off"
 msgid "on"
 msgstr "on"
-
-#: header.php:22
-msgid "Skip to content"
-msgstr "Iri rekte al enhavo"
 
 #. translators: If there are characters in your language that are not supported
 #. * by Merriweather, translate this to 'off'. Do not translate into your own
@@ -238,7 +239,7 @@ msgstr "http://wordpress.org/"
 msgid "Continue reading <span class=\"meta-nav\">&rarr;</span>"
 msgstr "Legi plu <span class=\"meta-nav\">&rarr;</span>"
 
-#: content-page.php:32 inc/template-tags.php:130
+#: content-page.php:32 inc/template-tags.php:127
 msgid "Edit"
 msgstr "Redakti"
 
@@ -289,41 +290,41 @@ msgid_plural "%1$s thoughts on &ldquo;%2$s&rdquo;"
 msgstr[0] "Unu penso pri &ldquo;%2$s&rdquo;"
 msgstr[1] "%1$s pensoj pri &ldquo;%2$s&rdquo;"
 
-#: author-bio.php:10
-msgid "Published by %s"
-msgstr "Publikita de %s"
-
 #: author-bio.php:27
 msgid "View all posts by %s"
 msgstr "Vidu ĉiujn afiŝojn de %s"
 
-#: inc/template-tags.php:183
+#: author-bio.php:10
+msgid "Published by %s"
+msgstr "Publikita de %s"
+
+#: inc/template-tags.php:180
 msgid "Archives"
 msgstr "Arkivoj"
 
-#: inc/template-tags.php:153
+#: inc/template-tags.php:150
 msgctxt "yearly archives date format"
 msgid "Y"
 msgstr "Y"
 
-#: inc/template-tags.php:153
+#: inc/template-tags.php:150
 msgid "Year: %s"
 msgstr "Jaro: %s"
 
-#: inc/template-tags.php:155
+#: inc/template-tags.php:152
 msgctxt "monthly archives date format"
 msgid "F Y"
 msgstr "F Y"
 
-#: inc/template-tags.php:155
+#: inc/template-tags.php:152
 msgid "Month: %s"
 msgstr "Monato: %s"
 
-#: inc/template-tags.php:157
+#: inc/template-tags.php:154
 msgid "Day: %s"
 msgstr "Tago: %s"
 
-#: inc/template-tags.php:151
+#: inc/template-tags.php:148
 msgid "Author: %s"
 msgstr "Aŭtoro: %s"
 
