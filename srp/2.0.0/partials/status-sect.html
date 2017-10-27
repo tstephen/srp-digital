@@ -4,7 +4,7 @@
     <tr><th>Revision: </th><td>{{surveyReturn.revision}}</td></tr>
     <tr><th>Created: </th><td>{{formatDateTime(surveyReturn.created)}}</td></tr>
     <tr><th>Updated: </th><td>{{formatDateTime(surveyReturn.lastUpdated)}}</td></tr>
-    <tr><th>Submitted: </th><td>{{formatDateTime(surveyReturn.submittedDate)}}</td></tr>
+    <tr><th>Submitted: </th><td>{{#surveyReturn.submittedDate}}{{formatDateTime(surveyReturn.submittedDate)}}{{else}}n/a <em>Will be submitted automatically on 1st Oct</em>{{/}}</td></tr>
     <tr><th>Submitted By: </th><td>{{#surveyReturn.submittedBy}}{{surveyReturn.submittedBy}}{{else}}n/a{{/}}</td></tr>
     <tr class="no-print"><th>Actions: </th>
       <td>
