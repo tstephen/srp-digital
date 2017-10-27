@@ -162,52 +162,54 @@
         {{/if}}
 
         {{#if isCcg()}}
-          <p>For commissioned services here is the sustainability comparitor for our providers:</p>
+          <p>For commissioned services here is the sustainability comparitor for our providers; <em>please note this is published a year in arrears</em>:</p>
           <table class="table table-striped">
             <thead>
               <tr>
-                <th>Organisation Name</th><th>SDMP</th><th>on track for 34% reduction</th>
-                <th>GCC</th><th>Healthy travel plan</th><th>Adaptation</th><th>SD Reporting score</th>
+                <th>Organisation Name</th>
+                <th>SDMP</th>
+                <th>Adaptation</th>
+                <th>on track for 34% reduction</th>
+                <th>GCC</th><th>Healthy transport plan</th><th>SD Reporting score</th>
               </tr>
             </thead>
             <tbody>
-              {{# surveyReturn.providers:i}}
+              {{# surveyReturn.orgs:i}}
                 <tr>
-                  <td>{{formatProviderAnswer(i,'ORG_NAME')}}</td>
-                  <td>{{#if formatProviderAnswer(i,'SDMP_CRMP')==true}}Yes{{elseif formatProviderAnswer(i,'SDMP_CRMP')=='n/a'}}n/a{{else}}No{{/if}}</td>
-                  <td>{{#if formatProviderAnswer(i,'ON_TRACK')==true}}Yes{{elseif formatProviderAnswer(i,'ON_TRACK')=='n/a'}}n/a{{else}}No{{/if}}</td>
-                  <td>{{#if formatProviderAnswer(i,'LAST_GCC_SCORE')}}{{formatProviderAnswer(i,'LAST_GCC_SCORE')}}{{else}}-{{/if}}</td>
-                  <td>{{#if formatProviderAnswer(i,'HEALTHY_TRANSPORT_PLAN')==true}}Yes{{elseif formatProviderAnswer(i,'HEALTHY_TRANSPORT_PLAN')=='n/a'}}n/a{{else}}No{{/if}}</td>
-                  <td>{{#if formatProviderAnswer(i,'ADAPTATION_PLAN_INC')==true}}Yes{{elseif formatProviderAnswer(i,'ADAPTATION_PLAN_INC')=='n/a'}}n/a{{else}}No{{/if}}</td>
-                  <td>{{#if formatProviderAnswer(i,'SDU_RPT_SCORE')}}{{formatProviderAnswer(i,'SDU_RPT_SCORE')}}{{else}}-{{/if}}</td>
+                  <td>{{name}}</td>
+                  <td>{{#if customFields.sdmp==null}}n/a{{elseif customFields.sdmp==true}}Yes{{else}}No{{/if}}</td>
+                  <td>{{#if customFields.adaptation==null}}n/a{{elseif customFields.adaptation==true}}Yes{{else}}No{{/if}}</td>
+                  <td>{{#if customFields.onTrack34Pct==null}}n/a{{else}}{{customFields.onTrack34Pct}}{{/if}}</td>
+                  <td>{{#if !customFields.gcc}}n/a{{else}}{{customFields.gcc}}{{/if}}</td>
+                  <td>{{#if customFields.healthyTP==null}}n/a{{elseif customFields.healthyTP==true}}Yes{{else}}No{{/if}}</td>
+                  <td>{{#if customFields.srScore==null}}n/a{{else}}{{customFields.srScore}} ({{customFields.srPct}}){{/if}}</td>
                 </tr>
               {{/}}
-              {{^surveyReturn.providers}}
+              {{^surveyReturn.orgs}}
                 <tr><td colspan="7">No provider data specified</td></tr>
               {{/}}
             </tbody>
           </table>
         {{else}}
-          <p>For commissioned services here is the sustainability comparitor for our CCGs:</p>
+          <p>For commissioned services here is the sustainability comparitor for our CCGs; <em>please note this is published a year in arrears</em>:</p>
           <table class="table table-striped">
             <thead>
               <tr>
                 <th>Organisation Name</th><th>SDMP</th>
-                <th>GCC</th><th>Adaptation</th><th>SD Reporting score</th>
+                <th>GCC</th><th>SD Reporting score</th>
               </tr>
             </thead>
             <tbody>
-              {{# surveyReturn.commissioners:i}}
+              {{# surveyReturn.orgs:i}}
                 <tr>
-                  <td>{{formatCommissionerAnswer(i,'ORG_NAME')}}</td>
-                  <td>{{#if formatCommissionerAnswer(i,'SDMP_CRMP')==true}}Yes{{elseif formatCommissionerAnswer(i,'SDMP_CRMP')=='n/a'}}n/a{{else}}No{{/if}}</td>
-                  <td>{{#if formatCommissionerAnswer(i,'LAST_GCC_SCORE')}}{{formatCommissionerAnswer(i,'LAST_GCC_SCORE')}}{{else}}-{{/if}}</td>
-                  <td>{{#if formatCommissionerAnswer(i,'ADAPTATION_PLAN_INC')==true}}Yes{{elseif formatCommissionerAnswer(i,'ADAPTATION_PLAN_INC')=='n/a'}}n/a{{else}}No{{/if}}</td>
-                  <td>{{#if formatCommissionerAnswer(i,'SDU_RPT_SCORE')}}{{formatCommissionerAnswer(i,'SDU_RPT_SCORE')}}{{else}}-{{/if}}</td>
+                  <td>{{name}}</td>
+                  <td>{{#if customFields.sdmp==null}}n/a{{elseif customFields.sdmp==true}}Yes{{else}}No{{/if}}</td>
+                  <td>{{#if !customFields.gcc}}n/a{{else}}{{customFields.gcc}}{{/if}}</td>
+                  <td>{{#if customFields.srScore==null}}n/a{{else}}{{customFields.srScore}} ({{customFields.srPct}}){{/if}}</td>
                 </tr>
               {{/}}
-              {{^surveyReturn.commissioners}}
-                <tr><td colspan="5">No commissioner data specified</td></tr>
+              {{^surveyReturn.orgs}}
+                <tr><td colspan="6">No commissioner data specified</td></tr>
               {{/}}
             </tbody>
           </table>
@@ -260,25 +262,27 @@
               <thead>
                 <tr>
                   <th>Organisation Name</th>
-                  <th>Energy use</th>
-                  <th>Energy use per WTE</th>
+                  <th>Building energy use</th>
+                  <th>Building energy use per WTE</th>
                   <th>Water</th>
                   <th>Water use per WTE</th>
-                  <!--th>Percent high cost waste</th>
-                  <th>Waste cost increase</th-->
+                  <th>Percent high cost waste</th>
+                  <th>Waste cost increase</th>
                 </tr>
               </thead>
               <tbody>
-                {{# surveyReturn.providers:i}}
+                {{# surveyReturn.orgs:i}}
                   <tr>
-                    <td>{{formatProviderAnswer(i,'ORG_NAME')}}</td>
-                    <td>{{formatProviderAnswer(i,'TOTAL_ENERGY')}}</td>
-                    <td>{{formatProviderAnswer(i,'TOTAL_ENERGY_BY_WTE')}}</td>
-                    <td>{{formatProviderAnswer(i,'WATER_VOL')}}</td>
-                    <td>{{formatProviderAnswer(i,'WATER_VOL_BY_WTE')}}</td>
+                    <td>{{name}}</td>
+                    <td>{{#if surveyReturn.orgs[i].customFields.energy==null}}n/a{{else}}{{surveyReturn.orgs[i].customFields.energy}}{{/if}}</td>
+                    <td>{{#if surveyReturn.orgs[i].customFields.energyFte==null}}n/a{{else}}{{surveyReturn.orgs[i].customFields.energyFte}}{{/if}}</td>
+                    <td>{{#if surveyReturn.orgs[i].customFields.water==null}}n/a{{else}}{{surveyReturn.orgs[i].customFields.water}}{{/if}}</td>
+                    <td>{{#if surveyReturn.orgs[i].customFields.waterFte==null}}n/a{{else}}{{surveyReturn.orgs[i].customFields.waterFte}}{{/if}}</td>
+                    <td>{{#if surveyReturn.orgs[i].customFields.waste==null}}n/a{{else}}{{surveyReturn.orgs[i].customFields.waste}}{{/if}}</td>
+                    <td>{{#if surveyReturn.orgs[i].customFields.wasteChange==null}}n/a{{else}}{{surveyReturn.orgs[i].customFields.wasteChange}}{{/if}}</td>
                   </tr>
                 {{/}}
-                {{^surveyReturn.providers}}
+                {{^surveyReturn.orgs}}
                   <tr><td colspan="8">No provider data specified</td></tr>
                 {{/}}
               </tbody>

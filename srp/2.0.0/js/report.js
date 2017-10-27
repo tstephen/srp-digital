@@ -19,6 +19,10 @@ var ractive = new BaseRactive({
   template: '#template',
   data: {
     narrativePrompt: 'Please click to insert a commentary on your performance in this area.',
+    orgAnswerNames: ['PROVIDER1_COMMISSIONED','PROVIDER2_COMMISSIONED','PROVIDER3_COMMISSIONED',
+        'PROVIDER4_COMMISSIONED','PROVIDER5_COMMISSIONED','PROVIDER6_COMMISSIONED',
+        'PROVIDER7_COMMISSIONED','PROVIDER8_COMMISSIONED','CCG1_SERVED',
+        'CCG2_SERVED','CCG3_SERVED','CCG4_SERVED','CCG5_SERVED','CCG6_SERVED'],
     requiredAnswers: ['ORG_CODE', 'ORG_NAME', 'ORG_TYPE', 'SDMP_CRMP', 'HEALTHY_TRANSPORT_PLAN', 'PROMOTE_HEALTHY_TRAVEL'],
     server: $env.server,
     survey: 'SDU-2016-17',
@@ -112,57 +116,6 @@ var ractive = new BaseRactive({
       success: ractive.fetchSuccessHandler
     });
   },
-  fetchCommissionerData: function() {
-    console.info('fetchCommissionerData');
-    $( "#ajax-loader" ).show();
-    ractive.set('surveyReturn.commissioners',[]);
-    for (var idx = 1 ; idx < 9 ; idx++) {
-      var commissioner = ractive.getAnswer('CCG'+idx+'_SERVED');
-      if (commissioner == undefined) continue;
-      $.ajax({
-        dataType: "json",
-        url: ractive.getServer()+'/returns/findCurrentBySurveyNameAndOrg/'+ractive.get('survey')+'/'+commissioner,
-        crossDomain: true,
-        headers: {
-          "X-Requested-With": "XMLHttpRequest",
-          "X-Authorization": "Bearer "+localStorage['token'],
-          "Cache-Control": "no-cache"
-        },
-        success: function( data ) {
-          ractive.set('saveObserver', false);
-          for (j = 0 ; j < ractive.get('surveyReturn.commissioners').length ; j++) {
-            if (ractive.get('surveyReturn.commissioners.'+j+'.org') == data.org) {
-              ractive.splice('surveyReturn.commissioners',j,1);
-            }
-          }
-          ractive.push('surveyReturn.commissioners', data);
-          $( "#ajax-loader" ).hide();
-          ractive.set('saveObserver', true);
-        },
-        error: function(jqXHR, textStatus, errorThrown ) {
-          var commissioner = this.url.substring(this.url.lastIndexOf('/')+1);
-          console.warn('Unable to fetch data for '+commissioner+'.'+jqXHR.status+':'+textStatus+','+errorThrown);
-          for (j = 0 ; j < ractive.get('surveyReturn.commissioners').length ; j++) {
-            if (ractive.get('surveyReturn.commissioners.'+j+'.orgName') == commissioner) {
-              ractive.splice('surveyReturn.commissioners',j,1);
-            }
-          }
-          ractive.push('surveyReturn.commissioners', {
-                orgName: commissioner, answers: [
-                  { question: { name: 'ORG_NAME' }, response: commissioner },
-                  { question: { name: 'SDMP_CRMP' }, response: 'n/a' },
-                  { question: { name: 'LAST_GCC_SCORE' }, response: 'n/a' },
-                  { question: { name: 'ADAPTATION_PLAN_INC' }, response: 'n/a' },
-                  { question: { name: 'SDU_RPT_SCORE' }, response: 'n/a' }
-                ]
-              });
-          ractive.showMessage('foo');
-          $( "#ajax-loader" ).hide();
-          ractive.set('saveObserver', true);
-        }
-      });
-    }
-  },
   fetchCsv: function(ctrl, callback) {
     var url = $(ctrl)
         .data('src').indexOf('//')==-1
@@ -200,18 +153,18 @@ var ractive = new BaseRactive({
       }
     });
   },
-  fetchProviderData: function() {
-    console.info('fetchProviderData');
+  fetchOrgData: function() {
+    console.info('fetchOrgData');
     $( "#ajax-loader" ).show();
     ractive.set('saveObserver', false);
-    ractive.set('surveyReturn.providers', []);
-    for (var idx = 1 ; idx < 9 ; idx++) {
+    ractive.set('surveyReturn.orgs', []);
+    for (var idx = 1 ; idx < ractive.get('orgAnswerNames').length ; idx++) {
       try {
-        var provider = ractive.getAnswer('PROVIDER'+idx+'_COMMISSIONED');
-        if (provider == undefined) continue;
+        var org = ractive.getAnswer(ractive.get('orgAnswerNames')[idx]);
+        if (org == undefined) continue;
         $.ajax({
           dataType: "json",
-          url: ractive.getServer()+'/returns/findCurrentBySurveyNameAndOrg/'+ractive.get('survey')+'/'+provider,
+          url: ractive.getServer()+'/'+ractive.get('tenant.id')+'/accounts/findByName/'+encodeURIComponent(org),
           crossDomain: true,
           headers: {
             "X-Requested-With": "XMLHttpRequest",
@@ -220,44 +173,24 @@ var ractive = new BaseRactive({
           },
           success: function( data ) {
             ractive.set('saveObserver', false);
-            for (j = 0 ; j < ractive.get('surveyReturn.providers').length ; j++) {
-              if (ractive.get('surveyReturn.providers.'+j+'.org') == data.org) {
-                ractive.splice('surveyReturn.providers',j,1);
+            for (j = 0 ; j < ractive.get('surveyReturn.orgs').length ; j++) {
+              if (ractive.get('surveyReturn.orgs.'+j+'.name') == data.name) {
+                ractive.splice('surveyReturn.orgs',j,1);
               }
             }
-            ractive.push('surveyReturn.providers', data);
+            ractive.push('surveyReturn.orgs', data);
             $( "#ajax-loader" ).hide();
             ractive.set('saveObserver', true);
           },
           error: function(jqXHR, textStatus, errorThrown ) {
-            var provider = this.url.substring(this.url.lastIndexOf('/')+1);
-            console.warn('Unable to fetch data for '+provider+'.'+jqXHR.status+':'+textStatus+','+errorThrown);
-            for (j = 0 ; j < ractive.get('surveyReturn.providers').length ; j++) {
-              if (ractive.get('surveyReturn.providers.'+j+'.orgName') == provider) {
-                ractive.splice('surveyReturn.providers',j,1);
-              }
-            }
-            ractive.push('surveyReturn.providers', {
-                  orgName: provider, answers: [
-                    { question: { name: 'ORG_NAME' }, response: provider },
-                    { question: { name: 'SDMP_CRMP' }, response: 'n/a' },
-                    { question: { name: 'ON_TRACK' }, response: 'n/a' },
-                    { question: { name: 'LAST_GCC_SCORE' }, response: 'n/a' },
-                    { question: { name: 'HEALTHY_TRANSPORT_PLAN' }, response: 'n/a' },
-                    { question: { name: 'ADAPTATION_PLAN_INC' }, response: 'n/a' },
-                    { question: { name: 'SDU_RPT_SCORE' }, response: 'n/a' },
-                    { question: { name: 'TOTAL_ENERGY' }, response: 'n/a' },
-                    { question: { name: 'TOTAL_ENERGY_BY_WTE' }, response: 'n/a' },
-                    { question: { name: 'WATER_VOL' }, response: 'n/a' },
-                    { question: { name: 'WATER_VOL_BY_WTE' }, response: 'n/a' }
-                  ]
-                });
+            var org = this.url.substring(this.url.lastIndexOf('/')+1);
+            console.warn('Unable to fetch data for '+org+'.'+jqXHR.status+':'+textStatus+','+errorThrown);
             $( "#ajax-loader" ).hide();
             ractive.set('saveObserver', true);
           }
         });
       } catch (e) {
-        console.info('Assume no provider at idx: '+idx);
+        console.info('Assume no org at idx: '+idx);
       }
     }
   },
@@ -265,8 +198,8 @@ var ractive = new BaseRactive({
     ractive.set('saveObserver', false);
     if (Array.isArray(data)) ractive.set('surveyReturn', data[0]);
     else ractive.set('surveyReturn', data);
-    if (ractive.isCcg()) ractive.fetchProviderData();
-    else ractive.fetchCommissionerData();
+    if (ractive.isCcg()) ractive.fetchOrgData();
+    else ractive.fetchOrgData();
     //if (ractive.hasRole('admin')) $('.admin').show();
     //if (ractive.hasRole('power-user')) $('.power-user').show();
     if (ractive.fetchCallbacks!=null) ractive.fetchCallbacks.fire();
