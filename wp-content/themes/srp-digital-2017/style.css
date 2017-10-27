@@ -166,9 +166,19 @@ h6 a {
 /*--------------------------------------------------------------
 3.0 Layout
 --------------------------------------------------------------*/
+.entry-footer:not(.empty) {
+  border-top: none;
+  padding-bottom: 0px;
+}
 .next-link .site-main,
 .previous-link .site-main {
   padding: 0 !important;
+}
+.post-navigation {
+  display: none;
+}
+.site-main {
+  margin-top: 0px !important;
 }
 .site-description {
   margin: 0.145em 0 -0.145em;
