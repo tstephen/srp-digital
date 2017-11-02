@@ -103,6 +103,7 @@
           {{else}}
             <p>
               <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/co2e-by-population.csv"
+                   data-y-axis-label="kg CO&#x2082;e"
                    class="rpt stacked" id="emissionsByPopulationGraph" width="600" height="400"></svg>
             </p>
             <div class="rpt table" id="co2eByPopulationRptTable"
@@ -111,12 +112,13 @@
         </section>
 
         <section id="totalEmissionsByFloorAreaSect">
-          <h3>Benchmarking by gross internal area (tCO<sub>2</sub>e/m<sup>2</sup>)</h3>
+          <h3>Benchmarking by gross internal area (kgCO<sub>2</sub>e/m<sup>2</sup>)</h3>
           {{#if formatAnswer('FLOOR_AREA') == ''}}
             <p>No floor area data available</p>
           {{else}}
             <p>
               <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/co2e-by-floor-area.csv"
+                   data-y-axis-label="kg CO&#x2082;e"
                    class="rpt stacked" id="emissionsByFloorAreaGraph" width="600" height="400"></svg>
             </p>
             <div class="rpt table" id="co2eByFloorAreaRptTable"
@@ -139,12 +141,13 @@
         </section>
 
         <section id="totalEmissionsByOccupiedBedsSect">
-          <h3>Benchmarking by number of occupied beds (tCO<sub>2</sub>e/bed)</h3>
+          <h3>Benchmarking by number of occupied beds (kgCO<sub>2</sub>e/bed)</h3>
           {{#if formatAnswer('NO_BEDS') == ''}}
             <p>No bed data available</p>
           {{else}}
             <p>
               <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/co2e-by-beds.csv"
+                   data-y-axis-label="kg CO&#x2082;e"
                    class="rpt stacked" id="emissionsByOccupiedBedsGraph" width="600" height="400"></svg>
             </p>
             <div class="rpt table" id="co2eByBedsRptTable"
@@ -153,12 +156,13 @@
         </section>
 
         <section id="totalEmissionsByPatientContactsSect">
-          <h3>Benchmarking by total patient contacts (tCO<sub>2</sub>e/patient contact)</h3>
+          <h3>Benchmarking by total patient contacts (kgCO<sub>2</sub>e/patient contact)</h3>
           {{#if formatAnswer('NO_PATIENT_CONTACTS') == ''}}
             <p>No patient contact data available</p>
           {{else}}
             <p>
               <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/co2e-by-patient-contacts.csv"
+                   data-y-axis-label="kg CO&#x2082;e"
                    class="rpt stacked" id="emissionsByPatientContactsGraph" width="600" height="400"></svg>
             </p>
             <div class="rpt table" id="co2eByPatientContactsRptTable"
@@ -167,12 +171,13 @@
         </section>
 
         <section id="totalEmissionsByOpExSect">
-          <h3>Benchmarking by operating expenditure (gCO<sub>2</sub>e/&pound;)</h3>
+          <h3>Benchmarking by operating expenditure (kgCO<sub>2</sub>e/&pound;)</h3>
           {{#if formatAnswer('OP_EX') == ''}}
             <p>No operating expenditure data available</p>
           {{else}}
             <p>
               <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/co2e-by-opex.csv"
+                   data-y-axis-label="kg CO&#x2082;e"
                    class="rpt stacked" id="emissionsByOpexGraph" width="600" height="400"></svg>
             </p>
             <div class="rpt table" id="co2eByOpexRptTable"

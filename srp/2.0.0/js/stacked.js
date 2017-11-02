@@ -39,6 +39,7 @@ function renderStacked(selector, csvString, options) {
   //data.sort(function(a, b) { return b.total - a.total; });
   x.domain(data.map(function(d) { return d.Period; }));
   y.domain([0, d3.max(data, function(d) { return d.total; })]).nice();
+  // y.domain([0, 0.05]);
   z.domain(keys);
 
   g.append("g")
