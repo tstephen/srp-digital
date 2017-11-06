@@ -26,6 +26,7 @@ Tags: light, blue, gray, white, one-column, responsive-layout, custom-menu, sing
   7.1 x <= 568px
   7.2 x <= 768px
   7.3 x <= 1024px
+8.0 Boardwalk parent theme overrides
 --------------------------------------------------------------*/
 
 /*--------------------------------------------------------------
@@ -190,6 +191,18 @@ h6 a {
 }
 .wf-active .site-description {
   margin: 0;
+}
+
+#loginSect {
+  margin-bottom: 60px;
+}
+#loginSect input {
+  margin: 10px 0;
+}
+#loginSect input[type='button'],
+#loginSect a {
+  clear: both;
+  float: right;
 }
 
 /*--------------------------------------------------------------
@@ -428,6 +441,7 @@ Footer widgets
 --------------------------------------------------------------*/
 footer .footer-widget-area {
   display:inline-flex;
+  min-height: 220px;
   width:100%;
 }
 footer .widget_nav_menu h4 {
@@ -546,3 +560,14 @@ footer .slide {
 @media screen and (min-width: 1024px) {
 
 }
+
+/* 8.0 BOARDWALK OVERRIDES, OMISSIONS */
+input[type="tel"] {
+  padding: 5px;
+  width: 100%;
+  background: #f2f2f2;
+  border: 1px solid #d9d9d9;
+  color: #000;
+  -webkit-appearance: none;
+}
+
