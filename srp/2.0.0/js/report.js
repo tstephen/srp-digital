@@ -461,4 +461,5 @@ $(document).ready(function() {
     ractive.showMessage('You have been successfully logged out');
   }
   $auth.addLoginCallback(ractive.fetch);
+  $auth.addLoginCallback(ractive.getProfile);
 })

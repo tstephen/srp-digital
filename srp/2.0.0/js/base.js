@@ -116,38 +116,30 @@ var BaseRactive = Ractive.extend({
     var parts = value.split("; " + name + "=");
     if (parts.length == 2) return parts.pop().split(";").shift();
   },
-  /*getProfile: function() {
-    console.log('getProfile: '+this.get('username'));
-    $auth.getProfile(this.get('username'));
-  },*/
-  /*handleError: function(jqXHR, textStatus, errorThrown) {
-    switch (jqXHR.status) {
-    case 400:
-      var msg = jqXHR.responseJSON == null ? textStatus+': '+errorThrown : errorThrown+': '+jqXHR.responseJSON.message;
-      ractive.showError(msg);
-      break;
-    case 401:
-    case 403:
-    case 405: / * Could also be a bug but in production we'll assume a timeout * /
-      ractive.showError("Session expired, please login again");
-      ractive.logout();
-      break;
-    case 404:
-      var path ='';
-      if (jqXHR.responseJSON != undefined) {
-        path = " '"+jqXHR.responseJSON.path+"'";
-      }
-      var msg = "That's odd, we can't find the page"+path+". Please let us know about this message";
-      console.error('msg:'+msg);
-      ractive.showError(msg);
-      break;
-    default:
-      var msg = "Bother! Something has gone wrong (code "+jqXHR.status+"): "+textStatus+':'+errorThrown;
-      console.error('msg:'+msg);
-      $( "#ajax-loader" ).hide();
-      ractive.showError(msg);
-    }
-  },*/
+  getProfile: function() {
+        if ($auth.loginInProgress) {
+                console.info('skip fetch profile while logging in');
+                return;
+              }
+        var username = $auth.getClaim('sub');
+        console.log('getProfile: '+username);
+        if (username) {
+                $.getJSON(ractive.getServer()+'/users/'+username, function(profile) {
+                    ractive.set('saveObserver', false);
+                    ractive.set('profile',profile);
+                    $('.profile-img').empty().append('<img class="img-rounded" src="//www.gravatar.com/avatar/'+ractive.hash(ractive.get('profile.email'))+'?s=34" title="'+ractive.get('profile.email')+'"/>');
+                    if (ractive.hasRole('super_admin')) $('.super-admin').show();
+                    ractive.loadTenantConfig(ractive.get('profile.tenant'));
+                    ractive.set('saveObserver', true);
+                  });
+              } else if (ractive.get('tenant') && $auth.isPublic(window.location.href)) {
+                var tenant = ractive.get('tenant.id');
+                console.warn('... page supplied default tenant:'+tenant);
+                ractive.loadTenantConfig(ractive.get('tenant.id'));
+              } else {
+                      $auth.showLogin();
+                    }
+      },
   getServer: function() {
     return ractive.get('server')==undefined ? '' : ractive.get('server');
   },
@@ -279,6 +271,23 @@ var BaseRactive = Ractive.extend({
     if (ractive == undefined || stdPartials == undefined) return;
     $.each(stdPartials, function(i,d) {
       ractive.loadStandardPartial(d.name, d.url);
+    });
+  },
+  loadTenantConfig: function(tenant) {
+    if ($auth.loginInProgress) {
+      console.info('skip tenant load while logging in');
+      return;
+    }
+    if (tenant==undefined || tenant=='undefined') $auth.showLogin();
+    console.info('loadTenantConfig:'+tenant);
+    $.getJSON(ractive.getServer()+'/tenants/'+tenant+'.json', function(response) {
+      //console.log('... response: '+JSON.stringify(response));
+      ractive.set('saveObserver', false);
+      ractive.set('tenant', response);
+      ractive.applyBranding();
+      ractive.initAutoComplete();
+      ractive.set('saveObserver', true);
+      if (ractive.tenantCallbacks!=undefined) ractive.tenantCallbacks.fire();
     });
   },
   parseDate: function(timeString) {
