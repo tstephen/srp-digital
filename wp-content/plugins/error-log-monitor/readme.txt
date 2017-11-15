@@ -2,8 +2,8 @@
 Contributors: whiteshadow
 Tags: dashboard widget, administration, error reporting, admin, maintenance, php
 Requires at least: 4.5
-Tested up to: 4.9-beta2
-Stable tag: 1.5.5
+Tested up to: 4.9
+Stable tag: 1.5.6
 
 Adds a Dashboard widget that displays the latest messages from your PHP error log. It can also send logged errors to email.
 
@@ -45,6 +45,10 @@ Follow these steps to install the plugin on your site:
 2. Dashboard widget configuration screen.
 
 == Changelog ==
+
+= 1.5.6 =
+* The dashboard widget now shows the log file size and the "Clear Log" button even when all entries are filtered out.
+* Tested with WP 4.9 and WP 5.0-alpha.
 
 = 1.5.5 =
 * Fixed two PHP notices: "Undefined index: schedule in [...]Cron.php on line 69" and "Undefined index: time in [...]Cron.php on line 76".

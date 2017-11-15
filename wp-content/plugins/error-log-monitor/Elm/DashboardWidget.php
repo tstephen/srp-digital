@@ -130,7 +130,9 @@ class Elm_DashboardWidget {
 			if ( $filteredLog->getSkippedEntryCount() > 0 ) {
 				$this->displaySkippedEntryCount($filteredLog);
 			}
+		}
 
+		if ( $log->getFileSize() > 0 ) {
 			echo '<p>';
 			printf(
 				/* translators: 1: Log file name, 2: Log file size */
