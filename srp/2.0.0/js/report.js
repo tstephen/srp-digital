@@ -103,6 +103,7 @@ var ractive = new BaseRactive({
   },
   fetch: function() {
     console.info('fetch...');
+    if ($auth.getClaim('org') == undefined) return;
     ractive.set('org',$auth.getClaim('org'));
     $.ajax({
       dataType: "json",

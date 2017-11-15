@@ -45,7 +45,7 @@ var $r = (function ($, ractive, $auth) {
   }
 
   function _fetchLists() {
-    if ($auth.loginInProgress) {
+    if ($auth.loginInProgress || localStorage['token'] == undefined) {
       console.info('skip fetch lists while logging in');
       $auth.addLoginCallback(_fetchLists);
       return;
@@ -64,7 +64,7 @@ var $r = (function ($, ractive, $auth) {
 
   // load return (fetching blank if needed)
   function _fetchReturn() {
-    if ($auth.loginInProgress) {
+    if ($auth.loginInProgress || localStorage['token'] == undefined) {
       console.info('skip fetch return while logging in');
       $auth.addLoginCallback(_fetchReturn);
       return;

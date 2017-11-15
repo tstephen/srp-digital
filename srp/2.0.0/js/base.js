@@ -53,14 +53,6 @@ var BaseRactive = Ractive.extend({
       if (ractive.get('tenant.theme.iconUrl')!=undefined) {
           $('link[rel="icon"]').attr('href',ractive.get('tenant.theme.iconUrl'));
       }
-      // ajax loader
-      if ($('#ajax-loader').length==0) $('body').append('<div id="ajax-loader"><img class="ajax-loader" src="'+ractive.getServer()+'/images/ajax-loader.gif" alt="Loading..."/></div>');
-      $( document ).ajaxStart(function() {
-        $( "#ajax-loader" ).show();
-      });
-      $( document ).ajaxStop(function() {
-        $( "#ajax-loader" ).hide();
-      });
       ractive.initContentEditable();// required here for the tenant switcher
       // tenant partial templates
       $.each(ractive.get('tenant').partials, function(i,d) {
@@ -117,29 +109,29 @@ var BaseRactive = Ractive.extend({
     if (parts.length == 2) return parts.pop().split(";").shift();
   },
   getProfile: function() {
-        if ($auth.loginInProgress) {
-                console.info('skip fetch profile while logging in');
-                return;
-              }
-        var username = $auth.getClaim('sub');
-        console.log('getProfile: '+username);
-        if (username) {
-                $.getJSON(ractive.getServer()+'/users/'+username, function(profile) {
-                    ractive.set('saveObserver', false);
-                    ractive.set('profile',profile);
-                    $('.profile-img').empty().append('<img class="img-rounded" src="//www.gravatar.com/avatar/'+ractive.hash(ractive.get('profile.email'))+'?s=34" title="'+ractive.get('profile.email')+'"/>');
-                    if (ractive.hasRole('super_admin')) $('.super-admin').show();
-                    ractive.loadTenantConfig(ractive.get('profile.tenant'));
-                    ractive.set('saveObserver', true);
-                  });
-              } else if (ractive.get('tenant') && $auth.isPublic(window.location.href)) {
-                var tenant = ractive.get('tenant.id');
-                console.warn('... page supplied default tenant:'+tenant);
-                ractive.loadTenantConfig(ractive.get('tenant.id'));
-              } else {
-                      $auth.showLogin();
-                    }
-      },
+    if ($auth.loginInProgress) {
+      console.info('skip fetch profile while logging in');
+      return;
+    }
+    var username = $auth.getClaim('sub');
+    console.log('getProfile: '+username);
+    if (username) {
+      $.getJSON(ractive.getServer()+'/users/'+username, function(profile) {
+          ractive.set('saveObserver', false);
+          ractive.set('profile',profile);
+          $('.profile-img').empty().append('<img class="img-rounded" src="//www.gravatar.com/avatar/'+ractive.hash(ractive.get('profile.email'))+'?s=34" title="'+ractive.get('profile.email')+'"/>');
+          if (ractive.hasRole('super_admin')) $('.super-admin').show();
+          ractive.loadTenantConfig(ractive.get('profile.tenant'));
+          ractive.set('saveObserver', true);
+        });
+      } else if (ractive.get('tenant') && $auth.isPublic(window.location.href)) {
+        var tenant = ractive.get('tenant.id');
+        console.warn('... page supplied default tenant:'+tenant);
+        ractive.loadTenantConfig(ractive.get('tenant.id'));
+      } else {
+        $auth.showLogin();
+      }
+  },
   getServer: function() {
     return ractive.get('server')==undefined ? '' : ractive.get('server');
   },
@@ -289,6 +281,9 @@ var BaseRactive = Ractive.extend({
       ractive.set('saveObserver', true);
       if (ractive.tenantCallbacks!=undefined) ractive.tenantCallbacks.fire();
     });
+  },
+  logout: function() {
+    $auth.logout();
   },
   parseDate: function(timeString) {
     var d = new Date(timeString);
@@ -595,7 +590,17 @@ $(document).ready(function() {
     })();
   }
 
+  // ajax loader
+  if ($('#ajax-loader').length==0) $('body').append('<div id="ajax-loader"><img class="ajax-loader" src="'+ractive.getServer()+'/images/ajax-loader.gif" alt="Loading..."/></div>');
+  $( document ).ajaxStart(function() {
+    $( "#ajax-loader" ).show();
+  });
+  $( document ).ajaxStop(function() {
+    $( "#ajax-loader" ).hide();
+  });
+
   ractive.loadStandardPartials(ractive.get('stdPartials'));
+  // $auth.addLoginCallback(ractive.getProfile);
 
   $( document ).ajaxComplete(function( event, jqXHR, ajaxOptions ) {
     if (jqXHR.status > 0) ractive.showReconnected();

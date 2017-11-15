@@ -174,9 +174,10 @@ form .criteria input {
 .form li {
   margin: 5px 0 5px;
 }
+/* breaks layout on contacts page, remove when find why here and fix
 .form label, .form input {
   display:block;
-}
+}*/
 .form label.required::after {
   color: red;
   content: '*';
