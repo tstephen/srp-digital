@@ -95,16 +95,16 @@
         </p>
         <p>
           {{#if formatAnswer('GCC_USER')}}
-            One of the ways in which we measure our impact as an organisation on corporate social responsibility is through the use of the Good Corporate Citizenship (GCC) tool.
+            One of the ways in which we measure our impact as an organisation on corporate social responsibility is through the use of the <a href="https://www.sduhealth.org.uk/sdat/">Sustainable Development Assessment Tool</a> (SDAT) tool.
             {{#if formatAnswer('LAST_GCC_DATE')!=undefined}}
-              The last time we used the GCC self assessment was in {{formatAnswer('LAST_GCC_DATE')}}
+              The last time we used the SDAT self assessment was in {{formatAnswer('LAST_GCC_DATE')}}
               scoring {{formatAnswer('LAST_GCC_SCORE')}}.
             {{/if}}
             {{#if formatAnswer('promoteSustainabilityToStaff')}}
               As an organisation that acknowledges its responsibility towards creating a sustainable future, we help acheive that goal by running awareness campaigns that promote the benefits of sustainability to our staff.
             {{/if}}
           {{else}}
-            We do not currently use the Good Corporate Citizenship (GCC) tool or run awareness campaigns promoting sustainability.
+            We do not currently use the <a href="https://www.sduhealth.org.uk/sdat/">Sustainable Development Assessment Tool</a> (SDAT) tool or run awareness campaigns promoting sustainability.
           {{/if}}
         </p>
         <p>
@@ -122,6 +122,60 @@
             area.
           {{/if}}
         </p>
+        {{#formatAnswer('SDG_STARTING')==''}}
+          <p>Our organisation is not yet <em>starting</em> to contribute to any of the Sustainable Development Goals (SDGs).</p>
+        {{/}}
+        {{#formatAnswer('SDG_STARTING')!=''}}
+          <p>Our organisation is <em>starting</em> to contribute to the following Sustainable Development Goals (SDGs).</p>
+          <div class="container-fluid sdgs">
+            {{#formatAnswer('SDG_STARTING').indexOf('No poverty')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-01-180x180.png" alt="Icon for 'No poverty' goal" width="180px"/></div>{{/}}
+            {{#formatAnswer('SDG_STARTING').indexOf('Zero hunger')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-02-180x180.png" alt="Icon for 'Zero hunger' goal"/></div>{{/}}
+            {{#formatAnswer('SDG_STARTING').indexOf('Good health')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-03-180x180.png" alt="Icon for 'Good health and well-being' goal"/></div>{{/}}
+            {{#formatAnswer('SDG_STARTING').indexOf('Quality education')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-04-180x180.png" alt="Icon for 'Quality education' goal"/></div>{{/}}
+            {{#formatAnswer('SDG_STARTING').indexOf('Gender equality')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-05-180x180.png" alt="Icon for 'Clean water and sannitation' goal"/></div>{{/}}
+            {{#formatAnswer('SDG_STARTING').indexOf('Clean water and sanitation')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-06-180x180.png" alt="Icon for 'Clean water and sanitation' goal"/></div>{{/}}
+            {{#formatAnswer('SDG_STARTING').indexOf('Affordable and clean energy')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-07-180x180.png" alt="Icon for 'Affordable and clean energy' goal"/></div>{{/}}
+            {{#formatAnswer('SDG_STARTING').indexOf('Decent work and economic growth')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-08-180x180.png" alt="Icon for 'Decent work and economic growth' goal"/></div>{{/}}
+            {{#formatAnswer('SDG_STARTING').indexOf('Industry, innovation and infrastructure')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-09-180x180.png" alt="Icon for 'Industry, innovation and infrastructure' goal"/></div>{{/}}
+            {{#formatAnswer('SDG_STARTING').indexOf('Reduced inequalities')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-10-180x180.png" alt="Icon for 'Reduced inequalities' goal"/></div>{{/}}
+            {{#formatAnswer('SDG_STARTING').indexOf('Sustainable cities and communities')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-11-180x180.png" alt="Icon for 'Sustainable cities and communities' goal"/></div>{{/}}
+            {{#formatAnswer('SDG_STARTING').indexOf('Climate action')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-12-180x180.png" alt="Icon for 'Climate action' goal"/></div>{{/}}
+            {{#formatAnswer('SDG_STARTING').indexOf('Responsible consumption and production')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-13-180x180.png" alt="Icon for 'Responsible consumption and production' goal"/></div>{{/}}
+            {{#formatAnswer('SDG_STARTING').indexOf('Life below water')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-14-180x180.png" alt="Icon for 'Life below water' goal"/></div>{{/}}
+            {{#formatAnswer('SDG_STARTING').indexOf('Life on land')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-15-180x180.png" alt="Icon for 'Life on land' goal"/></div>{{/}}
+            {{#formatAnswer('SDG_STARTING').indexOf('Peace, justice and strong institutions')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-16-180x180.png" alt="Icon for 'Peace, justice and strong institutions' goal"/></div>{{/}}
+            {{#formatAnswer('SDG_STARTING').indexOf('Partnerships for the goals')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-17-180x180.png" alt="Icon for 'Partnerships for the goals' goal"/></div>{{/}}
+            <div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_Logo_No-UN-Emblem-02-180x180.png" alt="Icon for Sustainable Development Goals"/></div>
+          </div>
+        {{/}}
+        {{#formatAnswer('SDG_CLEAR')==''}}
+          <p>Our organisation is not yet <em>clearly</em> contributing to any of the Sustainable Development Goals (SDGs).</p>
+        {{/}}
+        {{#formatAnswer('SDG_CLEAR')!=''}}
+        <p>
+          Our organisation is <em>clearly</em> contributing to the following Sustainable Development Goals (SDGs). 
+        </p>
+        <div class="container-fluid sdgs">
+          {{#formatAnswer('SDG_CLEAR').indexOf('No poverty')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-01-180x180.png" alt="Icon for 'No poverty' goal"/></div>{{/}}
+          {{#formatAnswer('SDG_CLEAR').indexOf('Zero hunger')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-02-180x180.png" alt="Icon for 'Zero hunger' goal"/></div>{{/}}
+          {{#formatAnswer('SDG_CLEAR').indexOf('Good health')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-03-180x180.png" alt="Icon for 'Good health and well-being' goal"/></div>{{/}}
+          {{#formatAnswer('SDG_CLEAR').indexOf('Quality education')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-04-180x180.png" alt="Icon for 'Quality education' goal"/></div>{{/}}
+          {{#formatAnswer('SDG_CLEAR').indexOf('Gender equality')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-05-180x180.png" alt="Icon for 'Clean water and sannitation' goal"/></div>{{/}}
+          {{#formatAnswer('SDG_CLEAR').indexOf('Clean water and sanitation')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-06-180x180.png" alt="Icon for 'Clean water and sanitation' goal"/></div>{{/}}
+          {{#formatAnswer('SDG_CLEAR').indexOf('Affordable and clean energy')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-07-180x180.png" alt="Icon for 'Affordable and clean energy' goal"/></div>{{/}}
+          {{#formatAnswer('SDG_CLEAR').indexOf('Decent work and economic growth')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-08-180x180.png" alt="Icon for 'Decent work and economic growth' goal"/></div>{{/}}
+          {{#formatAnswer('SDG_CLEAR').indexOf('Industry, innovation and infrastructure')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-09-180x180.png" alt="Icon for 'Industry, innovation and infrastructure' goal"/></div>{{/}}
+          {{#formatAnswer('SDG_CLEAR').indexOf('Reduced inequalities')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-10-180x180.png" alt="Icon for 'Reduced inequalities' goal"/></div>{{/}}
+          {{#formatAnswer('SDG_CLEAR').indexOf('Sustainable cities and communities')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-11-180x180.png" alt="Icon for 'Sustainable cities and communities' goal"/></div>{{/}}
+          {{#formatAnswer('SDG_CLEAR').indexOf('Climate action')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-12-180x180.png" alt="Icon for 'Climate action' goal"/></div>{{/}}
+          {{#formatAnswer('SDG_CLEAR').indexOf('Responsible consumption and production')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-13-180x180.png" alt="Icon for 'Responsible consumption and production' goal"/></div>{{/}}
+          {{#formatAnswer('SDG_CLEAR').indexOf('Life below water')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-14-180x180.png" alt="Icon for 'Life below water' goal"/></div>{{/}}
+          {{#formatAnswer('SDG_CLEAR').indexOf('Life on land')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-15-180x180.png" alt="Icon for 'Life on land' goal"/></div>{{/}}
+          {{#formatAnswer('SDG_CLEAR').indexOf('Peace, justice and strong institutions')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-16-180x180.png" alt="Icon for 'Peace, justice and strong institutions' goal"/></div>{{/}}
+          {{#formatAnswer('SDG_CLEAR').indexOf('Partnerships for the goals')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-17-180x180.png" alt="Icon for 'Partnerships for the goals' goal"/></div>{{/}}
+          <div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_Logo_No-UN-Emblem-02-180x180.png" alt="Icon for Sustainable Development Goals"/></div>
+        </div>
+        {{/}}
         <p>
           {{#if formatAnswer('QUANT_ES_IMPACTS')}}
             {{formatAnswer('QUANT_ES_IMPACTS')}}
@@ -138,10 +192,18 @@
         </p>
         <p>
           {{#if formatAnswer('SOCIAL_VALUE')}}
-            Our statement on Public Services (Social Value) Act {{formatAnswer('SOCIAL_VALUE')}}
+            Our statement on Public Services (Social Value) Act is...{{formatAnswer('SOCIAL_VALUE')}}
           {{else}}
             We have not currently issued a statement on meeting the requirements
             of the Public Services (Social Value) Act.
+          {{/if}}
+        </p>
+        <p>
+          {{#if formatAnswer('BIODIVERSITY')}}
+            {{formatAnswer('BIODIVERSITY')}}
+          {{else}}
+            We have not currently issued a statement on policy or initiatives
+            related to improving biodiversity and maximising the value of access to green space.
           {{/if}}
         </p>
       </section>
@@ -170,7 +232,7 @@
                 <th>SDMP</th>
                 <th>Adaptation</th>
                 <th>on track for 34% reduction</th>
-                <th>GCC</th><th>Healthy transport plan</th><th>SD Reporting score</th>
+                <th>SDAT</th><th>Healthy transport plan</th><th>SD Reporting score</th>
               </tr>
             </thead>
             <tbody>
@@ -196,7 +258,7 @@
             <thead>
               <tr>
                 <th>Organisation Name</th><th>SDMP</th>
-                <th>GCC</th><th>SD Reporting score</th>
+                <th>SDAT</th><th>SD Reporting score</th>
               </tr>
             </thead>
             <tbody>

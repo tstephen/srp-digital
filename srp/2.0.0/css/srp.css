@@ -307,6 +307,14 @@ text.inverse {
 }
 /************* END CHARTS INC MACC *****************/
 
+/********************** START SDGs *****************/
+.container-fluid.sdgs .col-xs-2 {
+  padding-right: 5px;
+  padding-left: 0px;
+  padding-bottom: 5px;
+}
+/********************** END SDGs *******************/
+
 /************* START PRINT MEDIA *******************/
 @media print {
   .controls,
