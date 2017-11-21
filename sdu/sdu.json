@@ -98,7 +98,7 @@
     { "name": "Merge memo", "ref": "MergeMemoTemplate", "url": "processes/link/omny/memos/MergeMemoTemplate.bpmn" },
     { "name": "Raise Ticket", "ref": "RaiseTicket", "url": "processes/link/omny/support/RaiseTicket.bpmn" },
     { "name": "Record an enquiry", "ref": "RecordEnquiry", "url": "processes/link/omny/website/RecordEnquiry.bpmn" },
-    { "name": "Register a new user", "ref": "RegisterOmnyContact", "url": "processes/link/omny/website/RegisterOmnyContact.bpmn" },
+    { "name": "Register a new user", "ref": "RegisterOmnyContact", "url": "processes/link/omny/acctmgmt/RegisterOmnyContact.bpmn" },
     { "name": "Reset user's password", "ref": "ResetPassword", "url": "processes/link/omny/support/ResetPassword.bpmn" },
     { "name": "Select enquiry response", "ref": "SelectEnquiryResponse", "url": "processes/link/omny/mail/SelectDefaultEnquiryResponse.bpmn" },
     { "name": "Send memo", "ref": "SendMemo", "url": "processes/link/omny/memos/SendMemo.bpmn" },
@@ -109,7 +109,7 @@
     { "name": "Restate sustainability return", "ref": "RestateSustainabilityReturn", "url": "processes/digital/srp/returns/RestateSustainabilityReturn.bpmn" },
     { "name": "Submit sustainability return", "ref": "SubmitSustainabilityReturn", "url": "processes/digital/srp/returns/SubmitSustainabilityReturn.bpmn" },
     { "name": "Record abatement plan", "ref": "RecordAbatementPlan", "url": "processes/digital/srp/macc/RecordAbatementPlan.bpmn" },
-    { "name": "Catch All", "ref": "CatchAllProcess", "url": "processes/digital/support/CatchAllProcess.bpmn" }
+    { "name": "Catch All", "ref": "CatchAllProcess", "url": "processes/digital/srp/support/CatchAllProcess.bpmn" }
   ],
   "strings": {
     "account": "Organisation",
