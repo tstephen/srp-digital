@@ -20,6 +20,10 @@
     "accentColor":"#99c344",
     "iconColor":"#99c344"
   },
+  "accountActions": [
+    { "name": "Add task", "ref": "SimpleToDo", "url": true },
+    { "name": "Add contact", "ref": "AddContactToAccount", "url": true }
+  ],
   "accountFields": [
     { "hint": "", "label": "Organisation Code", "name": "orgCode" },
     { "hint": "", "label": "NHS England Area", "name": "nhsEnglandArea", "type": "list" },
@@ -44,7 +48,6 @@
     { "label": "Interventions", "name": "interventions" }
   ],
   "contactFields": [
-    { "label": "License Agreed", "key": "licenseAgreed", "type": "checkbox" }
   ],
   "contactActions": [
     { "name": "Send email", "ref": "SendMemo", "url": true  },
@@ -79,6 +82,7 @@
     { "name": "sduAcute-MediumExtension", "url": "https://api.srp.digital/partials/account-extension.html"},
     { "name": "sduAcute-SmallExtension", "url": "https://api.srp.digital/partials/account-extension.html"},
     { "name": "sduAcute-TeachingExtension", "url": "https://api.srp.digital/partials/account-extension.html"},
+    { "name": "sduAddContactToAccount", "url": "https://api.srp.digital/partials/add-contact-to-account.html" },
     { "name": "sduAdultSocialCareExtension", "url": "https://api.srp.digital/partials/account-extension.html"},
     { "name": "sduAmbulanceExtension", "url": "https://api.srp.digital/partials/account-extension.html"},
     { "name": "sduClinicalCommissioningGroupExtension", "url": "https://api.srp.digital/partials/account-extension.html"},
@@ -93,6 +97,7 @@
   ],
   "processes": [
     { "name": "Add Activity To Contact", "ref": "AddActivityToContact", "url": "processes/link/omny/custmgmt/AddActivityToContact.bpmn" },
+    { "name": "Add contact to account", "ref": "AddContactToAccount", "url": "processes/link/omny/custmgmt/AddContactToAccount.bpmn" },
     { "name": "Add Note To Contact", "ref": "AddNoteToContact", "url": "processes/link/omny/custmgmt/AddNoteToContact.bpmn" },
     { "name": "Create Contact and Account", "ref": "CreateContactAndAccount", "url": "processes/link/omny/custmgmt/CreateContactAccountAndOrder.bpmn" },
     { "name": "Merge memo", "ref": "MergeMemoTemplate", "url": "processes/link/omny/memos/MergeMemoTemplate.bpmn" },
