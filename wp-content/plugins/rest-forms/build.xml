@@ -8,7 +8,7 @@
   <property name="version" value="${build.major}.${build.minor}.${build.patch}"/>
   <property name="yuicompressor-download-url" value="http://central.maven.org/maven2/com/yahoo/platform/yui/yuicompressor/2.3.6/yuicompressor-2.3.6.jar"/>
   <property name="yuicompressor-local-path" value="${m2_repo}/com/yahoo/platform/yui/yuicompressor/2.3.6/yuicompressor-2.3.6.jar"/>
-  <property name="zipName" value="${ant.project.name}.zip"/>
+  <property name="zipName" value="${ant.project.name}-${version}.zip"/>
 
   <target name="clean">
     <delete file="${dist}/${zipName}"/>
@@ -22,11 +22,11 @@
   </target>
 
   <target name="bump">
-    <copy file="js/${ant.project.name}-${build.lastReleased}.js" 
-          tofile="js/${ant.project.name}-${version}.js"/>
+    <copy file="${build.lastReleased}/js/${ant.project.name}.js" 
+          tofile="${version}/js/${ant.project.name}.js"/>
     <exec executable="git">
       <arg value="add"/>
-      <arg value="js/${ant.project.name}-${version}.js"/>
+      <arg value="${version}/js/${ant.project.name}.js"/>
     </exec>
 
     <!--
@@ -39,17 +39,17 @@
     -->
 
     <copy file="css/admin-${build.lastReleased}.css" 
-          tofile="css/admin-${version}.css"/>
+          tofile="${version}/css/admin.css"/>
     <exec executable="git">
       <arg value="add"/>
-      <arg value="css/admin-${version}.css"/>
+      <arg value="${version}/css/admin.css"/>
     </exec>
 
-    <copy file="css/frontend-${build.lastReleased}.css" 
-          tofile="css/frontend-${version}.css"/>
+    <copy file="${${build.lastReleased}/css/frontend.css" 
+          tofile="${version}/css/frontend.css"/>
     <exec executable="git">
       <arg value="add"/>
-      <arg value="css/frontend-${version}.css"/>
+      <arg value="${version}/css/frontend.css"/>
     </exec>
 
     <replaceregexp file="${basedir}/${ant.project.name}.php" 
@@ -73,36 +73,38 @@
   </target>
 
   <target name="compile">
-    <echo message="Compressing Javascript files in folder: ${src}/js" />
+    <echo message="Compressing Javascript files in folder: ${src}/${version}/js" />
     <java jar="${yuicompressor-local-path}" fork="true">
         <!-- input path for JS files -->
-        <arg value="${src}/js/${ant.project.name}-${version}.js" />
+        <arg value="${src}/${version}/js/admin.js" />
         <!--<arg value="-v" /> --><!-- Turn on verbose -->
         <arg value="-o" />
         <!-- output path for JS files -->
-        <arg value="${src}/js/${ant.project.name}-${version}.min.js" /> 
+        <arg value="${src}/${version}/js/admin.min.js" /> 
         <classpath>
           <pathelement location="${yuicompressor-local-path}"/>
         </classpath>
     </java>
-    <!--
     <java jar="${yuicompressor-local-path}" fork="true">
-        <arg value="${src}/js/workflow-${version}.js" />
+        <!-- input path for JS files -->
+        <arg value="${src}/${version}/js/frontend.js" />
+        <!--<arg value="-v" /> --><!-- Turn on verbose -->
         <arg value="-o" />
-        <arg value="${src}/js/workflow-${version}.min.js" /> 
+        <!-- output path for JS files -->
+        <arg value="${src}/${version}/js/frontend.min.js" /> 
         <classpath>
           <pathelement location="${yuicompressor-local-path}"/>
         </classpath>
     </java>
-    -->
   </target>
 
   <target name="package" depends="compile">
     <zip destfile="${dist}/${zipName}"
-         basedir="${src}"
          excludes=".svn/**/*, jasmine*, **/*~, **/*.log, **/*.swp, **/*.xcf"
          update="true"
-    />
+    >
+      <zipfileset dir="${src}" prefix="rest-forms"/>
+    </zip>
   </target>
 
 </project>

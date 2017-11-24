@@ -1,4 +1,4 @@
-=== Plugin Name ===
+=== Omny Link Forms ===
 Contributors: tstephenson
 Tags: forms, ajax, OmnyLink
 Requires at least: 4.0
@@ -29,8 +29,17 @@ The plugin is provided via the WordPress.org repository as well as as a zip file
 
 You can access the plugin's settings under in the Omny sub-menu of WordPress' settings menu in the Dashboard. The following options exist:
 
-1. Mail addressee: A comma-separated list of email addresses that forms will be sent to when configured in Standalone mode.
+=== General settings ===
+
 1. Enable debug output: If checked the plugin will write various messages to the PHP error log describing what it is doing. It is adviseable to turn this off once forms are working as it canbe quite verbose.
+1. AJAX proxy path: The location of the WordPress ajax handler, only needed if WordPress is running in a non-standard directory (not wp-admin)
+
+=== Standalone settings ===
+
+1. Mail addressee: A comma-separated list of email addresses that forms will be sent to when configured in Standalone mode.
+
+=== Omny Link settings ===
+
 1. API Server: This should only be changed if you are running your own Omny server, in which case refer to the developer documentation that accompanies that.
 2. API Key and API Secret: As with other API services, before you can send forms for processing by the Omny server you need to obtain a Key and Secret. Apply for these at http://omny.link/apply-for-key. Take care to protect these.
 3. Message namespace: Along with the API key and secret you will be provided a message namespace. This is used to route the messages you send to the Ommny server to the correct business processes.
@@ -43,6 +52,15 @@ In addition, when used in Standalone mode, the plugin will send mail from the ma
 == Creating a form ==
 
 Once installed you will see a menu entry in the WordPress dashboard named 'Omny Link Forms'. This allows you to create a form as a custom page type. In essence, these forms are simply HTML 5 forms with some shortcuts triggered by adding the 'decorate' class to input tags.
+
+There are two 'helpers' to assist with building the form fields:
+
+* 'Pre-defined fields' palette: This allows you to use fields known to the Omny Link server directly, simply choose the field you want and click 'Add control'.
+* 'Custom fields' palette: For all other fields, you will need to specify several characteristics in the provided fields.
+
+Be aware that the form does not render exactly as it will on the site within the design editor, so it is advisable to embed the form into a page ealry so that you can see how it truly appears.
+
+== Embedding a form into a post or page ==
 
 There are two 'helpers' to assist with building the form fields:
 
@@ -86,7 +104,13 @@ When authoring the form you will see in your browser's address bar something lik
 
 = How can I access the form's content to provide custom post-processing? =
 
-The plugin is configured to send the form content to the Omny Link workflow server on submit. This provides a separation of concerns keeping the WordPress site clean and focused on presentation. However in some cases you may want to perform some limited processing in the WordPress site in response to the form submission. For this case you may register an AJAX action to be called. The form's JSON payload may be accessed as $_POST['json'].
+The plugin is intended to send the form content to the Omny Link workflow server on submit. This keeps the WordPress site clean and focused on presentation. However in some cases you may want to perform some limited processing in the WordPress site in response to the form submission. For this case you may register an AJAX action to be called.
+
+To use this callback behaviour:
+ * Write an AJAX action as described here: [here](https://codex.wordpress.org/Plugin_API/Action_Reference/wp_ajax_(action))
+ * Tell the shortcode to invoke this by specifying the callback="action" attribute.
+
+The form's JSON payload may be accessed as $_REQUEST['json'].
 
 == Screenshots ==
 
@@ -96,11 +120,24 @@ The plugin is configured to send the form content to the Omny Link workflow serv
 
 == Changelog ==
 
-= 0.11.1 =
-Fix proxy support for sendIntermediateEvent
+= 1.0.0.alpha6 = 
 
-= 0.11.0 =
-HTML5 polyfill for Firefox and IE date picker support (care of webshim)
+- #25 add option to specify non-standard location of admin-ajax.php
+- #13 escape apostrophe in submitted JSON (e.g. O'Flynn) and normalise accented chars
+- prefer home_url to get_site_url for HTTP Origin request header
+
+= 1.0.0-a3 =
+
+- Restructure to split front end and admin scripts for smaller size
+- #24 fix bug with back button
+- #23 fix bug with radio controls causing lower controls to not bind
+
+= 1.0.0-a2 =
+
+- HTTP(s) agnostic URLs
+
+= 1.0.0-a1 =
+
 Form controls: radio and checkbox support added; select allowed to specify options as single attribute for greater concision
 Wordpress Widgets: Top tasks and Events
 Set business description as shortcode parameter

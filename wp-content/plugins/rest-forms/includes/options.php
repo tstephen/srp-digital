@@ -60,6 +60,13 @@ class FormsOptions {
       return $this->options['mail_addressee'];
     }
 
+    public function get_proxy_path() {
+      if (empty($this->options['proxy_path']))
+        return '/wp-admin/admin-ajax.php';
+      else
+        return $this->options['proxy_path'];
+    }
+
     public function get_message_namespace() {
       return $this->options['message_namespace'];
     }
@@ -86,7 +93,7 @@ class FormsOptions {
         // This page will be under "Settings"
         add_options_page(
             P_NAME.' Settings Admin',
-            P_NAME.' Settings',
+            P_NAME,
             'manage_options',
             'p_settings_admin',
             array( $this, 'p_create_admin_page' )
@@ -131,18 +138,18 @@ class FormsOptions {
             'p_settings_admin' // Page
         );
 
-        /*add_settings_field(
-            'debug', // ID
-            'Enable debug output', // Label
-            array( $this, 'p_debug_callback' ), // Callback
-            'p_settings_admin', // Page
-            'p_setting_section_general' // Section
-        );*/
-
         add_settings_field(
             'log_level', // ID
             'Enable logging level', // Label
             array( $this, 'p_log_level_callback' ), // Callback
+            'p_settings_admin', // Page
+            'p_setting_section_general' // Section
+        );
+
+        add_settings_field(
+            'proxy_path', // ID
+            'AJAX proxy path', // Label
+            array( $this, 'p_proxy_path_callback' ), // Callback
             'p_settings_admin', // Page
             'p_setting_section_general' // Section
         );
@@ -242,6 +249,11 @@ class FormsOptions {
             $new_input['log_level'] = $input['log_level'] ;
         }
 
+        if( isset( $input['proxy_path'] ) )
+            $new_input['proxy_path'] = sanitize_text_field( $input['proxy_path'] );
+        else
+            $new_input['proxy_path'] = '/wp-admin/admin-ajax.php';
+
         if( isset( $input['message_namespace'] ) )
             $new_input['message_namespace'] = sanitize_text_field( $input['message_namespace'] );
 
@@ -259,12 +271,12 @@ class FormsOptions {
     }
 
     /**
-     * Output checkbox for 'debug' option.
+     * Output input for 'proxy_path' option.
      */
-    public function p_debug_callback() {
+    public function p_proxy_path_callback() {
         printf(
-            '<input type="checkbox" id="debug" name="'.P_ID.'_options[debug]" %s />',
-            isset( $this->options['debug'] ) && $this->options['debug'] == True ? 'checked' : ''
+            '<input id="proxy_path" name="'.P_ID.'_options[proxy_path]" placeholder="/wp-admin/admin-ajax.php" %s type="text"/>',
+            isset( $this->options['proxy_path'] ) == True ? 'value="'.$this->options['proxy_path'].'"' : ''
         );
     }
 

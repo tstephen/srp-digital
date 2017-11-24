@@ -33,7 +33,7 @@
     $temp_content .= '  webshims.polyfill("forms forms-ext");';
     $temp_content .= '</script>';
 
-    $temp_content .= '<form class="p-form" id="'.$form->post_name.'">';
+    $temp_content .= '<form class="p-form" id="'.$form->post_name.'-form">';
     if ($a['msg_display']=='both' || $a['msg_display'=='top']) {
       $temp_content .= '<div class="p-messages"></div>';
     }
@@ -69,7 +69,7 @@
     if (substr_count($a['msg_name'], '.') < 2) {
       $a['msg_name'] = $options->get_message_namespace().'.'.$a['msg_name'];
     }
-    $temp_content .= '<button class="btn" data-p-action="$p.sendMessageIfValid(\''.$form->post_name.'\',\''.$a['msg_pattern'].'\', \''.$a['msg_name'].'\', $p.'.str_replace('-','_',$form->post_name).','.$a['redirect_to'].',\''.$a['callback'].'\','.$a['proxy'].',\''.$a['business_description'].'\');" id="btn-'.$form->post_name.'" form="'.$form->post_name.'" type="button">'.$a['button_text'].'</button>';
+    $temp_content .= '<button class="btn" data-p-action="$p.sendMessageIfValid(\''.$form->post_name.'-form\',\''.$a['msg_pattern'].'\', \''.$a['msg_name'].'\', $p.'.str_replace('-','_',$form->post_name).'_form,'.$a['redirect_to'].',\''.$a['callback'].'\','.$a['proxy'].',\''.$a['business_description'].'\');" id="btn-'.$form->post_name.'" form="'.$form->post_name.'" type="button">'.$a['button_text'].'</button>';
     $temp_content .= '</form>';
 
     ob_end_clean();

@@ -130,16 +130,20 @@
     wp_nonce_field( basename( __FILE__ ), 'p_nonce' );
     // TODO not sure why this is not being called on init, but it is not
     p_load_scripts();
+    p_footer(); // loads JS variables
     $options = new FormsOptions();
     ?>
 
     <p>
       <label for="domainCtrl"><?php _e( 'Field Name', P_TEXT_DOMAIN )?></label><br/>
-      <input class="autocomplete" data-p-ready="$p.initDomainModel()" type="text" name="domainCtrl" id="domainCtrl" />
+      <select id="domainCtrl" disabled name="domainCtrl">
+        <option value="not available">Not Available</option>
+      </select>
     </p>
 
     <p>
       <input type="button" id="addDomainCtrl" class="button"
+          disabled 
           onclick="$p.addDomainControl();"
           value="<?php _e( 'Add control', P_TEXT_DOMAIN )?>" />
     </p>
