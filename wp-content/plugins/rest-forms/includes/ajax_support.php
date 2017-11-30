@@ -122,7 +122,7 @@
       $url = $p_options->get_api_url().$p_options->get_message_namespace().'/messages/'.$msg_name.'/'.$_REQUEST['executionId'];
     }
     $origin = home_url();
-    //if (P_DEBUG || P_INFO) {
+    if (P_DEBUG || P_INFO) {
       error_log('Notifying server: ');
       error_log('  Verb: '.$_SERVER['REQUEST_METHOD']);
       error_log('  URL: '.$url);
@@ -130,7 +130,7 @@
       error_log('  Message name: '.$msg_name);
       error_log('  JSON: '.$msg);
       error_log('  Execution id: '.$_REQUEST['executionId']);
-    //}
+    }
     //$response = http_post_fields(P_API_URL.$msg_name, array('timeout'=>1), $fields);
 
     if ($_SERVER['REQUEST_METHOD']=='GET') {
@@ -159,6 +159,8 @@
     }
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_USERPWD, $p_options->get_api_key().":".$p_options->get_api_secret());
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false); 
 
     $response = curl_exec($ch);
     $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);

@@ -145,7 +145,7 @@ var $p = (function ($) {
     return str;
 
   }
-  this.validateRadio = function() {
+  function validateRadio() {
     $('[type="radio"]:invalid').parent().parent().find('.field-hint').removeClass('hidden').css('color','red');
   }
 
@@ -311,15 +311,11 @@ var $p = (function ($) {
           $.each(options, function(j,e) {
             console.log('  option: '+e);
             ctrl += '<span class="'+d.type+'-inline"><input class="decorate" '
-            +'" onchange="$p.validateRadio();$p.syncToModel(event)"'
+            +'" onchange="validateRadio();$p.syncToModel(event)"'
             +' name="'+d.id
             +'" '+(d.required?'required ':'')+' type="'+d.type+'" value="'+e+'">'+e+'</span>'
           });
-if (d.type=='radio') {
           ctrl += '<br/><span class="field-hint hidden">Please select one of the options above.</span>';
-} else if (options.length==1 && d.required) {
-          ctrl += '<br/><span class="field-hint hidden">Please agree to this condition.</span>';
-}
           ctrl += '</div>';
           $(d).replaceWith(ctrl);
         });
@@ -330,8 +326,7 @@ if (d.type=='radio') {
         $.each(selectCtrls, function(i,d) {
           console.log('Have '+d.type);
           var options = $(d).data('options') == undefined ? [] : $(d).data('options').split(',');
-          //$(d).append('<option></option>');
-          $(d).append('<option value="" disabled selected style="display: none;">Please select</option>');
+          if (!$(d).prop('required')) $(d).append('<option id="">Please Select</option>');
           $.each(options, function(j,e) {
             console.log('  option: '+e);
             $(d).append('<option id="'+e+'">'+e+'</option>');
@@ -562,7 +557,7 @@ if (d.type=='radio') {
     $.each($('#'+formId+' input[type="text"],#'+formId+' textarea'), function(i,d) {
       $(d).blur(); // force sync in case browser storing values not synced
     });
-    $p.validateRadio();
+    validateRadio();
     if (document.getElementById(formId).checkValidity()) {
       $p.sendMessage(mep, msgName, msg, redirect, wp_callback, proxy, businessDescription);
     } else {
@@ -691,7 +686,7 @@ if (d.type=='radio') {
 
     var cmd;
     switch (true) {
-    case (t.val() == undefined && t.val().length==0):
+    case (t.val().length==0):
       console.log('have empty value');
       cmd = t.data('p-bind')+'=null;';
       break;

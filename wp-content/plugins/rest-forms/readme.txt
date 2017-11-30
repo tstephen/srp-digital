@@ -120,6 +120,10 @@ The form's JSON payload may be accessed as $_REQUEST['json'].
 
 == Changelog ==
 
+= 1.0.0.alpha7 =
+
+- disable SSL verification since it is no longer able to verify Lets Encrypt certs
+
 = 1.0.0.alpha6 = 
 
 - #25 add option to specify non-standard location of admin-ajax.php
