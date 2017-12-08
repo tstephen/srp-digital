@@ -600,7 +600,7 @@ $(document).ready(function() {
   });
 
   ractive.loadStandardPartials(ractive.get('stdPartials'));
-  // $auth.addLoginCallback(ractive.getProfile);
+  $auth.addLoginCallback(ractive.getProfile);
 
   $( document ).ajaxComplete(function( event, jqXHR, ajaxOptions ) {
     if (jqXHR.status > 0) ractive.showReconnected();

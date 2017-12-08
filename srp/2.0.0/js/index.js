@@ -42,6 +42,12 @@ var ractive = new BaseRactive({
       { "name": "titleArea", "url": "/srp/2.0.0/partials/title-area.html"},
     ],
   },
+  partials: {
+    'loginSect': '',
+    'profileArea': '',
+    'sidebar': '',
+    'titleArea': ''
+  },
   fetch: function () {
     console.info('fetch...');
   },
