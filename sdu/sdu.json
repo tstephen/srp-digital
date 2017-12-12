@@ -12,6 +12,7 @@
     "stockCategoryImages":false, "stockItemImages":false
   },
   "theme": {
+    "cssUrl": "https://srp.digital/srp/2.0.0/css/srp.css",
     "logoUrl": "/srp/images/sdu-logo.png",
     "iconUrl": "/images/icon/sdu-icon-16x16.png",
     "headingColor":"#0078c1",
@@ -33,7 +34,7 @@
     { "hint": "", "label": "Adaptation Plan", "name": "adaptation", "type": "list" },
     { "hint": "", "label": "On track for 34%", "name": "onTrack34Pct", "type": "list" },
     { "hint": "", "label": "Healthy Trans. Plan", "name": "healthyTP", "type": "list" },
-    { "hint": "", "label": "GCC Score", "name": "gcc" },
+    { "hint": "", "label": "SDAT Score", "name": "gcc" },
     { "hint": "", "label": "Sust. Reporting Level", "name": "srScore", "type": "list" },
     { "hint": "", "label": "Sust. Reporting %", "name": "srPct" },
     { "hint": "", "label": "Energy Use", "name": "energy", "type": "list" },
@@ -54,18 +55,18 @@
     { "name": "Send new password", "ref": "SendNewPassword", "url": false }
   ],
   "toolbar": [
-    { "url": "/public/macc-national.html", "icon": "tr-icon-england", "title": "National carbon cost benefit curve", "description": "Latest findings for the Health and Social Care sector in England" },
-    { "url": "/public/macc-segmented.html", "icon": "tr-icon-acute-trust", "title": "National organisation type carbon and cost benefit curve", "description": "Latest findings broken down by organisation type" },
-    { "url": "/public/planner.html", "icon": "tr-icon-organization", "title": "Your carbon and cost benefit curve", "description": "A tool to identify the most suitable interventions for individual organisations" },
-    { "url": "/intervention-types.html", "icon": "glyphicon-flash", "role": "analyst", "title": "Intervention Types", "description": "Manage the available intervention types affecting Carbon footprint" },
-    { "url": "/interventions.html", "icon": "glyphicon-flash", "role": "analyst", "title": "Interventions", "description": "Manage the impact data for interventions on each organisation type" },
-    { "url": "/organisation-types.html", "icon": "glyphicon-flash", "role": "admin", "title": "Organisation Types", "description": "Manage the different types of organisations applying interventions" },
-    { "url": "/return.html", "icon": "glyphicon-open", "role": "user", "title": "SDU Return", "description": "Enter sustainability data for your SDU report" },
-    { "url": "/report.html", "icon": "glyphicon-dashboard", "role": "user", "title": "SDU Report", "description": "View SDU report" },
-    { "url": "/treasury.html", "icon": "glyphicon-gbp", "role": "user", "title": "Treasury Report", "description": "View Treasury report" },
-    { "url": "/explorer.html", "icon": "glyphicon-globe", "role": "analyst", "title": "Data Explorer", "description": "Create arbitrary reports on the SDU report and ERIC data" },
-    { "url": "/parameters.html", "icon": "glyphicon-equalizer", "role": "analyst", "title": "Parameters", "description": "Manage the parameters that change over time to keep calculations up to date" },
-    { "url": "/questions.html", "icon": "glyphicon-question-sign", "role": "analyst", "description": "Manage survey questions", "name": "Survey Questions" },
+    { "url": "/srp/public/macc-national.html", "icon": "tr-icon-england", "title": "National carbon cost benefit curve", "description": "Latest findings for the Health and Social Care sector in England" },
+    { "url": "/srp/public/macc-segmented.html", "icon": "tr-icon-acute-trust", "title": "National organisation type carbon and cost benefit curve", "description": "Latest findings broken down by organisation type" },
+    { "url": "/srp/public/planner.html", "icon": "tr-icon-organization", "title": "Your carbon and cost benefit curve", "description": "A tool to identify the most suitable interventions for individual organisations" },
+    { "url": "/srp/intervention-types.html", "icon": "glyphicon-flash", "role": "analyst", "title": "Intervention Types", "description": "Manage the available intervention types affecting Carbon footprint" },
+    { "url": "/srp/interventions.html", "icon": "glyphicon-flash", "role": "analyst", "title": "Interventions", "description": "Manage the impact data for interventions on each organisation type" },
+    { "url": "/srp/organisation-types.html", "icon": "glyphicon-flash", "role": "admin", "title": "Organisation Types", "description": "Manage the different types of organisations applying interventions" },
+    { "url": "/srp/return.html", "icon": "glyphicon-open", "role": "user", "title": "SDU Return", "description": "Enter sustainability data for your SDU report" },
+    { "url": "/srp/report.html", "icon": "glyphicon-dashboard", "role": "user", "title": "SDU Report", "description": "View SDU report" },
+    { "url": "/srp/treasury.html", "icon": "glyphicon-gbp", "role": "user", "title": "Treasury Report", "description": "View Treasury report" },
+    { "url": "/srp/explorer.html", "icon": "glyphicon-globe", "role": "analyst", "title": "Data Explorer", "description": "Create arbitrary reports on the SDU report and ERIC data" },
+    { "url": "/srp/parameters.html", "icon": "glyphicon-equalizer", "role": "analyst", "title": "Parameters", "description": "Manage the parameters that change over time to keep calculations up to date" },
+    { "url": "/srp/questions.html", "icon": "glyphicon-question-sign", "role": "analyst", "description": "Manage survey questions", "name": "Survey Questions" },
     { "url": "/work.html", "icon": "glyphicon-inbox", "description": "View your list of active tasks here", "feature":"workManagement", "name": "Work Management" },
     { "url": "/accounts.html", "icon": "omny-icon-address-book", "role": "analyst", "description": "Find a particular health or social care provider", "name": "Organisations" },
     { "url": "/memo.html", "icon": "glyphicon-envelope", "role": "admin", "name": "Templates", "description": "Create and edit your message templates"  },
@@ -93,6 +94,7 @@
     { "name": "sduMentalHealthExtension", "url": "https://api.srp.digital/partials/account-extension.html"},
     { "name": "sduPublicHealthExtension", "url": "https://api.srp.digital/partials/account-extension.html"},
     { "name": "sduSpecialistExtension", "url": "https://api.srp.digital/partials/account-extension.html"},
+    { "name": "sduSendMemo", "url": "https://api.srp.digital/partials/pick-memo.html"},
     { "name": "sduUserExtension", "url": "/srp/2.0.0/partials/user-extension.html"}
   ],
   "processes": [
@@ -143,7 +145,8 @@
         {  "idx":1, "id": "Registered", "name": "Registered"  },
         {  "idx":2, "id": "Partial data entered", "name": "Partial data entered"  },
         {  "idx":3, "id": "Data submitted", "name": "Data submitted"  },
-        {  "idx":-1, "id": "Defunct", "name": "Defunct"  }
+        {  "idx":-1, "id": "Defunct", "name": "Defunct"  },
+        {  "idx":-1, "id": "Superseded", "name": "Superseded"  }
       ]
     },{ "name": "accountTypes", "ref": "#curAccountType", "values": [
         {  "id": "AcuteTrust", "name": "Acute Trust"  },

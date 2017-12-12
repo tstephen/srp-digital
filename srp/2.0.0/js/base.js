@@ -165,6 +165,9 @@ var BaseRactive = Ractive.extend({
     var id = ractive.uri(entity);
     return id.substring(id.lastIndexOf('/')+1);
   },
+  initAbout: function() {
+    $('.powered-by-icon').empty().append('<img src="/srp/2.0.0/images/icon/srp-icon-32x32.png" alt="Sustainable Resource Planning™">');
+  },
   initAutoComplete: function() {
     console.log('initAutoComplete');
     $.each(ractive.get('tenant.typeaheadControls'), function(i,d) {
@@ -172,8 +175,10 @@ var BaseRactive = Ractive.extend({
       if (d.url==undefined) {
         ractive.addDataList(d,d.values);
       } else {
-        $.get(ractive.getServer()+d.url, function(data){
-          ractive.addDataList(d,d.values);
+        var url = d.url;
+        if (url.indexOf('//')==-1) url = ractive.getServer()+url;
+        $.get(url, function(data){
+          ractive.addDataList(d,data);
         },'json');
       }
     });
@@ -192,6 +197,7 @@ var BaseRactive = Ractive.extend({
   },
   initControls: function() {
     console.log('initControls');
+    ractive.initAbout();
     ractive.initAutoComplete();
     ractive.initAutoNumeric();
     ractive.initDatepicker();
@@ -577,7 +583,7 @@ $( document ).bind('keypress', function(e) {
 
 $(document).ready(function() {
   ractive.set('saveObserver', false);
-  ractive.set('context','/srp');
+  //ractive.set('context','/srp');
   if (document.location.href.indexOf('https://srp.digital/srp')!=-1) {
     (function() {
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -639,7 +645,7 @@ $(document).ready(function() {
   } else if (params['q']!=undefined) {
     ractive.set('searchTerm',decodeURIComponent(params['q']));
   }
-  var i18n = new I18nController($env.server+'/workmgmt/2.2.0');
+  var i18n = new I18nController($env.server+'/workmgmt/2.3.0');
 
   ractive.set('saveObserver', true);
 });

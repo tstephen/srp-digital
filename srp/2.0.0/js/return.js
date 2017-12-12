@@ -182,6 +182,9 @@ var $r = (function ($, ractive, $auth) {
       $('#PROVIDER1_COMMISSIONED,#PROVIDER2_COMMISSIONED,#PROVIDER3_COMMISSIONED,#PROVIDER4_COMMISSIONED,#PROVIDER5_COMMISSIONED,#PROVIDER6_COMMISSIONED,#PROVIDER7_COMMISSIONED,#PROVIDER8_COMMISSIONED').parent().parent().hide();
     }
   }
+  function _toggleEClass() {
+    
+  }
   me.complete = function() {
     ractive.showMessage("Redirecting to your report... Don't forget to submit it when you're done. <br/>Unsubmitted reports will be submited automatically on 1st October after year end.");
     setTimeout(function() {

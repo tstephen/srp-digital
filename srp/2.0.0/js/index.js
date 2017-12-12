@@ -53,7 +53,6 @@ var ractive = new BaseRactive({
   },
   oninit: function() {
     console.log('oninit');
-
     this.loadStandardPartials(this.get('stdPartials'));
   },
   sendMessage: function(msg) {
