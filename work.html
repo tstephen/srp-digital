@@ -56,6 +56,12 @@
     <!-- TODO need to get this from tenant config -->
     <a class="col-md-offset-3 col-sm-offset-3" href="{{value}}" target="_newtab">{{name == undefined ? id : name}}</a>
   </script>
+  <script id="memoTemplate" type="text/html">
+    <label class="col-md-3 col-sm-3">{{name.toLabel()}}: </label>
+    <input class="form-control" id="{{..id}}" list="memos"
+      onblur="ractive.set('current.processVariables.{{..id}}',this.value)"
+      value="{{..value}}">
+  </script>
   <script id="defaultTemplate" type="text/html">
     <label class="col-md-3 col-sm-3">{{name.toLabel()}}: </label>
     <input class="form-control" id="{{..id}}" {{..writeable==false ? 'readonly disabled' : ''}}
