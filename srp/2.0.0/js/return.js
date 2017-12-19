@@ -8,10 +8,10 @@ var $r = (function ($, ractive, $auth) {
   var _orgType;
   var _server = $env.server;
   var _survey;
-  var _surveyPeriod = '2016-17'; // TODO read system param
+  var _surveyPeriod = '2017-18'; // TODO read system param
   var _now = new Date();
   var _period = getSearchParameters()['p'] == undefined
-      ? (_now.getFullYear()-1)+'-'+(_now.getFullYear()-2000)
+      ? _surveyPeriod
       : getSearchParameters()['p'];
   var _surveyName = getSearchParameters()['s'] == undefined
       ? 'SDU-'+_period
