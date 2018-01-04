@@ -28,11 +28,13 @@ var $r = (function ($, ractive, $auth) {
 
   function _disableHeadSections() {
     console.info('disableHeadSections');
-    $('#Organisation h3').wrapInner('<span class="title"></span>').append(' - <em>Please enter these details only for the current year</em>')
-    $('#Policy h3').wrapInner('<span class="title"></span>').append(' - <em>Please enter these details only for the current year</em>')
-    $('#Performance h3').wrapInner('<span class="title"></span>').append(' - <em>Please enter these details only for the current year</em>')
-    //$('#Organisation input,#Organisation select,#Policy input,#Policy select,#Performance input,#Performance select').removeAttr('readonly').removeAttr('disabled');
-    $('#Organisation ol,#Policy ol,#Performance ol').hide();
+    if ($('#Organisation h3 .title').length==0) {
+      $('#Organisation h3').wrapInner('<span class="title"></span>').append(' - <em>Please enter these details only for the current year</em>')
+      $('#Policy h3').wrapInner('<span class="title"></span>').append(' - <em>Please enter these details only for the current year</em>')
+      $('#Performance h3').wrapInner('<span class="title"></span>').append(' - <em>Please enter these details only for the current year</em>')
+      //$('#Organisation input,#Organisation select,#Policy input,#Policy select,#Performance input,#Performance select').removeAttr('readonly').removeAttr('disabled');
+      $('#Organisation ol,#Policy ol,#Performance ol').hide();
+    }
   }
 
   function _enableHeadSections() {
