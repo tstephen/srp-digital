@@ -235,7 +235,7 @@ var ractive = new BaseRactive({
       var tmp = JSON.parse(JSON.stringify(ractive.get('current')));
       tmp.tenantId = ractive.get('tenant.id');
       if (tmp.optionNames == undefined) tmp.optionNames = [];
-      else tmp.optionNames = tmp.optionNames.split(',');
+      else if (typeof tmp.optionNames == 'string') tmp.optionNames = tmp.optionNames.split(',');
 //      console.log('ready to save question'+JSON.stringify(tmp)+' ...');
       $.ajax({
         url: id === undefined ? ractive.getServer()+'/'+tmp.tenantId+'/questions/' : id,
