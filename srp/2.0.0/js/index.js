@@ -7,7 +7,6 @@ var ractive = new BaseRactive({
   lazy: true,
   template: '#template',
   data: {
-    intro: "Let's get started right away by introducing the Omny Bar icons:",
     server: $env.server,
     title: $env.appName,
     tagLine: $env.tagLine,
@@ -39,13 +38,16 @@ var ractive = new BaseRactive({
       { "name": "loginSect", "url": $env.server+"/webjars/auth/1.1.0/partials/login-sect.html"},
       { "name": "profileArea", "url": "/srp/2.0.0/partials/profile-area.html"},
       { "name": "sidebar", "url": "/srp/2.0.0/partials/sidebar.html"},
+      { "name": "supportBar", "url": $env.server+"/webjars/supportservices/2.2.0/partials/support-bar.html"},
       { "name": "titleArea", "url": "/srp/2.0.0/partials/title-area.html"},
     ],
   },
   partials: {
+    'helpModal': '',
     'loginSect': '',
     'profileArea': '',
     'sidebar': '',
+    'supportBar': '',
     'titleArea': ''
   },
   fetch: function () {
