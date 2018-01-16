@@ -25,7 +25,7 @@ var ractive = new BaseRactive({
         'CCG2_SERVED','CCG3_SERVED','CCG4_SERVED','CCG5_SERVED','CCG6_SERVED'],
     requiredAnswers: ['ORG_CODE', 'ORG_NAME', 'ORG_TYPE', 'SDMP_CRMP', 'HEALTHY_TRANSPORT_PLAN', 'PROMOTE_HEALTHY_TRAVEL'],
     server: $env.server,
-    survey: 'SDU-2016-17',
+    survey: 'SDU-2017-18',
     tenant: { id: 'sdu' },
     username: localStorage['username'],
     formatAnswer: function(qName) {
