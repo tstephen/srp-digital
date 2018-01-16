@@ -256,6 +256,10 @@ form .criteria input {
 .form li {
   margin: 5px 0 5px;
 }
+/* Override Bootstrap #125 */
+.form#questionnaireForm li label {
+  display: block;
+}
 /* breaks layout on contacts page, remove when find why here and fix
 .form label, .form input {
   display:block;
