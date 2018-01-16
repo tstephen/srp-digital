@@ -244,7 +244,7 @@
                   <td>{{#if customFields.onTrack34Pct==null}}n/a{{else}}{{customFields.onTrack34Pct}}{{/if}}</td>
                   <td>{{#if !customFields.gcc}}n/a{{else}}{{customFields.gcc}}{{/if}}</td>
                   <td>{{#if customFields.healthyTP==null}}n/a{{elseif customFields.healthyTP==true}}Yes{{else}}No{{/if}}</td>
-                  <td>{{#if customFields.srScore==null}}n/a{{else}}{{customFields.srScore}} ({{customFields.srPct}}){{/if}}</td>
+                  <td>{{#if customFields.srScore==null}}n/a{{else}}{{customFields.srScore}}{{/if}}</td>
                 </tr>
               {{/}}
               {{^surveyReturn.orgs}}
@@ -267,7 +267,7 @@
                   <td>{{name}}</td>
                   <td>{{#if customFields.sdmp==null}}n/a{{elseif customFields.sdmp==true}}Yes{{else}}No{{/if}}</td>
                   <td>{{#if !customFields.gcc}}n/a{{else}}{{customFields.gcc}}{{/if}}</td>
-                  <td>{{#if customFields.srScore==null}}n/a{{else}}{{customFields.srScore}} ({{customFields.srPct}}){{/if}}</td>
+                  <td>{{#if customFields.srScore==null}}n/a{{else}}{{customFields.srScore}}{{/if}}</td>
                 </tr>
               {{/}}
               {{^surveyReturn.orgs}}
