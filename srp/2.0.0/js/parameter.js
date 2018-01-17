@@ -299,7 +299,7 @@ var ractive = new BaseRactive({
     this.showMessage(msg, addClass);
   },
   showResults: function() {
-    $('#parametersTableToggle').addClass('glyphicon-triangle-bottom').removeClass('glyphicon-triangle-right');
+    $('#parametersTableToggle').addClass('kp-icon-caret-down').removeClass('kp-icon-caret-right');
     $('#currentSect').slideUp();
     $('#parametersTable').slideDown({ queue: true });
   },
@@ -308,7 +308,7 @@ var ractive = new BaseRactive({
   },
   toggleResults: function() {
     console.log('toggleResults');
-    $('#parametersTableToggle').toggleClass('glyphicon-triangle-bottom').toggleClass('glyphicon-triangle-right');
+    $('#parametersTableToggle').toggleClass('kp-icon-caret-down').toggleClass('kp-icon-caret-right');
     $('#parametersTable').slideToggle();
   }
 });

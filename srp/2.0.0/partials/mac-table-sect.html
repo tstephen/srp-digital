@@ -9,14 +9,14 @@
         </tr>
         <tr>
           <th></th>
-          <!--<th on-click="sort:classification">Type<span class="sortable {{ sorted('classification') }} glyphicon glyphicon-btn "></span></th>-->
-          <th class="col-md-2" on-click="sort:name" style="cursor:pointer;">Name<span class="sortable {{ sorted('name') }} glyphicon glyphicon-btn "></span></th>
+          <!--<th on-click="sort:classification">Type<span class="sortable {{ sorted('classification') }} glyphicon icon-btn "></span></th>-->
+          <th class="col-md-2" on-click="sort:name" style="cursor:pointer;">Name<span class="sortable {{ sorted('name') }} glyphicon icon-btn "></span></th>
           <th class="col-md-4">Description</th>
-          <th class="col-md-1 alert-warning" style="cursor:pointer;text-align:center" on-click="sort:cashOutflowsUpFront">£{{#display000s==true}}000{{/}}s capital costs <span class="sortable {{ sorted('cashOutflowUpFront') }} glyphicon glyphicon-btn "></span></th>
-          <th class="col-md-1 alert-warning" style="cursor:pointer;text-align:center" on-click="sort:annualCashOutflowsTargetYear">£{{#display000s==true}}000{{/}}s costs in {{parameters.targetYear}}<span class="sortable {{ sorted('annualCashOutflowsTargetYear') }} glyphicon glyphicon-btn "></span></th>
-          <th class="col-md-1 alert-warning" style="cursor:pointer;text-align:center" on-click="sort:annualCashInflowsTargetYear">£{{#display000s==true}}000{{/}}s saved in {{parameters.targetYear}}<span class="sortable {{ sorted('annualCashInflowsTargetYear') }} glyphicon glyphicon-btn "></span></th>
-          <th class="col-md-1 alert-success" style="cursor:pointer;text-align:center" on-click="sort:costPerTonneCo2e">£ / tCO<sub>2</sub>e<span class="sortable {{ sorted('costPerTonneCo2e') }} glyphicon glyphicon-btn "></span></th>
-          <th class="col-md-1 alert-success" style="cursor:pointer;text-align:center" on-click="sort:tonnesCo2eSavedTargetYear">tCO<sub>2</sub>e saved in {{parameters.targetYear}}<span class="sortable {{ sorted('tonnesCo2eSavedTargetYear') }} glyphicon glyphicon-btn "></span></th>
+          <th class="col-md-1 alert-warning" style="cursor:pointer;text-align:center" on-click="sort:cashOutflowsUpFront">£{{#display000s==true}}000{{/}}s capital costs <span class="sortable {{ sorted('cashOutflowUpFront') }} glyphicon icon-btn "></span></th>
+          <th class="col-md-1 alert-warning" style="cursor:pointer;text-align:center" on-click="sort:annualCashOutflowsTargetYear">£{{#display000s==true}}000{{/}}s costs in {{parameters.targetYear}}<span class="sortable {{ sorted('annualCashOutflowsTargetYear') }} glyphicon icon-btn "></span></th>
+          <th class="col-md-1 alert-warning" style="cursor:pointer;text-align:center" on-click="sort:annualCashInflowsTargetYear">£{{#display000s==true}}000{{/}}s saved in {{parameters.targetYear}}<span class="sortable {{ sorted('annualCashInflowsTargetYear') }} glyphicon icon-btn "></span></th>
+          <th class="col-md-1 alert-success" style="cursor:pointer;text-align:center" on-click="sort:costPerTonneCo2e">£ / tCO<sub>2</sub>e<span class="sortable {{ sorted('costPerTonneCo2e') }} glyphicon icon-btn "></span></th>
+          <th class="col-md-1 alert-success" style="cursor:pointer;text-align:center" on-click="sort:tonnesCo2eSavedTargetYear">tCO<sub>2</sub>e saved in {{parameters.targetYear}}<span class="sortable {{ sorted('tonnesCo2eSavedTargetYear') }} glyphicon icon-btn "></span></th>
           <th class="col-md-1">Further info</th>
         </tr>
       </thead>
@@ -50,7 +50,7 @@
             <td class="col-md-1 alert-success" style="text-align:right">{{tonnesCo2eSavedTargetYear.sigFigs(3)}}</td>
             <td class="col-md-1">
               {{#furtherInfo}}
-                <a href="{{furtherInfo}}" target="_newtab"><span class="glyphicon glyphicon-btn glyphicon-new-window"></span>
+                <a href="{{furtherInfo}}" target="_newtab"><span class="glyphicon icon-btn glyphicon-new-window"></span>
               {{/}}
             </td>
           </tr>
@@ -65,7 +65,7 @@
         {{#active == 'planner' && showAddUserIntervention==true}}
           <tr>
             <td></td>
-            <td><span class="glyphicon glyphicon-btn glyphicon-plus" on-click="showUserInterventionModal()"></span></td>
+            <td><span class="glyphicon icon-btn kp-icon-plus" on-click="showUserInterventionModal()"></span></td>
             <td>Add your own intervention</td>
           </tr>
         {{/}}

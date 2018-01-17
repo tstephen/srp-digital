@@ -77,9 +77,9 @@ var ractive = new BaseRactive({
   partials: {
     'loginSect': '',
     'shareCtrl': '<div class="controls pull-right" style="display:none">'
-                +'  <span class="glyphicon glyphicon-btn glyphicon-share"></span>'
-                +'  <!--span class="glyphicon glyphicon-btn glyphicon-link"></span-->'
-                +'  <!--span class="glyphicon glyphicon-btn glyphicon-copy"></span-->'
+                +'  <span class="glyphicon icon-btn kp-icon-share"></span>'
+                +'  <!--span class="glyphicon icon-btn kp-icon-link"></span-->'
+                +'  <!--span class="glyphicon icon-btn kp-icon-copy"></span-->'
                 +'</div>'
   },
   calculate: function () {
@@ -148,7 +148,7 @@ var ractive = new BaseRactive({
           .on('mouseout', function(ev) {
             $('#'+ev.currentTarget.id+' .controls').hide();
           });
-        $('#'+ctrl.id+' .controls .glyphicon-share').wrap('<a href="'+ractive.getServer()+$(ctrl).data('src')+'" target="_blank"></a>');
+        $('#'+ctrl.id+' .controls .kp-icon-share').wrap('<a href="'+ractive.getServer()+$(ctrl).data('src')+'" target="_blank"></a>');
         callback('#'+ctrl.id, data, options);
         ractive.set('saveObserver', true);
       }
@@ -293,7 +293,7 @@ var ractive = new BaseRactive({
           .on('mouseout', function(ev) {
             $('#'+ev.currentTarget.id+' .controls').hide();
           });
-        $('#'+ctrl.id+' .controls .glyphicon-share').wrap('<a href="'+ractive.getServer()+$(ctrl).data('src')+'" target="_blank"></a>');
+        $('#'+ctrl.id+' .controls .kp-icon-share').wrap('<a href="'+ractive.getServer()+$(ctrl).data('src')+'" target="_blank"></a>');
         ractive.set('saveObserver', true);
       }
     });

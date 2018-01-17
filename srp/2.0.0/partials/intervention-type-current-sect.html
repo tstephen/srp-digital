@@ -10,7 +10,7 @@
       <span>Intervention Type:</span>
       <span>{{current.name}}</span>
       <span class="pull-right">
-        <a class="clickable glyphicon glyphicon-btn glyphicon-remove" aria-hidden="true" on-click="delete(current)" title="Delete this record"></a>
+        <a class="clickable glyphicon icon-btn kp-icon-remove" aria-hidden="true" on-click="delete(current)" title="Delete this record"></a>
       </span>
     </h2>
 
@@ -159,7 +159,7 @@
           <div class="input-group">
             <input class="autoNumeric form-control" data-a-sign="£ " data-a-pad="false" data-v-min="-9999999999999" id="curAnnualCashOutflows" required value="{{current.annualCashOutflows}}"/>
             <span class="clickable input-group-addon" aria-hidden="true" data-toggle="modal" data-target="#timeSeriesModal" on-click="initTimeSeries('annualCashOutflows','ongoingCashOutflows','upFront')">
-              <span class="glyphicon glyphicon-btn glyphicon-resize-full"></span>
+              <span class="glyphicon icon-btn glyphicon-resize-full"></span>
             </span>
           </div>
           <p class="help-block col-xs-offset-4">Ongoing annual cash outflows over lifetime, excluding front-loaded capital costs.</p>
@@ -179,7 +179,7 @@
           <div class="input-group">
             <input class="autoNumeric form-control" data-a-sign="£ " data-a-pad="false" data-v-min="-9999999999999" id="curAnnualCashInflows" required value="{{current.annualCashInflows}}"/>
             <span class="clickable input-group-addon" aria-hidden="true" data-toggle="modal" data-target="#timeSeriesModal" on-click="initTimeSeries('annualCashInflows','average')">
-              <span class="glyphicon glyphicon-btn glyphicon-resize-full"></span>
+              <span class="glyphicon icon-btn glyphicon-resize-full"></span>
             </span>
           </div>
           <p class="help-block col-xs-offset-4">Annual cash inflows.</p>
@@ -224,7 +224,7 @@
           <div class="input-group">
             <input class="autoNumeric form-control" data-a-pad="false" id="curAnnualTonnesCo2eSaved" required value="{{current.annualTonnesCo2eSaved}}"/>
             <span class="clickable input-group-addon" aria-hidden="true" data-toggle="modal" data-target="#timeSeriesModal" on-click="initTimeSeries('annualTonnesCo2eSaved','average')">
-              <span class="glyphicon glyphicon-btn glyphicon-resize-full"></span>
+              <span class="glyphicon icon-btn glyphicon-resize-full"></span>
             </span>
           </div>
           <p class="help-block col-xs-offset-4">Annual amount for CO<sub>2</sub>e being saved, in tonnes. Before uptake and scaling applied.</p>
@@ -256,7 +256,7 @@
           <div class="input-group">
             <input class="form-control" id="curFurtherInfo" type="url" value="{{current.furtherInfo}}"/>
             <span class="input-group-addon">
-              <a href="{{current.furtherInfo}}" target="_newtab"><span class="glyphicon glyphicon-btn glyphicon-new-window"></span></a>
+              <a href="{{current.furtherInfo}}" target="_newtab"><span class="glyphicon icon-btn glyphicon-new-window"></span></a>
             </span>
           </div>
           <p class="help-block col-xs-offset-4">This URL will contain explanation of how the calculations where performed and links to the original source material</p>

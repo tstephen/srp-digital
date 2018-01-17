@@ -1,9 +1,16 @@
 <section id="currentSect" style="display:none">
   <form class="inline-form form" id="currentForm">
     <h2 class="form-inline">
-      <span>Question {{current.name}}</span>
+      {{#current._links.self}}
+        <span>Edit </span>
+      {{/}}
+      {{^current._links.self}}
+        <span>Create </span>
+      {{/}}
+      <span>Question:</span>
+      <span>{{current.name}}</span>
       <span class="pull-right">
-        <a class="clickable glyphicon glyphicon-btn glyphicon-remove" aria-hidden="true" on-click="@this.delete(current)" title="Delete this record"></a>
+        <a class="clickable glyphicon icon-btn kp-icon-remove" aria-hidden="true" on-click="@this.delete(current)" title="Delete this record"></a>
       </span>
     </h2>
 
@@ -12,65 +19,49 @@
         <li>
           <label class="col-md-4 required">Name:</label>
           <input class="form-control" id="curName" required value="{{current.name}}">
-          <p class="help-block col-xs-offset-4">Name of the question is a short term to identify the question, not to be displayed to users</p>
         </li>
         <li>
           <label class="col-md-4 required">Label:</label>
           <input class="form-control" id="curLabel" required value="{{current.label}}"/>
-          <p class="help-block col-xs-offset-4">A relatively short label to display to the user</p>
-        </li>
-        <li>
-          <label class="col-md-4 required">Source:</label>
-          <input class="form-control" id="curSource" required value="{{current.source}}"/>
-          <p class="help-block col-xs-offset-4">Where this question comes from</p>
+          <p class="help-block col-xs-offset-4"></p>
         </li>
         <li>
           <label class="col-md-4">Type:</label>
-          <input class="form-control" id="curType" list="questionTypes" placeholder="If unspecified, will be a simple text input" value="{{current.type}}"/>
-          <p class="help-block col-xs-offset-4">Select from the list or leave blank for a simple text control</p>
+          <input class="form-control" id="curType" value="{{current.type}}"/>
+          <p class="help-block col-xs-offset-4"></p>
         </li>
         <li>
-          <label class="col-md-4">Options:</label>
-          <input class="form-control" id="curOptionNames" placeholder="Comma-separated list of values" value="{{current.optionNames}}"/>
-          <p class="help-block col-xs-offset-4">If the question's type is radio buttons or checkboxes specify options here</p>
+          <label class="col-md-4">Placeholder:</label>
+          <input class="form-control" id="curPlaceholder" value="{{current.placeholder}}"/>
+          <p class="help-block col-xs-offset-4"></p>
+        </li>
+        <li>
+          <label class="col-md-4">Hint:</label>
+          <textarea class="form-control" id="curHint" value="{{current.hint}}"></textarea>
         </li>
       </ul>
     </div>
     <div class="currentBody col-md-6 col-sm-12 col-xs-12">
       <ul class="form edit-form">
         <li>
-          <label class="col-md-4">Placeholder:</label>
-          <input class="form-control" id="curPlaceholder" value="{{current.placeholder}}"/>
-          <p class="help-block col-xs-offset-4">Text that will be displayed in an empty control</p>
-        </li>
-        <li>
           <label class="col-md-4">Required:</label>
-          <input class="form-control" id="curRequired" type="checkbox" value="{{current.required}}"/>
+          <input class="form-control" id="curRequired" value="{{current.required}}"/>
           <p class="help-block col-xs-offset-4"></p>
         </li>
         <li>
-          <label class="col-md-4">Unit:</label>
-          <input class="form-control" id="curUnit" list="units" value="{{current.unit}}"/>
-          <p class="help-block col-xs-offset-4">Typically for numeric answers, otherwise leave blank</p>
+          <label class="col-md-4 required">Unit:</label>
+          <input class="form-control" id="curUnit" value="{{current.unit}}"/>
+          <p class="help-block col-xs-offset-4"></p>
         </li>
         <li>
           <label class="col-md-4">Default:</label>
           <input class="form-control" id="curDefaultValue" value="{{current.defaultValue}}"/>
-          <p class="help-block col-xs-offset-4">Value to use if the user does not provide one</p>
+          <p class="help-block col-xs-offset-4"></p>
         </li>
         <li>
           <label class="col-md-4">Validation:</label>
-          <input class="form-control" id="curValidation" placeholder="A regular expression to validate user data" value="{{current.validation}}"/>
+          <input class="form-control" id="curValidation" value="{{current.validation}}"/>
           <p class="help-block col-xs-offset-4"></p>
-        </li>
-      </ul>
-    </div>
-    <div class="currentBody col-md-12">
-      <ul class="form edit-form">
-        <li>
-          <label class="col-md-2">Hint:</label>
-          <textarea class="form-control" id="curHint" value="{{current.hint}}"></textarea>
-          <p class="help-block col-xs-offset-2">A longer explanation to the user of what good answers to this question should look like</p>
         </li>
       </ul>
     </div>

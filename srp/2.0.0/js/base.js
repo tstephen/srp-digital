@@ -383,7 +383,7 @@ var BaseRactive = Ractive.extend({
     if (fadeOutMessages && additionalClass!='bg-danger text-danger') setTimeout(function() {
       $('#messages').fadeOut();
     }, EASING_DURATION*10);
-    else $('#messages, .messages').append('<span class="text-danger pull-right glyphicon glyphicon-btn glyphicon-remove" onclick="ractive.hideMessage()"></span>');
+    else $('#messages, .messages').append('<span class="text-danger pull-right glyphicon icon-btn kp-icon-remove" onclick="ractive.hideMessage()"></span>');
   },
   showReconnected: function() {
     console.log('showReconnected');
@@ -513,7 +513,7 @@ var BaseRactive = Ractive.extend({
   toggleSection: function(sect) {
     console.info('toggleSection: '+$(sect).attr('id'));
     $('#'+$(sect).attr('id')+'>div').toggle();
-    $('#'+$(sect).attr('id')+' .ol-collapse').toggleClass('glyphicon-triangle-right').toggleClass('glyphicon-triangle-bottom');
+    $('#'+$(sect).attr('id')+' .ol-collapse').toggleClass('kp-icon-caret-right').toggleClass('kp-icon-caret-down');
   },
   toggleSidebar: function() {
     console.info('toggleSidebar');
@@ -598,7 +598,7 @@ $(document).ready(function() {
   }
 
   // ajax loader
-  if ($('#ajax-loader').length==0) $('body').append('<div id="ajax-loader"><img class="ajax-loader" src="'+ractive.getServer()+'/images/ajax-loader.gif" alt="Loading..."/></div>');
+  if ($('#ajax-loader').length==0) $('body').append('<div id="ajax-loader"><img class="ajax-loader" src="'+ractive.getServer()+'/images/ajax-loader.svg" alt="Loading..."/></div>');
   $( document ).ajaxStart(function() {
     $( "#ajax-loader" ).show();
   });
@@ -646,7 +646,7 @@ $(document).ready(function() {
   } else if (params['q']!=undefined) {
     ractive.set('searchTerm',decodeURIComponent(params['q']));
   }
-  var i18n = new I18nController($env.server+'/workmgmt/2.3.0');
+  var i18n = new I18nController($env.server+'/workmgmt/3.0.0');
 
   ractive.set('saveObserver', true);
 });

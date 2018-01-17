@@ -383,7 +383,7 @@ var ractive = new BaseRactive({
     return uri;
   },
   hideResults: function() {
-    $('#interventionsTableToggle').addClass('glyphicon-triangle-right').removeClass('glyphicon-triangle-bottom');
+    $('#interventionsTableToggle').addClass('kp-icon-caret-right').removeClass('kp-icon-caret-down');
     $('#interventionsTable').slideUp();
     $('#currentSect').slideDown({ queue: true });
   },
@@ -501,13 +501,13 @@ var ractive = new BaseRactive({
     $('#upload').slideDown();
   },
   showResults: function() {
-    $('#interventionsTableToggle').addClass('glyphicon-triangle-bottom').removeClass('glyphicon-triangle-right');
+    $('#interventionsTableToggle').addClass('kp-icon-caret-down').removeClass('kp-icon-caret-right');
     $('#currentSect').slideUp();
     $('#interventionsTable').slideDown({ queue: true });
   },
   toggleResults: function() {
     console.info('toggleResults');
-    $('#interventionsTableToggle').toggleClass('glyphicon-triangle-bottom').toggleClass('glyphicon-triangle-right');
+    $('#interventionsTableToggle').toggleClass('kp-icon-caret-down').toggleClass('kp-icon-caret-right');
     $('#interventionsTable').slideToggle();
   },
   updateTimeSeriesSummary: function() {

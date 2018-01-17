@@ -52,6 +52,7 @@
             communities and the environment by working hard to minimise our footprint.</p>
         {{/if}}
 
+        {{#if formatAnswer('SDMP_MISSION_STATEMENT')}}<h5>{{formatAnswer('SDMP_MISSION_STATEMENT')}}</h5>{{/if}}
 
         <p>
           As a part of the NHS, public health and social care system, it is our
@@ -153,7 +154,7 @@
         {{/}}
         {{#formatAnswer('SDG_CLEAR')!=''}}
         <p>
-          Our organisation is <em>clearly</em> contributing to the following Sustainable Development Goals (SDGs). 
+          Our organisation is <em>clearly</em> contributing to the following Sustainable Development Goals (SDGs).
         </p>
         <div class="container-fluid sdgs">
           {{#formatAnswer('SDG_CLEAR').indexOf('No poverty')!=-1}}<div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_SDG-goals_icons-individual-rgb-01-180x180.png" alt="Icon for 'No poverty' goal"/></div>{{/}}
@@ -176,6 +177,7 @@
           <div class="col-xs-2"><img class="img-responsive" src="/wp-content/uploads/2017/11/E_Logo_No-UN-Emblem-02-180x180.png" alt="Icon for Sustainable Development Goals"/></div>
         </div>
         {{/}}
+
         <p>
           {{#if formatAnswer('QUANT_ES_IMPACTS')}}
             {{formatAnswer('QUANT_ES_IMPACTS')}}
@@ -192,7 +194,7 @@
         </p>
         <p>
           {{#if formatAnswer('SOCIAL_VALUE')}}
-            Our statement on Public Services (Social Value) Act is...{{formatAnswer('SOCIAL_VALUE')}}
+            Our statement on Public Services (Social Value) Act is... {{formatAnswer('SOCIAL_VALUE')}}
           {{else}}
             We have not currently issued a statement on meeting the requirements
             of the Public Services (Social Value) Act.
@@ -293,7 +295,7 @@
             reducing the carbon footprint of the NHS, public health and social
             care system by 34% (from a 1990 baseline) equivalent to a 28%
             reduction from a 2013 baseline by 2020. It is our aim to
-            {{#if formatAnswer('CARBON_REDUCTION_TARGET')=='Yes'}}supercede{{else}}meet{{/if}}
+            {{#if formatAnswer('CARBON_REDUCTION_TARGET')=='Yes'}}supersede{{else}}meet{{/if}}
             this target by reducing our carbon emissions
             {{#if formatAnswer('CARBON_REDUCTION_TARGET')=='No'}}10%{{else}}{{formatAnswer('CARBON_REDUCTION_TARGET_PCT')}}%{{/if}}
             by
@@ -320,6 +322,7 @@
         {{#if isCcg()}}
           <section id="commissionedActivitySect">
             <h3>Commissioned Activity</h3>
+
             <table class="table table-striped">
               <thead>
                 <tr>
@@ -360,8 +363,7 @@
           <h4>Carbon emissions resulting</h4>
           <p>
             <!-- data-colors="#0078c1,#99C344,#5C840C,#99C344,#BDE46F,#09613B,#03A1FF,#328F67,#82C7AA.#8D810D,#D1C549,#FFF7A7" -->
-            <svg
-                 data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/energy-co2e.csv"
+            <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/energy-co2e.csv"
                  class="rpt stacked" id="energyGraph" width="600" height="400"></svg>
           </p>
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
@@ -383,9 +385,7 @@
         <section id="travelSect">
           <h3>Travel</h3>
           <p>We can improve local air quality and improve the health of our community by promoting active travel to our staff and to the patients and public that use our services.
-
           <p>Every action counts and we are a lean organisation trying to realise efficiencies across the board for cost and carbon (CO<sub>2</sub>e) reductions. We support a culture for active travel to improve staff wellbeing and reduce sickness. Air pollution, accidents and noise all cause health problems for our local population, patients, staff and visitors and are caused by cars, as well as other forms of transport.</p>
-
           <p>We have used the SDU Health Outcomes of Travel Tool and we have calculated the total economic impact on health and society from travel we control or influence is &pound;{{formatAnswer('HEALTH_IMPACT_OF_TRAVEL')}} - we have identified the hotspots and will look to reduce these impacts.</p>
 
           <h4>Travel undertaken</h4>
@@ -412,22 +412,29 @@
                  class="rpt stacked" id="wasteGraph" width="600" height="400"></svg>
           </p>
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
+
           <div class="rpt table" id="wasteCo2eRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/waste-co2e.html?maxPeriods=4"></div>
-          <p contenteditable>{{formatAnswer('WASTE_PERF')}}</p>
-          <p>{{formatAnswer('WASTE_CONTEXT')}}</p>
+          <p class="narrative" data-q="WASTE_PERF">{{formatAnswer('WASTE_PERF')}}</p>
+          <p class="narrative" data-q="WASTE_CONTEXT">{{formatAnswer('WASTE_CONTEXT')}}</p>
         </section>
 
         <section id="waterSect">
           <h3>Finite resource use - Water</h3>
           <div class="rpt table" id="waterRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/water.html?maxPeriods=4"></div>
-          <p>{{formatAnswer('WATER_PERF')}}</p>
-          <p>{{formatAnswer('WATER_CONTEXT')}}</p>
+          <p class="narrative" data-q="WATER_CONTEXT">{{formatAnswer('WATER_PERF')}}</p>
+          <p class="narrative" data-q="WATER_CONTEXT">{{formatAnswer('WATER_CONTEXT')}}</p>
         </section>
 
         <section id="carbonFootprintSect">
           <h3>Modelled Carbon Footprint</h3>
           <p>
-            The information provided in the previous sections of this sustainability report uses the ERIC returns as its data source. However, we are aware that this does not reflect our entire carbon footprint. Therefore, the following information uses a scaled model based on work performed by the Sustainable Development Unit (SDU) in 2009-10. More information available here: http://www.sduhealth.org.uk/policy-strategy/reporting/nhs-carbon-footprint.aspx
+            The information provided in the previous sections of this
+            sustainability report uses the ERIC returns as its data source.
+            However, we are aware that this does not reflect our entire carbon
+            footprint. Therefore, the following information uses a scaled model
+            based on work performed by the Sustainable Development Unit (SDU) in
+            2009-10. More information available here:
+            http://www.sduhealth.org.uk/policy-strategy/reporting/nhs-carbon-footprint.aspx
           </p>
           <p>This shows how the most recent year&apos;s footprint breaks down as percentages. Any segment less than 5% is combined into &apos;Other&apos;.</p>
           <section class="col-md-6 col-xs-12">
@@ -441,12 +448,12 @@
                 data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-footprint.html?maxPeriods=1"></div>
           </section>
           {{#if getAnswer('ECLASS_USER')}}
-            <section id="eclassCarbonProfileSect" style="clear:both">
+            <section id="eclassCarbonProfileSect">
               <h2>E-Class Procurement Profile</h2>
               <div class="rpt table" id="eclassProfileRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/eclass-carbon-profile.html?maxPeriods=4"></div>
             </section>
           {{else}}
-            <section id="sduCarbonProfileSect" style="clear:both">
+            <section id="sduCarbonProfileSect">
               <h2>SDU whole organisation carbon profile</h2>
               <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
               <div class="rpt table" id="sduProfileRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/sdu-carbon-profile.html?maxPeriods=4"></div>
@@ -458,7 +465,7 @@
 
         <section id="trajectorySect">
           <h3>Carbon emissions progress</h3>
-          <p>{{formatAnswer('TRAJECTORY_PERF')}}</p>
+          <p class="narrative" data-q="TRAJECTORY_PERF">{{formatAnswer('TRAJECTORY_PERF')}}</p>
           <p>
             <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-trajectory.csv"
                 data-colors="#0072ce,#0BBDE5,#0BDBC9"
@@ -467,6 +474,7 @@
           </p>
           <div class="rpt table" id="trajectoryRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-trajectory.html?maxPeriods=4"></div>
         </section>
+
       </section>
 
       <section id="adaptationSect">
@@ -491,7 +499,7 @@
 
   <script src="https://api.srp.digital/js/md5.min.js"></script>
   <script src="2.0.0/js/string-functions-0.1.0.js"></script>
-  <script src="https://api.srp.digital/workmgmt/2.3.0/js/i18n.js"></script>
+  <script src="https://api.srp.digital/workmgmt/3.0.0/js/i18n.js"></script>
 
   <script src="https://api.srp.digital/js/env.js"></script>
   <script src="2.0.0/js/base.js"></script>

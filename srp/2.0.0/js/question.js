@@ -218,7 +218,7 @@ var ractive = new BaseRactive({
     $('input[type="search"]').blur();
   },
   hideResults: function() {
-    $('#questionsTableToggle').addClass('glyphicon-triangle-right').removeClass('glyphicon-triangle-bottom');
+    $('#questionsTableToggle').addClass('kp-icon-caret-right').removeClass('kp-icon-caret-down');
     $('#questionsTable').slideUp();
     $('#currentSect').slideDown({ queue: true });
   },
@@ -291,7 +291,7 @@ var ractive = new BaseRactive({
     this.showMessage(msg, addClass);
   },
   showResults: function() {
-    $('#questionsTableToggle').addClass('glyphicon-triangle-bottom').removeClass('glyphicon-triangle-right');
+    $('#questionsTableToggle').addClass('kp-icon-caret-down').removeClass('kp-icon-caret-right');
     $('#currentSect').slideUp();
     $('#questionsTable').slideDown({ queue: true });
   },
@@ -308,7 +308,7 @@ var ractive = new BaseRactive({
   },
   toggleResults: function() {
     console.info('toggleResults');
-    $('#questionsTableToggle').toggleClass('glyphicon-triangle-bottom').toggleClass('glyphicon-triangle-right');
+    $('#questionsTableToggle').toggleClass('kp-icon-caret-down').toggleClass('kp-icon-caret-right');
     $('#questionsTable').slideToggle();
   }
 });

@@ -299,7 +299,7 @@ var ractive = new BaseRactive({
     this.showMessage(msg, addClass);
   },
   showResults: function() {
-    $('#organisationTypesTableToggle').addClass('glyphicon-triangle-bottom').removeClass('glyphicon-triangle-right');
+    $('#organisationTypesTableToggle').addClass('kp-icon-caret-down').removeClass('kp-icon-caret-right');
     $('#currentSect').slideUp();
     $('#organisationTypesTable').slideDown({ queue: true });
   },
@@ -308,7 +308,7 @@ var ractive = new BaseRactive({
   },
   toggleResults: function() {
     console.log('toggleResults');
-    $('#organisationTypesTableToggle').toggleClass('glyphicon-triangle-bottom').toggleClass('glyphicon-triangle-right');
+    $('#organisationTypesTableToggle').toggleClass('kp-icon-caret-down').toggleClass('kp-icon-caret-right');
     $('#organisationTypesTable').slideToggle();
   }
 });

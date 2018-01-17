@@ -256,7 +256,7 @@ var ractive = new BaseRactive({
     return uri;
   },
   hideResults: function() {
-    $('#interventionTypesTableToggle').addClass('glyphicon-triangle-right').removeClass('glyphicon-triangle-bottom');
+    $('#interventionTypesTableToggle').addClass('kp-icon-caret-right').removeClass('kp-icon-caret-down');
     $('#interventionTypesTable').slideUp();
     $('#currentSect').slideDown({ queue: true });
   },
@@ -388,7 +388,7 @@ var ractive = new BaseRactive({
     this.showMessage(msg, addClass);
   },
   showResults: function() {
-    $('#interventionTypesTableToggle').addClass('glyphicon-triangle-bottom').removeClass('glyphicon-triangle-right');
+    $('#interventionTypesTableToggle').addClass('kp-icon-caret-down').removeClass('kp-icon-caret-right');
     $('#currentSect').slideUp();
     $('#interventionTypesTable').slideDown({ queue: true });
   },
@@ -401,7 +401,7 @@ var ractive = new BaseRactive({
   },
   toggleResults: function() {
     console.info('toggleResults');
-    $('#interventionTypesTableToggle').toggleClass('glyphicon-triangle-bottom').toggleClass('glyphicon-triangle-right');
+    $('#interventionTypesTableToggle').toggleClass('kp-icon-caret-down').toggleClass('kp-icon-caret-right');
     $('#interventionTypesTable').slideToggle();
   },
   updateTimeSeriesSummary: function() {
