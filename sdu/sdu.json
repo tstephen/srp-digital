@@ -52,6 +52,7 @@
   ],
   "contactActions": [
     { "name": "Send email", "ref": "SendMemo", "url": true  },
+    { "name": "Convert to user", "ref": "ConvertContactToUser", "url": false },
     { "name": "Send new password", "ref": "SendNewPassword", "url": false }
   ],
   "toolbar": [
@@ -101,12 +102,14 @@
     { "name": "Add Activity To Contact", "ref": "AddActivityToContact", "url": "processes/link/omny/custmgmt/AddActivityToContact.bpmn" },
     { "name": "Add contact to account", "ref": "AddContactToAccount", "url": "processes/link/omny/custmgmt/AddContactToAccount.bpmn" },
     { "name": "Add Note To Contact", "ref": "AddNoteToContact", "url": "processes/link/omny/custmgmt/AddNoteToContact.bpmn" },
+    { "name": "Convert contact to user", "ref": "ConvertContactToUser", "url": "processes/link/omny/acctmgmt/ConvertContactToUser.bpmn" },
     { "name": "Create Contact and Account", "ref": "CreateContactAndAccount", "url": "processes/link/omny/custmgmt/CreateContactAccountAndOrder.bpmn" },
     { "name": "Merge memo", "ref": "MergeMemoTemplate", "url": "processes/link/omny/memos/MergeMemoTemplate.bpmn" },
     { "name": "Raise Ticket", "ref": "RaiseTicket", "url": "processes/link/omny/support/RaiseTicket.bpmn" },
+    { "name": "Read contact", "ref": "ReadContact", "url": "processes/link/omny/custmgmt/ReadContact.bpmn" },
     { "name": "Record an enquiry", "ref": "RecordEnquiry", "url": "processes/link/omny/website/RecordEnquiry.bpmn" },
     { "name": "Register a new user", "ref": "RegisterOmnyContact", "url": "processes/link/omny/acctmgmt/RegisterOmnyContact.bpmn" },
-    { "name": "Reset user's password", "ref": "ResetPassword", "url": "processes/link/omny/support/ResetPassword.bpmn" },
+    { "name": "Request new password", "ref": "RequestNewPassword", "url": "processes/link/omny/support/RequestNewPassword.bpmn" },
     { "name": "Select enquiry response", "ref": "SelectEnquiryResponse", "url": "processes/link/omny/mail/SelectDefaultEnquiryResponse.bpmn" },
     { "name": "Send memo", "ref": "SendMemo", "url": "processes/link/omny/memos/SendMemo.bpmn" },
     { "name": "Send new password", "ref": "SendNewPassword", "url": "processes/link/omny/support/SendNewPassword.bpmn" },
@@ -205,10 +208,6 @@
         {  "name": "Direct"  },
         {  "name": "Organic"  },
         {  "name": "Referral"  }
-      ]
-    },{ "ref": "#curOwner", "values": [
-        {  "name": "derek@trakeo.com"  },
-        {  "name": "tim@trakeo.com"  }
       ]
     },{ "name": "nhsEnglandAreas", "ref": "#curNhsEnglandArea", "values": [
         {  "name": "NHS England London"  },
