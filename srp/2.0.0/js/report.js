@@ -24,6 +24,7 @@ var ractive = new BaseRactive({
         'PROVIDER7_COMMISSIONED','PROVIDER8_COMMISSIONED','CCG1_SERVED',
         'CCG2_SERVED','CCG3_SERVED','CCG4_SERVED','CCG5_SERVED','CCG6_SERVED'],
     requiredAnswers: ['ORG_CODE', 'ORG_NAME', 'ORG_TYPE', 'SDMP_CRMP', 'HEALTHY_TRANSPORT_PLAN', 'PROMOTE_HEALTHY_TRAVEL'],
+    period: '2017-18',
     server: $env.server,
     survey: 'SDU-2017-18',
     tenant: { id: 'sdu' },
@@ -43,7 +44,7 @@ var ractive = new BaseRactive({
       if (qName==undefined || ractive.get('surveyReturn.commissioners.'+idx)==undefined) return '';
       else {
         try {
-          var answer = ractive.getAnswer(qName, ractive.get('surveyReturn.commissioners.'+idx+'.answers'));
+          var answer = ractive.getAnswer(qName, ractive.get('period'), ractive.get('surveyReturn.commissioners.'+idx+'.answers'));
           return answer;
         } catch (e) {
           return '';
@@ -59,7 +60,7 @@ var ractive = new BaseRactive({
       if (qName==undefined || ractive.get('surveyReturn.providers.'+idx)==undefined) return '';
       else {
         try {
-          var answer = ractive.getAnswer(qName, ractive.get('surveyReturn.providers.'+idx+'.answers'));
+          var answer = ractive.getAnswer(qName, ractive.get('period'), ractive.get('surveyReturn.providers.'+idx+'.answers'));
           return answer;
         } catch (e) {
           return '';
@@ -304,17 +305,21 @@ var ractive = new BaseRactive({
       d.innerText = a.replace(new RegExp("^(\\d{" + (a.length%3?a.length%3:0) + "})(\\d{3})", "g"), "$1,$2").replace(/(\d{3})+?/gi, "$1,").replace(/^,/,'').slice(0,-1);
     });
   },
-  getAnswer: function(qName, answers) {
-    if (answers == undefined) answers = ractive.get('surveyReturn.answers');
+  getAnswer: function(qName, period) {
+    if (period == undefined) period = ractive.get('period');
+    var answers = ractive.get('surveyReturn.answers');
+    return ractive.getAnswerFromArray(qName, period, answers);
+  },
+  getAnswerFromArray: function(qName, period, answers) {
     for (var idx = 0 ; idx < answers.length ; idx++) {
       var a = answers[idx];
-      if (a.question.name == qName && a.response=='true') {
+      if (a.question.name == qName && a.applicablePeriod == period && a.response=='true') {
         return true;
-      } else if (a.question.name == qName && a.response=='false') {
+      } else if (a.question.name == qName && a.applicablePeriod == period && a.response=='false') {
         return false;
-      } else if (a.question.name == qName && a.question.type == 'number') {
+      } else if (a.question.name == qName && a.applicablePeriod == period && a.question.type == 'number') {
         return parseFloat(a.response).sigFigs(3);
-      } else if (a.question.name == qName) {
+      } else if (a.question.name == qName && a.applicablePeriod == period) {
         return a.response;
       }
     }
