@@ -26,7 +26,7 @@
           obligation to work in a way that has a positive effect on the
           communities we serve. Sustainability means spending public money well,
           the smart and efficient use of natural resources and building healthy,
-          resilient communties.  By making the most of by making the most of
+          resilient communities.  By making the most of by making the most of
           social, environmental and economic assets we can improve health both
           in the immediate and long term even in the context of rising cost of
           natural resources. Demonstrating that we consider the social and
@@ -44,7 +44,7 @@
             has created a sustainable development management plan (SDMP).
           </p>
           {{#if formatAnswer('SDMP_MISSION_STATEMENT')}}
-            <p>Our sustainiability mission statement is... {{formatAnswer('SDMP_MISSION_STATEMENT')}}</p>
+            <p>Our sustainability mission statement is: {{formatAnswer('SDMP_MISSION_STATEMENT')}}</p>
           {{/if}}
         {{else}}
           <p>
@@ -94,20 +94,6 @@
           {{/if}}
         </p>
         <p>
-          {{#if formatAnswer('GCC_USER')}}
-            One of the ways in which we measure our impact as an organisation on corporate social responsibility is through the use of the <a href="https://www.sduhealth.org.uk/sdat/">Sustainable Development Assessment Tool</a> (SDAT) tool.
-            {{#if formatAnswer('LAST_GCC_DATE')!=undefined}}
-              The last time we used the SDAT self assessment was in {{formatAnswer('LAST_GCC_DATE')}}
-              scoring {{formatAnswer('LAST_GCC_SCORE')}}.
-            {{/if}}
-            {{#if formatAnswer('promoteSustainabilityToStaff')}}
-              As an organisation that acknowledges its responsibility towards creating a sustainable future, we help acheive that goal by running awareness campaigns that promote the benefits of sustainability to our staff.
-            {{/if}}
-          {{else}}
-            We do not currently use the <a href="https://www.sduhealth.org.uk/sdat/">Sustainable Development Assessment Tool</a> (SDAT) tool or run awareness campaigns promoting sustainability.
-          {{/if}}
-        </p>
-        <p>
           Climate change brings new challenges to our business both in direct
           effects to the healthcare estates, but also to patient health.
           Examples of recent years include the effects of heat waves, extreme
@@ -122,8 +108,22 @@
             area.
           {{/if}}
         </p>
+        <p>
+          {{#if formatAnswer('GCC_USER')}}
+            One of the ways in which we measure our impact as an organisation on corporate social responsibility is through the use of the <a href="https://www.sduhealth.org.uk/sdat/">Sustainable Development Assessment Tool</a> (SDAT) tool.
+            {{#if formatAnswer('LAST_GCC_DATE')!=undefined}}
+              The last time we used the SDAT self assessment was in {{formatAnswer('LAST_GCC_DATE')}}
+              scoring {{formatAnswer('LAST_GCC_SCORE')}}.
+            {{/if}}
+            {{#if formatAnswer('promoteSustainabilityToStaff')}}
+              As an organisation that acknowledges its responsibility towards creating a sustainable future, we help acheive that goal by running awareness campaigns that promote the benefits of sustainability to our staff.
+            {{/if}}
+          {{else}}
+            We do not currently use the <a href="https://www.sduhealth.org.uk/sdat/">Sustainable Development Assessment Tool</a> (SDAT) tool or run awareness campaigns promoting sustainability.
+          {{/if}}
+        </p>
         {{#formatAnswer('SDG_STARTING')==''}}
-          <p>Our organisation is not yet <em>starting</em> to contribute to any of the Sustainable Development Goals (SDGs).</p>
+          {{! Nothing here #178 }}
         {{/}}
         {{#formatAnswer('SDG_STARTING')!=''}}
           <p>Our organisation is <em>starting</em> to contribute to the following Sustainable Development Goals (SDGs).</p>
@@ -149,7 +149,7 @@
           </div>
         {{/}}
         {{#formatAnswer('SDG_CLEAR')==''}}
-          <p>Our organisation is not yet <em>clearly</em> contributing to any of the Sustainable Development Goals (SDGs).</p>
+          {{! Nothing here #178 }}
         {{/}}
         {{#formatAnswer('SDG_CLEAR')!=''}}
         <p>
@@ -185,25 +185,17 @@
         </p>
         <p>
           {{#if formatAnswer('MOD_SLAVERY')}}
-            Our statement on Modern Slavery is... {{formatAnswer('MOD_SLAVERY')}}
+            Our statement on Modern Slavery is: {{formatAnswer('MOD_SLAVERY')}}
           {{else}}
             We have not currently issued a statement on Modern Slavery.
           {{/if}}
         </p>
         <p>
           {{#if formatAnswer('SOCIAL_VALUE')}}
-            Our statement on Public Services (Social Value) Act is...{{formatAnswer('SOCIAL_VALUE')}}
+            Our statement on Public Services (Social Value) Act is:{{formatAnswer('SOCIAL_VALUE')}}
           {{else}}
             We have not currently issued a statement on meeting the requirements
             of the Public Services (Social Value) Act.
-          {{/if}}
-        </p>
-        <p>
-          {{#if formatAnswer('BIODIVERSITY')}}
-            {{formatAnswer('BIODIVERSITY')}}
-          {{else}}
-            We have not currently issued a statement on policy or initiatives
-            related to improving biodiversity and maximising the value of access to green space.
           {{/if}}
         </p>
       </section>
@@ -224,7 +216,7 @@
         {{/if}}
 
         {{#if isCcg()}}
-          <p>For commissioned services here is the sustainability comparitor for our providers; <em>please note this is published a year in arrears</em>:</p>
+          <p>For commissioned services here is the sustainability comparator for our providers; <em>please note this is published a year in arrears</em>:</p>
           <table class="table table-striped">
             <thead>
               <tr>
@@ -311,7 +303,7 @@
             <div class="rpt table" id="orgRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/org.html?maxPeriods=4"></div>
 
             <p>
-              In 2014 the Sustainable Development Strategy outlined an ambition to
+              The 2014-2020 Sustainable Development Strategy outlined an ambition to
               reduce the carbon footprint of the NHS by 28% (from a 2013 baseline)
               by 2020. We have supported this ambition as follows:</p>
           {{/if}}
@@ -354,6 +346,17 @@
 
         <section id="energySect">
           <h3>Energy</h3>
+ <!--
+=IF(E106=0,"",(IF($Input.$B$20="",$Input.$B$18,$Input.$B$20)&" has spent £"&$Input.M69&" on energy in 2017/18, which is a "&IF(F106>E106,ROUND((F106-E106)*100/E106,1),ROUND((E106-F106)*100/E106,1))&IF(F106>E106,"% increase","% decrease")&" on energy spend from last year."))
+-->
+          {{#formatAnswer('TOTAL_ENERGY_COST')!='NaN'}}
+            <p>{{formatAnswer('ORG_NAME')}} has spent &pound;{{formatAnswer('TOTAL_ENERGY_COST')}} on energy in {{surveyReturn.applicablePeriod
+}}, which is a
+            {{formatAnswer('ENERGY_COST_CHANGE_PCT')}}%
+            {{#if isNaN(formatAnswer('ENERGY_COST_CHANGE_PCT')) || formatAnswer('ENERGY_COST_CHANGE_PCT').indexOf('-')==-1}} increase {{else}} decrease {{/if}}
+            on energy spend from last year.
+            </p>
+          {{/}}
           <h4>Energy used</h4>
           <p>Energy consumption in kWh</p>
           <div class="rpt table" id="energyRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/energy.html?maxPeriods=4"></div>
@@ -473,6 +476,17 @@
         <h2>Adaptation</h2>
         <p>Events such as heatwaves, cold snaps and flooding are expected to increase as a result of climate change. To ensure that our services continue to meet the needs of our local population during such events we have developed and implemented a number of policies and protocols in partnership with other local agencies these include:</p>
         <p>{{formatAnswer('ADAPTATION_PERF')}}</p>
+      </section>
+      <section id="biodversitySect">
+        <h2>Biodoversity Action Plan</h2>
+        <p>
+          {{#if formatAnswer('BIODIVERSITY')}}
+            {{formatAnswer('BIODIVERSITY')}}
+          {{else}}
+            We have not currently issued a statement on policy or initiatives
+            related to improving biodiversity and maximising the value of access to green space.
+          {{/if}}
+        </p>
       </section>
     {{else}}
       <section class="loading" id="loadingSect">
