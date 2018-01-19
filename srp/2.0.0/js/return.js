@@ -5,6 +5,7 @@ var $r = (function ($, ractive, $auth) {
   };
   // var _org = 'RDR';
   var _isCcg = false;
+  var _isIE = false;
   var _orgType;
   var _server = $env.server;
   var _survey;
@@ -182,6 +183,13 @@ var $r = (function ($, ractive, $auth) {
       }
     } else {
       $('#PROVIDER1_COMMISSIONED,#PROVIDER2_COMMISSIONED,#PROVIDER3_COMMISSIONED,#PROVIDER4_COMMISSIONED,#PROVIDER5_COMMISSIONED,#PROVIDER6_COMMISSIONED,#PROVIDER7_COMMISSIONED,#PROVIDER8_COMMISSIONED').parent().parent().hide();
+    }
+    if (_isIE) {
+      $('.help-block').removeClass('hidden');
+      $('.previous').empty().append('&lt; Previous').addClass('btn');
+      $('.next').empty().append('Next &gt;').addClass('btn pull-right');
+    } else {
+      console.info('No need for IE workarounds');
     }
   }
   function _toggleEClass() {
@@ -389,6 +397,9 @@ var $r = (function ($, ractive, $auth) {
   ractive.fetchCallbacks.add(_hideCalcs);
   ractive.fetchCallbacks.add(me.fill);
   ractive.fetchCallbacks.add(_showQuestionnaire);
+
+  try { _isIE = navigator.userAgent.match(/trident/i)!=null; } catch (e) {
+  }
 
   return me;
 }($, ractive, $auth));
