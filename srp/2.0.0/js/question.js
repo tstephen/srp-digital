@@ -104,6 +104,9 @@ var ractive = new BaseRactive({
         for (var idx = 0 ; idx < search.length ; idx++) {
           var searchTerm = search[idx].toLowerCase();
           var match = ( (obj.name.toLowerCase().indexOf(searchTerm)>=0)
+            || (obj.label!=undefined && obj.label.toLowerCase().indexOf(searchTerm)>=0)
+            || (obj.hint!=undefined && obj.hint.toLowerCase().indexOf(searchTerm)>=0)
+            || (obj.placeholder!=undefined && obj.placeholder.toLowerCase().indexOf(searchTerm)>=0)
             || (obj.source!=undefined && obj.source.toLowerCase().indexOf(searchTerm)>=0)
             || (obj.type!=undefined && obj.type.toLowerCase().indexOf(searchTerm)>=0)
             || (searchTerm.startsWith('updated>') && new Date(obj.lastUpdated)>new Date(searchTerm.substring(8)))
