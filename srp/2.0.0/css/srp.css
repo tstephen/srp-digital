@@ -68,7 +68,10 @@ small {
   font-style: italic;
 }
 .btn.importEric > .glyphicon {
-  padding:6px;
+  padding-left:6px;
+}
+.help-block {
+  font-style: italic;
 }
 .navbar-brand {
   padding-top: 0;
