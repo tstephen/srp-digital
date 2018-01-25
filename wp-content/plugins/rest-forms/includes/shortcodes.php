@@ -50,7 +50,7 @@
       foreach($form_consts as $c) {
         $arr = explode('=',$c);
         //$temp_content .= ('<input id="'.$arr[0].'" value="'.$arr[1].'" type="hidden"/>');
-        $temp_content .= $arr[0].':"'.$arr[1].'",';
+        if (!empty($arr[0])) $temp_content .= $arr[0].':"'.$arr[1].'",';
       }
     }
     $temp_content .= 'ip:"'.$_SERVER["REMOTE_ADDR"].'",';

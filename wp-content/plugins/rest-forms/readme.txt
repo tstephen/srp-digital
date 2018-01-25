@@ -2,7 +2,7 @@
 Contributors: tstephenson
 Tags: forms, ajax, OmnyLink
 Requires at least: 4.0
-Tested up to: 4.4.2
+Tested up to: 4.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Stable tag: trunk
@@ -119,6 +119,10 @@ The form's JSON payload may be accessed as $_REQUEST['json'].
 2. Embedding the shortcode in a page and passing the additional property 'product name'.
 
 == Changelog ==
+
+= 1.0.0.alpha8 =
+
+- #23 radio button binding fix
 
 = 1.0.0.alpha7 =
 
