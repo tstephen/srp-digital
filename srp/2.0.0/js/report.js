@@ -18,7 +18,8 @@ var ractive = new BaseRactive({
   lazy: true,
   template: '#template',
   data: {
-    narrativePrompt: 'Please click to insert a commentary on your performance in this area.',
+    narrativeCtxtPrompt: 'Please insert a commentary on contextual information e.g. projects, initiatives etc. related to this area.',
+    narrativePerfPrompt: 'Please click to insert a commentary on your performance in this area.',
     orgAnswerNames: ['PROVIDER1_COMMISSIONED','PROVIDER2_COMMISSIONED','PROVIDER3_COMMISSIONED',
         'PROVIDER4_COMMISSIONED','PROVIDER5_COMMISSIONED','PROVIDER6_COMMISSIONED',
         'PROVIDER7_COMMISSIONED','PROVIDER8_COMMISSIONED','CCG1_SERVED',
@@ -348,8 +349,10 @@ var ractive = new BaseRactive({
                 ev.target.innerText);
           }
         });
-    $('.narrative:empty')
-        .html(ractive.get('narrativePrompt'));
+    $('.narrative.context:empty')
+        .html(ractive.get('narrativeCtxtPrompt'));
+    $('.narrative.performance:empty')
+        .html(ractive.get('narrativePerfPrompt'));
   },
   isCcg: function() {
     if (ractive.get('surveyReturn')==undefined) return false;

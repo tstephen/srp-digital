@@ -371,7 +371,7 @@
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
           <div class="rpt table" id="energyCo2eRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/energy-co2e.html?maxPeriods=4"></div>
 
-          <p class="narrative" data-q="ENERGY_PERF">{{formatAnswer('ENERGY_PERF')}}</p>
+          <p class="narrative performance" data-q="ENERGY_PERF">{{formatAnswer('ENERGY_PERF')}}</p>
           <p>
             {{! TODO to calculate, perhaps server side }}
             {{#if formatAnswer('ELEC_USED_3RD_PTY_PCT')}}
@@ -381,7 +381,7 @@
             {{/if}}
             % of our electricity use comes from renewable sources.
           </p>
-          <p class="narrative" contenteditable data-q="ENERGY_CTXT">{{formatAnswer('ENERGY_CTXT')}}</p>
+          <p class="narrative context" contenteditable data-q="ENERGY_CTXT">{{formatAnswer('ENERGY_CTXT')}}</p>
         </section>
 
         <section id="travelSect">
@@ -400,7 +400,7 @@
           </p>
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
           <div class="rpt table" id="travelCo2eRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/travel-co2e.html?maxPeriods=4"></div>
-          <p class="narrative" data-q="TRAVEL_PERF">{{formatAnswer('TRAVEL_PERF')}}</p>
+          <p class="narrative performance" data-q="TRAVEL_PERF">{{formatAnswer('TRAVEL_PERF')}}</p>
         </section>
 
         <section id="wasteSect">
@@ -416,15 +416,15 @@
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
 
           <div class="rpt table" id="wasteCo2eRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/waste-co2e.html?maxPeriods=4"></div>
-          <p class="narrative" data-q="WASTE_PERF">{{formatAnswer('WASTE_PERF')}}</p>
-          <p class="narrative" data-q="WASTE_CONTEXT">{{formatAnswer('WASTE_CONTEXT')}}</p>
+          <p class="narrative performance" data-q="WASTE_PERF">{{formatAnswer('WASTE_PERF')}}</p>
+          <p class="narrative context" data-q="WASTE_CONTEXT">{{formatAnswer('WASTE_CONTEXT')}}</p>
         </section>
 
         <section id="waterSect">
           <h3>Finite resource use - Water</h3>
           <div class="rpt table" id="waterRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/water.html?maxPeriods=4"></div>
-          <p class="narrative" data-q="WATER_CONTEXT">{{formatAnswer('WATER_PERF')}}</p>
-          <p class="narrative" data-q="WATER_CONTEXT">{{formatAnswer('WATER_CONTEXT')}}</p>
+          <p class="narrative performance" data-q="WATER_PERF">{{formatAnswer('WATER_PERF')}}</p>
+          <p class="narrative context" data-q="WATER_CONTEXT">{{formatAnswer('WATER_CONTEXT')}}</p>
         </section>
 
         <section id="carbonFootprintSect">
@@ -467,7 +467,7 @@
 
         <section id="trajectorySect">
           <h3>Carbon emissions progress</h3>
-          <p class="narrative" data-q="TRAJECTORY_PERF">{{formatAnswer('TRAJECTORY_PERF')}}</p>
+          <p class="narrative performance" data-q="TRAJECTORY_PERF">{{formatAnswer('TRAJECTORY_PERF')}}</p>
           <p>
             <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-trajectory.csv"
                 data-colors="#0072ce,#0BBDE5,#0BDBC9"
