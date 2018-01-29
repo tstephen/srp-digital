@@ -141,11 +141,34 @@ th {
 }
 /* END BOOTSTRAP OVERRIDES */
 
+#ajax-loader {
+  left: 45%;
+  position: fixed;
+  top: 45%;
+}
 #ajax-loader img.ajax-loader {
+  position: fixed;
   left: 55%;
   width: 80px;
+  z-index: 200;
 }
 
+.ajax-loader {
+  animation-name: spin;
+  animation-duration: 4000ms;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+@keyframes blinker {
+  50% { opacity: 0; }
+}
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  } to {
+    transform: rotate(360deg);
+  }
+}
 .clickable:focus,
 .clickable:hover,
 a.glyphicon:focus,
