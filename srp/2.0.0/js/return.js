@@ -90,7 +90,7 @@ var $r = (function ($, ractive, $auth) {
         console.log('  fill: '+survey.categories[i].questions[j].name);
 
         // reset question
-        ractive.set('q.categories.'+i+'.questions.'+j+'.response', undefined);
+        //ractive.set('q.categories.'+i+'.questions.'+j+'.response', undefined);
         $('#'+survey.categories[i].questions[j].name).removeAttr('readonly').removeAttr('disabled');
 
         // fill answer
@@ -138,9 +138,11 @@ var $r = (function ($, ractive, $auth) {
               }
               // update ractive model with current value or default
               if (me.rtn.answers[k].response!=undefined && me.rtn.answers[k].response!='') {
-                ractive.set('q.categories.'+i+'.questions.'+j+'.response', me.rtn.answers[k].response);
+                ractive.set('q.categories.'+i+'.questions.'+j+'.response', $r.getAnswer(me.rtn.answers[k].question.name, _period).response);
               } else if (ractive.get('q.categories.'+i+'.questions.'+j+'.defaultValue')!=undefined) {
                 ractive.set('q.categories.'+i+'.questions.'+j+'.response', ractive.get('q.categories.'+i+'.questions.'+j+'.defaultValue'));
+              } else {
+                ractive.set('q.categories.'+i+'.questions.'+j+'.response', '');
               }
             }
             // store answer that needs to receive updates
@@ -231,47 +233,6 @@ var $r = (function ($, ractive, $auth) {
     if (me.rtn==undefined) _survey = survey;
     else _fill(survey);
 
-    ractive.observe('q.categories.*.questions.*.response', function(newValue, oldValue, keypath) {
-      if (newValue === oldValue) return;
-      console.log('change '+keypath+' from '+oldValue+' to '+newValue);
-      if (newValue==null) return; // loading form
-      var q = ractive.get(keypath.substring(0, keypath.indexOf('.response')));
-      // if (q['answer']!=undefined) {
-      //   q.answer.response=newValue;
-      //   $r.dirty = true;
-      // }
-      if ($r.rtn!=undefined && newValue!='') {
-        var found = false;
-        for (idx in $r.rtn.answers) {
-          if (found) break;
-          if ($r.rtn.answers[idx].question.name == q.name && $r.rtn.answers[idx].applicablePeriod == _period) {
-            $r.rtn.answers[idx].response = newValue;
-            found = true;
-          }
-        }
-        if (!found) {
-          $r.rtn.answers.push( { question: q, response: newValue, applicablePeriod: _period, status: 'Draft', revision: 1 } );
-        }
-        $r.dirty = true;
-      }
-      // apply inter-question dependencies
-      switch(q.name) {
-      case 'ECLASS_USER':
-        if (newValue=='0-E-Class') {
-          $('section#Procurement.category li:not(:first)').slideDown();
-        } else {
-          $('section#Procurement.category li:not(:first)').slideUp();
-        }
-        break;
-      case 'SDMP_CRMP':
-        if (newValue=='true') {
-          $('section#Policy.category li:hidden').slideDown();
-        } else {
-          $('section#Policy.category li:gt(0):lt(3)').slideUp();
-        }
-        break;
-      }
-    });
   };
 
   me.getAnswer = function(qName,period) {
@@ -375,6 +336,43 @@ var $r = (function ($, ractive, $auth) {
           parent.notifyIFrameSize($('#containerSect').height());
         },100);
       }
+    }
+  });
+
+  ractive.observe('q.categories.*.questions.*.response', function(newValue, oldValue, keypath) {
+    if (newValue === oldValue) return;
+    console.log('change '+keypath+' from '+oldValue+' to '+newValue);
+    var q = ractive.get(keypath.substring(0, keypath.indexOf('.response')));
+    if ($r.rtn!=undefined) {
+      var found = false;
+      for (idx in $r.rtn.answers) {
+        if (found) break;
+        if ($r.rtn.answers[idx].question.name == q.name && $r.rtn.answers[idx].applicablePeriod == _period) {
+          $r.rtn.answers[idx].response = newValue;
+          found = true;
+        }
+      }
+      if (!found) {
+        $r.rtn.answers.push( { question: q, response: newValue, applicablePeriod: _period, status: 'Draft', revision: 1 } );
+      }
+      $r.dirty = true;
+    }
+    // apply inter-question dependencies
+    switch(q.name) {
+    case 'ECLASS_USER':
+      if (newValue=='0-E-Class') {
+        $('section#Procurement.category li:not(:first)').slideDown();
+      } else {
+        $('section#Procurement.category li:not(:first)').slideUp();
+      }
+      break;
+    case 'SDMP_CRMP':
+      if (newValue=='true') {
+        $('section#Policy.category li:hidden').slideDown();
+      } else {
+        $('section#Policy.category li:gt(0):lt(3)').slideUp();
+      }
+      break;
     }
   });
 

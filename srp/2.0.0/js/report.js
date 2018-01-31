@@ -164,7 +164,7 @@ var ractive = new BaseRactive({
     for (var idx = 1 ; idx < ractive.get('orgAnswerNames').length ; idx++) {
       try {
         var org = ractive.getAnswer(ractive.get('orgAnswerNames')[idx]);
-        if (org == undefined) continue;
+        if (org == undefined || org.trim().length==0) continue;
         $.ajax({
           dataType: "json",
           url: ractive.getServer()+'/'+ractive.get('tenant.id')+'/accounts/findByName/'+encodeURIComponent(org),
