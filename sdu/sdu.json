@@ -114,7 +114,6 @@
     { "name": "Send memo", "ref": "SendMemo", "url": "processes/link/omny/memos/SendMemo.bpmn" },
     { "name": "Send new password", "ref": "SendNewPassword", "url": "processes/link/omny/support/SendNewPassword.bpmn" },
     { "name": "Send alert", "ref": "SendAlert", "url": "processes/link/omny/alerts/SendAlertEmail.bpmn" },
-    { "name": "Send alert", "ref": "SendAlert", "url": "processes/link/omny/alerts/SendAlertMemo.bpmn" },
     { "name": "Update contact", "ref": "UpdateContact", "url": "processes/link/omny/custmgmt/UpdateContact.bpmn" },
     { "name": "Restate sustainability return", "ref": "RestateSustainabilityReturn", "url": "processes/digital/srp/returns/RestateSustainabilityReturn.bpmn" },
     { "name": "Submit sustainability return", "ref": "SubmitSustainabilityReturn", "url": "processes/digital/srp/returns/SubmitSustainabilityReturn.bpmn" },
