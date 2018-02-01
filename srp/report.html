@@ -109,12 +109,10 @@
           {{/if}}
         </p>
         <p>
-          {{#if formatAnswer('GCC_USER')}}
+          {{#if formatAnswer('LAST_GCC_DATE')!=undefined && formatAnswer('LAST_GCC_DATE')!=''}}
             One of the ways in which we measure our impact as an organisation on corporate social responsibility is through the use of the <a href="https://www.sduhealth.org.uk/sdat/">Sustainable Development Assessment Tool</a> (SDAT) tool.
-            {{#if formatAnswer('LAST_GCC_DATE')!=undefined}}
               The last time we used the SDAT self assessment was in {{formatAnswer('LAST_GCC_DATE')}}
               scoring {{formatAnswer('LAST_GCC_SCORE')}}.
-            {{/if}}
             {{#if formatAnswer('promoteSustainabilityToStaff')}}
               As an organisation that acknowledges its responsibility towards creating a sustainable future, we help acheive that goal by running awareness campaigns that promote the benefits of sustainability to our staff.
             {{/if}}
