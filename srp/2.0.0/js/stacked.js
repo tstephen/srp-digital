@@ -1,7 +1,7 @@
 function renderStacked(selector, csvString, options) {
   var defaultOptions = {
     colors: ["#0B4BE5", "#0072CE", "#0BBDE5", "#0BDBC9", "#00F299", "#A2FC00", "#FFEB00", "#FFAD00"],
-    legendWidth: 140,
+    legendWidth: 200,
     margin: {top: 20, right: 100, bottom: 50, left: 40},
     xAxisLabel: "Financial Years",
     yAxisLabel: "Tonnes CO\u2082e"
