@@ -434,6 +434,14 @@
         <section id="waterSect">
           <h3>Finite resource use - Water</h3>
           <div class="rpt table" id="waterRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/water.html?maxPeriods=4"></div>
+          <h4>Carbon emissions resulting</h4>
+          <p>
+            <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/water-co2e.csv"
+                 class="rpt stacked" id="waterGraph" width="600" height="400"></svg>
+          </p>
+          <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
+
+          <div class="rpt table" id="waterCo2eRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/water-co2e.html?maxPeriods=4"></div>
           <p class="narrative performance" data-q="WATER_PERF">{{formatAnswer('WATER_PERF')}}</p>
           <p class="narrative context" data-q="WATER_CONTEXT">{{formatAnswer('WATER_CONTEXT')}}</p>
         </section>
