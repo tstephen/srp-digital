@@ -382,6 +382,19 @@
           <p class="narrative context" contenteditable data-q="ENERGY_CTXT">{{formatAnswer('ENERGY_CTXT')}}</p>
         </section>
 
+        <section id="paperSect">
+          <h3>Paper</h3>
+          <p>The movement to a Paperless NHS can be supported by staff reducing the use of paper at all levels, this reduces the environmental impact of paper, reducing cost of paper to the NHS and can help improve data security.</p>
+
+          <h4>Paper consumed</h4>
+          <p>Cost is in pounds and weight in tonnes.</p>
+          <div class="rpt table" id="paperRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/paper.html?maxPeriods=4"></div>
+          <h4>Carbon emissions resulting</h4>
+          <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
+          <div class="rpt table" id="paperCo2eRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/paper-co2e.html?maxPeriods=4"></div>
+          <p class="narrative performance" data-q="PAPER_PERF">{{formatAnswer('PAPER_PERF')}}</p>
+        </section>
+
         <section id="travelSect">
           <h3>Travel</h3>
           <p>We can improve local air quality and improve the health of our community by promoting active travel to our staff and to the patients and public that use our services.
