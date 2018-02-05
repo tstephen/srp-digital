@@ -194,9 +194,19 @@ var $r = (function ($, ractive, $auth) {
       console.info('No need for IE workarounds');
     }
   }
-  function _toggleEClass() {
-    
+
+  function _notifyParent() {
+    console.info('notify parent to resize');
+    if (parent!=undefined && parent['notifyClick']!=undefined) {
+      parent.notifyClick();
+      // allow time for notify click to scroll to top and for iframe to calc new height
+      setTimeout(function() {
+        //parent.alert(''+$('#containerSect').height());
+        parent.notifyIFrameSize($('#containerSect').height());
+      },400);
+    }
   }
+
   me.complete = function() {
     ractive.showMessage("Redirecting to your report... Don't forget to submit it when you're done. <br/>Unsubmitted reports will be submited automatically on 1st October after year end.");
     setTimeout(function() {
@@ -328,14 +338,7 @@ var $r = (function ($, ractive, $auth) {
   ractive.observe('q.activeCategory', function (newValue, oldValue, keypath) {
     if (newValue!=oldValue) {
       _hideNotApplicable();
-      if (parent!=undefined && parent['notifyClick']!=undefined) {
-        parent.notifyClick();
-        // allow time for notify click to scroll to top and for iframe to calc new height
-        setTimeout(function() {
-          //parent.alert(''+$('#containerSect').height());
-          parent.notifyIFrameSize($('#containerSect').height());
-        },100);
-      }
+      _notifyParent();
     }
   });
 
@@ -362,8 +365,10 @@ var $r = (function ($, ractive, $auth) {
     case 'ECLASS_USER':
       if (newValue=='0-E-Class') {
         $('section#Procurement.category li:not(:first)').slideDown();
+        _notifyParent();
       } else {
         $('section#Procurement.category li:not(:first)').slideUp();
+        _notifyParent();
       }
       break;
     case 'SDMP_CRMP':
