@@ -449,32 +449,28 @@
         <section id="carbonFootprintSect">
           <h3>Modelled Carbon Footprint</h3>
           <p>
-            The information provided in the previous sections of this
-            sustainability report uses the ERIC returns as its data source.
-            However, we are aware that this does not reflect our entire carbon
-            footprint. Therefore, the following information uses a scaled model
-            based on work performed by the Sustainable Development Unit (SDU) in
-            2009-10. More information available here:
-            http://www.sduhealth.org.uk/policy-strategy/reporting/nhs-carbon-footprint.aspx
+            The information provided in the previous sections of this sustainability report uses the ERIC returns as its data source. However, we are aware that this does not reflect our entire carbon footprint. Therefore, the following information estimates the impact of our supply chain from our spend. More information available here: <a href="http://www.sduhealth.org.uk/policy-strategy/reporting/nhs-carbon-footprint.aspx">http://www.sduhealth.org.uk/policy-strategy/reporting/nhs-carbon-footprint.aspx</a>
           </p>
-          <p>This shows how the most recent year&apos;s footprint breaks down as percentages. Any segment less than 5% is combined into &apos;Other&apos;.</p>
+          <!--p>This shows how the most recent year's footprint breaks down as percentages; Core represents the impact of the things we do, from the energy we use, to the driving we do to deliver care. Supply chain is all the things we buy to help us deliver quality care from bandages, to medicines and equipment. Community is the impact associated outside of the our organisation, such as staff commuting to work and the movement of patients to access care.</p-->
           <section class="col-md-6 col-xs-12">
+            <p>Any segment less than 5% is combined into &apos;Other&apos;.</p>
             <p>
               <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-footprint.csv?maxPeriods=1"
                    class="rpt pie" id="carbonFootprintPieChart" width="600" height="400"></svg>
             </p>
           </section>
           <section class="col-md-6 col-xs-12">
+            <p>The values in the table below are percentages.</p>
             <div class="rpt table" id="carbonFootprintRptTable"
                 data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-footprint.html?maxPeriods=1"></div>
           </section>
           {{#if getAnswer('ECLASS_USER')}}
-            <section id="eclassCarbonProfileSect">
+            <section id="eclassCarbonProfileSect" style="clear:both">
               <h2>E-Class Procurement Profile</h2>
               <div class="rpt table" id="eclassProfileRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/eclass-carbon-profile.html?maxPeriods=4"></div>
             </section>
           {{else}}
-            <section id="sduCarbonProfileSect">
+            <section id="sduCarbonProfileSect" style="clear:both">
               <h2>SDU whole organisation carbon profile</h2>
               <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
               <div class="rpt table" id="sduProfileRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/sdu-carbon-profile.html?maxPeriods=4"></div>
@@ -488,12 +484,12 @@
           <h3>Carbon emissions progress</h3>
           <p class="narrative performance" data-q="TRAJECTORY_PERF">{{formatAnswer('TRAJECTORY_PERF')}}</p>
           <p>
-            <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-trajectory.csv"
+            <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-trajectory.csv?maxPeriods=11"
                 data-colors="#0072ce,#0BBDE5,#0BDBC9"
                 data-y-axis-label="Emissions (tCO&#x2082;e)"
                 class="rpt stacked" id="carbonTrajectoryGraph" width="600" height="400"></svg>
           </p>
-          <div class="rpt table" id="trajectoryRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-trajectory.html?maxPeriods=4"></div>
+          <div class="rpt table" id="trajectoryRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-trajectory.html?maxPeriods=11"></div>
         </section>
 
       </section>
