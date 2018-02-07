@@ -86,6 +86,7 @@ var ractive = new BaseRactive({
   },
   calculate: function () {
     console.info('calculate...');
+    $('.btn-calc,.btn-refresh,.btn-submit').attr('disabled','disabled');
     $('#ajax-loader').show();
     $.ajax({
       dataType: "json",
@@ -358,6 +359,13 @@ var ractive = new BaseRactive({
     if (ractive.get('surveyReturn')==undefined) return false;
     if (ractive.getAnswer('ORG_TYPE')=='Clinical Commissioning Group') return true;
     else return false;
+  },
+  oninit: function() {
+    /* TODO this works but is too late to affect data load
+    $.getJSON($env.server+'/sdu/parameters/REPORTING_PERIOD', function(data) {
+      ractive.set('period', data.value);
+      ractive.set('survey', 'SDU-'+data.value);
+    });*/
   },
   reset: function() {
     console.info('reset');
