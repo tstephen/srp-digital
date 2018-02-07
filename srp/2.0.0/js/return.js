@@ -155,7 +155,7 @@ var $r = (function ($, ractive, $auth) {
     _bindLists();
 
     $('#questionnaireForm input, #questionnaireForm select, #questionnaireForm textarea')
-        .off().on('blur', me.submit);
+        .off().on('blur', me.saveAnswer);
 
     // Set questionnaire details specific to SDU return
     ractive.set('q.about.title', 'SDU return '+_period);
@@ -276,7 +276,8 @@ var $r = (function ($, ractive, $auth) {
       $('.next').hide();
       return;
     }
-    _period = (currentYear+1)+'-'+(currentYear+2-2000);
+    var yearEnd = (currentYear+2-2000);
+    _period = (currentYear+1)+'-'+(yearEnd < 10 ? '0'+yearEnd : yearEnd);
     ractive.set('q.about.title', 'SDU return '+_period);
     _fill(_survey);
     if (_period == _surveyPeriod) _enableHeadSections();
@@ -287,11 +288,50 @@ var $r = (function ($, ractive, $auth) {
     console.info('_movePrevious');
     $('.next').show();
     var currentYear = _period.substring(0,4);
-    _period = (currentYear-1)+'-'+(currentYear-2000);
+    var yearEnd = (currentYear-2000);
+    _period = (currentYear-1)+'-'+(yearEnd < 10 ? '0'+yearEnd : yearEnd);
     ractive.set('q.about.title', 'SDU return '+_period);
     _fill(_survey);
     if (_period == _surveyPeriod) _enableHeadSections();
     else _disableHeadSections();
+  }
+
+  me.saveAnswer = function(ev) {
+    var answer = $r.getAnswer(ev.target.id, _period);
+    if ($r.dirty == false || $r.rtn.status != 'Draft' || $auth.loginInProgress) {
+      console.info('skip save, dirty: '+$r.dirty+', loginInProgress: '+$auth.loginInProgress);
+      return;
+    } else if (me.rtn == undefined) {
+      ractive.fetch();
+      _fetchReturn();
+    }
+    $.each(me.rtn.links, function (i,d) {
+      if (d.rel=='self') me.rtn.selfRef = d.href;
+    });
+
+    var response = answer.response;
+    if (response == undefined) return;
+    if (answer.question.type = 'radio' && Array.isArray(answer.response)) {
+      response = answer.response.join();
+    }
+
+    $('.save-indicator').show();
+    return $.ajax({
+        url: me.rtn.selfRef+'/answers/'+answer.question.name+'/'+_period,
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(response),
+        success: function(data, textStatus, jqXHR) {
+          console.log('updated ok');
+          $('.save-indicator span').toggleClass('save-indicator-animation glyphicon-save glyphicon-saved');
+          setTimeout(function() {
+            $('.save-indicator').fadeOut(function() {
+              $('.save-indicator span').toggleClass('save-indicator-animation glyphicon-save glyphicon-saved');
+            });
+          }, 3000);
+          $r.dirty = false;
+        }
+      });
   }
 
   me.submit = function() {
@@ -346,18 +386,8 @@ var $r = (function ($, ractive, $auth) {
     if (newValue === oldValue) return;
     console.log('change '+keypath+' from '+oldValue+' to '+newValue);
     var q = ractive.get(keypath.substring(0, keypath.indexOf('.response')));
-    if ($r.rtn!=undefined) {
-      var found = false;
-      for (idx in $r.rtn.answers) {
-        if (found) break;
-        if ($r.rtn.answers[idx].question.name == q.name && $r.rtn.answers[idx].applicablePeriod == _period) {
-          $r.rtn.answers[idx].response = newValue;
-          found = true;
-        }
-      }
-      if (!found) {
-        $r.rtn.answers.push( { question: q, response: newValue, applicablePeriod: _period, status: 'Draft', revision: 1 } );
-      }
+    // after #226 not sure if this is still needed
+    if ($r.rtn!=undefined && oldValue!=undefined && oldValue!='') {
       $r.dirty = true;
     }
     // apply inter-question dependencies
