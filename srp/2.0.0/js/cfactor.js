@@ -153,7 +153,11 @@ var ractive = new BaseRactive({
     console.log('add...');
     $('h2.edit-form,h2.edit-field').hide();
     $('.create-form,create-field').show();
-    var cfactor = { applicablePeriod: new Date().getFullYear(), tenantId: ractive.get('tenant.id') };
+    var year = new Date().getFullYear();
+    var cfactor = {
+      applicablePeriod: year+'-'+(year-1999),
+      tenantId: ractive.get('tenant.id')
+    };
     ractive.select(cfactor);
   },
   delete: function (obj) {
@@ -208,6 +212,15 @@ var ractive = new BaseRactive({
     $('#cfactorsTable').slideUp();
     $('#currentSect').slideDown({ queue: true });
   },
+  postSelect(cfactor) {
+    ractive.set('current', cfactor);
+    ractive.initControls();
+    // who knows why this is needed, but it is, at least for first time rendering
+    $('.autoNumeric').autoNumeric('update',{});
+    ractive.hideResults();
+    $('#currentSect').slideDown();
+    ractive.set('saveObserver',true);
+  },
   save: function () {
     console.log('save cfactor: '+ractive.get('current').name+'...');
     ractive.set('saveObserver',false);
@@ -256,19 +269,13 @@ var ractive = new BaseRactive({
     var url = ractive.uri(cfactor);
     if (url == undefined) {
       console.log('Skipping load as no uri.');
-      ractive.set('current', cfactor);
-      ractive.set('saveObserver',true);
+      ractive.postSelect(cfactor);
     } else {
       console.log('loading detail for '+url);
       $.getJSON(url,  function( data ) {
         console.log('found cfactor '+data);
-        ractive.set('current', data);
-        ractive.initControls();
-        // who knows why this is needed, but it is, at least for first time rendering
-        $('.autoNumeric').autoNumeric('update',{});
-        ractive.hideResults();
-        $('#currentSect').slideDown();
-        ractive.set('saveObserver',true);
+        ractive.set('saveObserver',false);
+        ractive.postSelect(data);
       });
     }
   },

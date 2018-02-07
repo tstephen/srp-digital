@@ -12,7 +12,7 @@
         {{#matchRole('admin')}}
           <li>
             <label class="col-md-4 required">Name:</label>
-            <input class="form-control" disabled id="curName" readonly value="{{current.name}}">
+            <input class="form-control" id="curName" {{#current.name!=undefined}}disabled readonly{{/}} value="{{current.name}}">
           </li>
         {{/}}
         <li>
@@ -26,8 +26,8 @@
           <p class="help-block col-xs-offset-4"></p>
         </li>
         <li>
-          <label class="col-md-4">Applicable Period:</label>
-          <input class="form-control" id="curApplicablePeriod" value="{{current.applicablePeriod}}"/>
+          <label class="col-md-4 required">Applicable Period:</label>
+          <input class="form-control" id="curApplicablePeriod" required value="{{current.applicablePeriod}}"/>
           <p class="help-block col-xs-offset-4"></p>
         </li>
       </ul>
@@ -40,13 +40,13 @@
           <p class="help-block col-xs-offset-4"></p>
         </li>
         <li>
-          <label class="col-md-4">Value:</label>
-          <input class="form-control" id="curValue" value="{{current.value}}"/>
+          <label class="col-md-4 required">Value:</label>
+          <input class="form-control" id="curValue" required value="{{current.value}}"/>
           <p class="help-block col-xs-offset-4"></p>
         </li>
         <li>
           <label class="col-md-4 required">Unit:</label>
-          <input class="form-control" id="curUnit" value="{{current.unit}}"/>
+          <input class="form-control" id="curUnit" required value="{{current.unit}}"/>
           <p class="help-block col-xs-offset-4"></p>
         </li>
         <li>
