@@ -151,7 +151,7 @@ var ractive = new BaseRactive({
           .on('mouseout', function(ev) {
             $('#'+ev.currentTarget.id+' .controls').hide();
           });
-        $('#'+ctrl.id+' .controls .kp-icon-share').wrap('<a href="'+ractive.getServer()+$(ctrl).data('src')+'" target="_blank"></a>');
+        $('#'+ctrl.id+' .controls .kp-icon-new-tab').wrap('<a href="'+ractive.getServer()+$(ctrl).data('src')+'" target="_blank"></a>');
         callback('#'+ctrl.id, data, options);
         ractive.set('saveObserver', true);
       }
@@ -296,7 +296,7 @@ var ractive = new BaseRactive({
           .on('mouseout', function(ev) {
             $('#'+ev.currentTarget.id+' .controls').hide();
           });
-        $('#'+ctrl.id+' .controls .kp-icon-share').wrap('<a href="'+ractive.getServer()+$(ctrl).data('src')+'" target="_blank"></a>');
+        $('#'+ctrl.id+' .controls .kp-icon-new-tab').wrap('<a href="'+ractive.getServer()+$(ctrl).data('src')+'" target="_blank"></a>');
         ractive.set('saveObserver', true);
       }
     });
