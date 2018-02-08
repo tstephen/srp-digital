@@ -9,19 +9,19 @@ var replace     = require('gulp-replace');
 
 gulp.task('dev2prod', function() {
   gulp.src(['**/*.html'])
-    .pipe(replace('http://localhost:8083', 'https://api.srp.digital'))
+    .pipe(replace('http://localhost:8083', 'https://api.knowprocess.com'))
     .pipe(gulp.dest('.'));
   gulp.src(['sdu/sdu.json'])
-    .pipe(replace('http://localhost:8083', 'https://api.srp.digital'))
+    .pipe(replace('http://localhost:8083', 'https://api.knowprocess.com'))
     .pipe(gulp.dest('sdu/'));
 });
 
 gulp.task('prod2dev', function() {
   gulp.src(['**/*.html'])
-    .pipe(replace('https://api.srp.digital', 'http://localhost:8083'))
+    .pipe(replace('https://api.knowprocess.com', 'http://localhost:8083'))
     .pipe(gulp.dest('.'));
   gulp.src(['sdu/sdu.json'])
-    .pipe(replace('https://api.srp.digital', 'http://localhost:8083'))
+    .pipe(replace('https://api.knowprocess.com', 'http://localhost:8083'))
     .pipe(gulp.dest('sdu/'));
 });
 
