@@ -100,11 +100,13 @@ var $r = (function ($, ractive, $auth) {
             if (me.rtn.answers[k].question.type=='checkbox' && typeof me.rtn.answers[k].response == 'string') {
               me.rtn.answers[k].response = me.rtn.answers[k].response.split(',');
             }
-            if (me.rtn.answers[k].question.type=='radio' && typeof me.rtn.answers[k].response == 'string') {
-              me.rtn.answers[k].response = me.rtn.answers[k].response.split(',');
-            }
             switch (me.rtn.answers[k].question.name) {
             // special handling for organisation ...
+            case 'ECLASS_USER':
+              ractive.set('q.categories.'+i+'.questions.'+j+'.response', me.rtn.answers[k].response);
+              $('[data-id="ECLASS_USER"][value="'+me.rtn.answers[k].response+'"]').attr('checked','checked');
+              _toggleEClass();
+              break;
             case 'ORG_CODE':
               ractive.set('q.categories.'+i+'.questions.'+j+'.response', $auth.getClaim('org'));
               $('#ORG_CODE').attr('readonly','readonly').attr('disabled','disabled');
@@ -129,6 +131,29 @@ var $r = (function ($, ractive, $auth) {
               } else {
                 $('#'+me.rtn.answers[k].question.name).removeAttr('readonly').removeAttr('disabled');
               }
+              break;
+            case 'PROC_SUPPLIER_SUSTAINABILITY':
+              ractive.set('q.categories.'+i+'.questions.'+j+'.response', me.rtn.answers[k].response);
+              for (var idx = 0 ; idx < me.rtn.answers[k].response.length ; idx++) {
+                $('[data-id="PROC_SUPPLIER_SUSTAINABILITY"][value="'+me.rtn.answers[k].response[idx]+'"]').attr('checked','checked');
+              } 
+              break;
+            case 'SDG_CLEAR':
+              ractive.set('q.categories.'+i+'.questions.'+j+'.response', me.rtn.answers[k].response);
+              for (var idx = 0 ; idx < me.rtn.answers[k].response.length ; idx++) {
+                $('[data-id="SDG_CLEAR"][value="'+me.rtn.answers[k].response[idx]+'"]').attr('checked','checked');
+              } 
+              break;
+            case 'SDG_STARTING':
+              ractive.set('q.categories.'+i+'.questions.'+j+'.response', me.rtn.answers[k].response);
+              for (var idx = 0 ; idx < me.rtn.answers[k].response.length ; idx++) {
+                $('[data-id="SDG_STARTING"][value="'+me.rtn.answers[k].response[idx]+'"]').attr('checked','checked');
+              } 
+              break;
+            case 'SDMP_CRMP':
+              ractive.set('q.categories.'+i+'.questions.'+j+'.response', me.rtn.answers[k].response);
+              $('[data-id="SDMP_CRMP"][value="'+me.rtn.answers[k].response+'"]').attr('checked','checked');
+              _toggleSdmp();
               break;
             default:
               if ('Submitted'==me.rtn.answers[k].status || 'Published'==me.rtn.answers[k].status) {
@@ -155,13 +180,55 @@ var $r = (function ($, ractive, $auth) {
     _bindLists();
 
     $('#questionnaireForm input, #questionnaireForm select, #questionnaireForm textarea')
-        .off().on('blur', me.saveAnswer);
+        .off().on('blur', function(ev) {
+          $r.dirty = true;
+          var id = $(ev.target).data('id');
+          if (id == undefined) id = ev.target.id;
+          var answer = $r.getAnswer(id, _period);
+          answer.response = ev.target.value;
+          me.saveAnswer(answer);
+        });
 
     // Set questionnaire details specific to SDU return
     ractive.set('q.about.title', 'SDU return '+_period);
     ractive.set('q.about.options.previous', '$r.movePrevious()');
     ractive.set('q.about.options.next', '$r.moveNext()');
     ractive.set('q.about.options.finalSubmitButton', true);
+    $('[data-id="ECLASS_USER"]').off().on('blur', function(ev) {
+      var answer = $r.getAnswer('ECLASS_USER', _period);
+      answer.response = ev.target.value;
+      $r.dirty = true;
+      $r.saveAnswer(answer);
+      _toggleEClass();
+    });
+    $('[data-id="PROC_SUPPLIER_SUSTAINABILITY"]').off().on('change', function(ev) {
+      var answer = $r.getAnswer('PROC_SUPPLIER_SUSTAINABILITY', _period);
+      if (ev.target.checked) answer.response.push(ev.target.value);
+      else answer.response.splice(answer.response.indexOf(ev.target.value), 1);
+      $r.dirty = true;
+      $r.saveAnswer(answer);
+    });
+    $('[data-id="SDG_CLEAR"]').off().on('change', function(ev) {
+      var answer = $r.getAnswer('SDG_CLEAR', _period);
+      if (ev.target.checked) answer.response.push(ev.target.value);
+      else answer.response.splice(answer.response.indexOf(ev.target.value), 1);
+      $r.dirty = true;
+      $r.saveAnswer(answer);
+    });
+    $('[data-id="SDG_STARTING"]').off().on('change', function(ev) {
+      var answer = $r.getAnswer('SDG_STARTING', _period);
+      if (ev.target.checked) answer.response.push(ev.target.value);
+      else answer.response.splice(answer.response.indexOf(ev.target.value), 1);
+      $r.dirty = true;
+      $r.saveAnswer(answer);
+    });
+    $('[data-id="SDMP_CRMP"]').off().on('blur', function(ev) {
+      var answer = $r.getAnswer('SDMP_CRMP', _period);
+      answer.response = ev.target.value;
+      $r.dirty = true;
+      $r.saveAnswer(answer);
+      _toggleSdmp();
+    });
   }
 
   /**
@@ -204,6 +271,26 @@ var $r = (function ($, ractive, $auth) {
         //parent.alert(''+$('#containerSect').height());
         parent.notifyIFrameSize($('#containerSect').height());
       },400);
+    }
+  }
+
+  function _toggleEClass() {
+    var answer = $r.getAnswer('ECLASS_USER', _period);
+    if (answer.response=='0-E-Class') {
+      $('section#Procurement.category li:not(:first)').slideDown();
+      _notifyParent();
+    } else {
+      $('section#Procurement.category li:not(:first)').slideUp();
+      _notifyParent();
+    }
+  }
+
+  function _toggleSdmp() {
+    var answer = $r.getAnswer('SDMP_CRMP', _period);
+    if (answer.response=='true') {
+      $('section#Policy.category li:hidden').slideDown();
+    } else {
+      $('section#Policy.category li:gt(0):lt(3)').slideUp();
     }
   }
 
@@ -296,8 +383,7 @@ var $r = (function ($, ractive, $auth) {
     else _disableHeadSections();
   }
 
-  me.saveAnswer = function(ev) {
-    var answer = $r.getAnswer(ev.target.id, _period);
+  me.saveAnswer = function(answer) {
     if ($r.dirty == false || $r.rtn.status != 'Draft' || $auth.loginInProgress) {
       console.info('skip save, dirty: '+$r.dirty+', loginInProgress: '+$auth.loginInProgress);
       return;
@@ -310,7 +396,6 @@ var $r = (function ($, ractive, $auth) {
     });
 
     var response = answer.response;
-    if (response == undefined) return;
     if (answer.question.type = 'radio' && Array.isArray(answer.response)) {
       response = answer.response.join();
     }
@@ -388,26 +473,18 @@ var $r = (function ($, ractive, $auth) {
     var q = ractive.get(keypath.substring(0, keypath.indexOf('.response')));
     // after #226 not sure if this is still needed
     if ($r.rtn!=undefined && oldValue!=undefined && oldValue!='') {
-      $r.dirty = true;
-    }
-    // apply inter-question dependencies
-    switch(q.name) {
-    case 'ECLASS_USER':
-      if (newValue=='0-E-Class') {
-        $('section#Procurement.category li:not(:first)').slideDown();
-        _notifyParent();
-      } else {
-        $('section#Procurement.category li:not(:first)').slideUp();
-        _notifyParent();
-      }
-      break;
-    case 'SDMP_CRMP':
-      if (newValue=='true') {
-        $('section#Policy.category li:hidden').slideDown();
-      } else {
-        $('section#Policy.category li:gt(0):lt(3)').slideUp();
-      }
-      break;
+      //var found = false;
+      /*for (idx in $r.rtn.answers) {
+        //if (found) break;
+        if ($r.rtn.answers[idx].question.name == q.name && $r.rtn.answers[idx].applicablePeriod == _period) {
+          $r.dirty = true;
+          $r.rtn.answers[idx].response = newValue;
+          $r.saveAnswer($r.rtn.answers[idx]);
+          break;
+          //found = true;
+        }
+      }*/
+          $r.dirty = true;
     }
   });
 
