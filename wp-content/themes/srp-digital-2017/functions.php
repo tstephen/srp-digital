@@ -58,6 +58,8 @@ function srp_scripts() {
   }
 
   wp_enqueue_script( 'srp-digital-2017-script', get_stylesheet_directory_uri() . '/js/srp-digital-2017.js', array( 'jquery' ), '20150113', true );
+  wp_enqueue_script( 'env', 'https://api.knowprocess.com/js/env.js', array( 'jquery' ), null, true );
+  wp_enqueue_script( 'auth', 'https://api.knowprocess.com/webjars/auth/1.1.0/js/auth.js', array( 'jquery' ), null, true );
 }
 add_action( 'wp_enqueue_scripts', 'srp_scripts', 11 );
 
