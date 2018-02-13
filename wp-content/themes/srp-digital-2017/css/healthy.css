@@ -1,0 +1,239 @@
+/* 
+ * COLOURS 
+ *   orange:      ec9300;
+ *   pale orange: f5c980;
+ *   blue:        0060ad;
+ *   grey:  (TBC) 949699;
+ */
+
+/* START BOOTSTRAP OVERRIDES */
+article {
+  margin-left: 10px;
+}
+article p {
+  margin-left: 0px;
+}
+blockquote {
+  font-style: italic;
+  padding: 20px;
+}
+button#searchsubmit {
+  padding: 2px 5px 1px 5px;
+}
+h1, .h1, h2, .h2, h3, .h3, h4, .h4 {
+  margin-bottom: 15px;
+}
+input,select,textarea { 
+	margin: 0 5px 0 5px;
+}
+#decisionTable input { 
+  border: 0px;
+}
+section h2,
+section h3 {
+  border-bottom: solid 1px #ec9300;
+  padding-bottom: 5px; 
+}
+h2 .glyphicon-search {
+  border: 1px solid #0060ad;
+  padding: 3px;
+  position: relative;
+  left: -10px;
+  top: 2px;
+  border-bottom-right-radius: 15px;
+  border-top-right-radius: 15px;
+}
+section h2 .search {
+  /*margin-bottom: 10px;*/
+  margin-right: 0;
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 0;
+  border-color: #0060ad;
+  height: 32px;
+  position: relative;
+  bottom: 5px;
+}
+.glyphicon,
+a.glyphicon {
+  font-size: 24px;
+  text-decoration: none;
+}
+article form .form-group {
+  margin-bottom: -30px;
+}
+.navbar-brand { 
+	padding-top: 0;
+}
+.table>thead>tr>th, .table>tbody>tr>th, .table>tfoot>tr>th, .table>thead>tr>td, .table>tbody>tr>td, .table>tfoot>tr>td {
+  vertical-align: middle;
+}
+th { 
+  font-weight: bold;
+}
+th, td {
+  padding:10px;
+}
+.search {
+	border-radius:15px;
+	width:100px;
+	display:inline;
+	position:relative;
+	bottom:5px;	
+}
+.site-sub-footer {
+  padding: 10px 30px;
+  color: #efefef;
+}
+.text-danger { 
+  font-style: italic;
+}
+/* END BOOTSTRAP OVERRIDES */
+
+.after-navbar { 
+  padding-top: 60px;
+}
+.benefit-widget {
+  background-color: #f5c980;
+  margin-bottom: 30px;
+  padding-top: 20px;
+  min-height: 270px;
+}
+.brand-accent {
+  color: #ec9300;
+}
+.clickable:hover {
+	cursor: pointer; 
+}
+
+.form { 
+	display: block;
+	list-style: none;
+}
+.form li { 
+	margin: 5px 0 5px;
+}
+.form label, .form input {
+  display:inline-block;
+}
+.form label {
+	padding-right: 10px;
+  vertical-align: top;
+}
+.form .radio label.srp-error {
+  color: #f33 ;
+}
+
+.form input.srp-error:invalid, 
+.form select.srp-error:invalid, 
+.form textarea.srp-error:invalid { 
+  border: solid 1px #f33;
+}
+
+.form input:focus:invalid, 
+.form select:focus:invalid, 
+.form textarea:focus:invalid { 
+  border: solid 1px #f33 ;
+}
+
+.form input ~ .field-hint, 
+.form select ~ .field-hint, 
+.form textarea ~ .field-hint { 
+  visibility: hidden ;
+  line-height: 0em;
+}
+
+.form input:focus:invalid ~ .field-hint, 
+.form select:focus:invalid ~ .field-hint, 
+.form textarea:focus:invalid ~ .field-hint { 
+  color: #f33 ;
+  visibility: visible ;
+  line-height: 1.5em;
+}
+.form.create-form {
+  padding-bottom: 2px;	
+}
+div.srp-error, div.srp-mandatory { 
+  color: #f00;
+}
+
+.footer-supporter-area { 
+  background-image: url('../images/dark-embroidery.png');
+  color: #efefef;
+  padding: 40px 100px 40px;
+}
+.footer-widget-area h4 {
+  font-size: 36px;
+}
+.footer-widget-area img.logo {
+  padding: 20px;
+  background-color: white;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+}
+.watermark { 
+  font-size: 180px;
+  left: 20%;
+  opacity: 0.3;
+  position: fixed;
+  text-align: center;
+  top: 40%;
+  -ms-transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+  z-index: 100;
+}
+
+#messages {
+  position: fixed;
+  width: 80%;
+  z-index: 100;
+}
+
+#messages .glyphicon.text-danger {
+  color: #a94442 !important;
+  padding-top: 0.25em;
+}
+
+#messages,
+.messages, 
+.instructions {
+  line-height: 3em;
+  padding-left: 1em;
+  padding-right: 1em;
+  font-style: italic;
+}
+
+.instructions {
+  width: 100%;
+}
+#content {
+  font-size: 1.2em;
+  min-height: 300px; 
+}
+.showcase {
+  background-color: #0078c1;
+  color: #fff;
+  padding-bottom: 20px;
+  padding-top: 20px;
+}
+.showcase h3 a, .showcase h4 a {
+  color: #fff;
+  font-size: 1em;
+}
+.showcase .featured-img img {
+  padding: 10px 50px;
+}
+.showcase .content {
+  margin-left: 1em;
+}
+.showcase .widget_tr_showcase_widget {
+  padding-bottom: 10px;
+  padding-top: 10px;
+}
+
+@media (min-width: 768px) {
+  .showcase .content {
+    font-size: 1.2em;
+  }
+}
