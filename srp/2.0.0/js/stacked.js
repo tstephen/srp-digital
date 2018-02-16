@@ -118,6 +118,7 @@ function renderStacked(selector, csvString, options) {
     var y2 = y1 * (1 - ((100-90) / 100)); // 10% reduction from 2007-08 baseline
     var ccaPhase1 = [[x1,y1,x2,y2]];
     var x3 = x('2020-21'); // x dimension scaled to 2020
+    if (x3 == undefined) x3 = chartWidth;
     var y3 = y2 * (1 - ((100-66   ) / 100)); // 34% reduction from 2015-16 to 20-21
     var ccaPhase2 = [[x2,y2,x3,y3]];
 
@@ -149,13 +150,15 @@ function renderStacked(selector, csvString, options) {
     var trendLines = ["CCA 2008"]; // just in case don't have enough org data
 
     // Organisation's own target - n% reduction in emissions from base year by 2020/21
-    if (data[4]!=undefined && data[4]['total'] != undefined) {
+    if (data[4]!=undefined && data[4]['total'] != undefined
+        && data[4]['total'] > 0) {
       trendLines = ["CCA 2008", "Org'n Target"]; // both trend lines available
 
       var n = 32;
       var x4 = x('2011-12'); // x dimension scaled to baseline year
       var y4 = data[4]['total']; //
       var x5 = x('2020-21'); // x dimension scaled to 2020
+      if (x5 == undefined) x5 = chartWidth;
       var y5 = y4 * (1 - ((n) / 100)); // n% reduction from baseline
       var orgTarget = [[x4,y4,x5,y5]];
 
