@@ -162,7 +162,7 @@ var ractive = new BaseRactive({
     $( "#ajax-loader" ).show();
     ractive.set('saveObserver', false);
     ractive.set('surveyReturn.orgs', []);
-    for (var idx = 1 ; idx < ractive.get('orgAnswerNames').length ; idx++) {
+    for (var idx = 0 ; idx < ractive.get('orgAnswerNames').length ; idx++) {
       try {
         var org = ractive.getAnswer(ractive.get('orgAnswerNames')[idx]);
         if (org == undefined || org.trim().length==0) continue;
