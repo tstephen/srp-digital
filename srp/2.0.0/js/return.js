@@ -134,18 +134,21 @@ var $r = (function ($, ractive, $auth) {
               break;
             case 'PROC_SUPPLIER_SUSTAINABILITY':
               ractive.set('q.categories.'+i+'.questions.'+j+'.response', me.rtn.answers[k].response);
+              if (me.rtn.answers[k].response == undefined) break;
               for (var idx = 0 ; idx < me.rtn.answers[k].response.length ; idx++) {
                 $('[data-id="PROC_SUPPLIER_SUSTAINABILITY"][value="'+me.rtn.answers[k].response[idx]+'"]').attr('checked','checked');
               } 
               break;
             case 'SDG_CLEAR':
               ractive.set('q.categories.'+i+'.questions.'+j+'.response', me.rtn.answers[k].response);
+              if (me.rtn.answers[k].response == undefined) break;
               for (var idx = 0 ; idx < me.rtn.answers[k].response.length ; idx++) {
                 $('[data-id="SDG_CLEAR"][value="'+me.rtn.answers[k].response[idx]+'"]').attr('checked','checked');
               } 
               break;
             case 'SDG_STARTING':
               ractive.set('q.categories.'+i+'.questions.'+j+'.response', me.rtn.answers[k].response);
+              if (me.rtn.answers[k].response == undefined) break;
               for (var idx = 0 ; idx < me.rtn.answers[k].response.length ; idx++) {
                 $('[data-id="SDG_STARTING"][value="'+me.rtn.answers[k].response[idx]+'"]').attr('checked','checked');
               } 
