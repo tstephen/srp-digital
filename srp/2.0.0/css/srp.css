@@ -220,12 +220,6 @@ form .criteria input {
   text-align: right;
   width: 8em;
 }
-.beta,
-.omny-bar {
-  background-color: #f9f9f9;
-  border-color: #ec9300;
-  color: #ec9300;
-}
 .omny-bar-left li span:not(.active):not(:active):not(:hover),
 .omny-bar li span:not(.active) {
   border-bottom-color: #ec9300;
