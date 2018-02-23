@@ -391,9 +391,9 @@
           <h4>Paper consumed</h4>
           <p>Cost is in pounds and weight in tonnes.</p>
           <div class="rpt table" id="paperRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/paper.html?maxPeriods=4"></div>
-          <h4>Carbon emissions resulting</h4>
+          <!--h4>Carbon emissions resulting</h4>
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
-          <div class="rpt table" id="paperCo2eRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/paper-co2e.html?maxPeriods=4"></div>
+          <div class="rpt table" id="paperCo2eRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/paper-co2e.html?maxPeriods=4"></div-->
           <p class="narrative performance" data-q="PAPER_PERF">{{formatAnswer('PAPER_PERF')}}</p>
         </section>
 
@@ -479,6 +479,7 @@
           {{else}}
             <section id="sduCarbonProfileSect" style="clear:both">
               <h2>SDU whole organisation carbon profile</h2>
+              <p>Calculated from operating expenditure of <em>&pound;{{formatAnswer('OP_EX')}},000</em> of which <em>&pound;{{formatAnswer('NON_PAY_SPEND')}},000</em> is non-pay spend based on typical values for an {{formatAnswer('ORG_TYPE')}} organisation.</p>
               <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
               <div class="rpt table" id="sduProfileRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/sdu-carbon-profile.html?maxPeriods=4"></div>
             </section>
