@@ -365,7 +365,6 @@
           <div class="rpt table" id="energyRptTable" data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/energy.html?maxPeriods=4"></div>
           <h4>Carbon emissions resulting</h4>
           <p>
-            <!-- data-colors="#0078c1,#99C344,#5C840C,#99C344,#BDE46F,#09613B,#03A1FF,#328F67,#82C7AA.#8D810D,#D1C549,#FFF7A7" -->
             <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/energy-co2e.csv"
                  class="rpt stacked" id="energyGraph" width="600" height="400"></svg>
           </p>
@@ -410,6 +409,7 @@
           <h4>Carbon emissions resulting</h4>
           <p>
             <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/travel-co2e.csv"
+                 data-colors="#0B4BE5,#0BBDE5,#00F299,#A2FC00,#FFEB00,#FFAD00"
                  class="rpt stacked" id="travelGraph" width="600" height="400"></svg>
           </p>
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
@@ -425,6 +425,7 @@
           <h4>Carbon emissions resulting</h4>
           <p>
             <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/waste-co2e.csv"
+                 data-colors="#0B4BE5,#0BBDE5,#00F299,#A2FC00,#FFEB00,#FFAD00"
                  class="rpt stacked" id="wasteGraph" width="600" height="400"></svg>
           </p>
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
@@ -440,6 +441,7 @@
           <h4>Carbon emissions resulting</h4>
           <p>
             <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/water-co2e.csv"
+                 data-colors="#0B4BE5,#0BBDE5,#00F299,#A2FC00,#FFEB00,#FFAD00"
                  class="rpt stacked" id="waterGraph" width="600" height="400"></svg>
           </p>
           <p>CO<sub>2</sub> Emissions (tCO<sub>2</sub>e)</p>
@@ -456,9 +458,11 @@
           </p>
           <!--p>This shows how the most recent year's footprint breaks down as percentages; Core represents the impact of the things we do, from the energy we use, to the driving we do to deliver care. Supply chain is all the things we buy to help us deliver quality care from bandages, to medicines and equipment. Community is the impact associated outside of the our organisation, such as staff commuting to work and the movement of patients to access care.</p-->
           <section class="col-md-6 col-xs-12">
-            <p>Any segment less than 5% is combined into &apos;Other&apos;.</p>
             <p>
               <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-footprint.csv?maxPeriods=1"
+                   data-colors="#a9d156,#003d61,#007ac3,#fbde06"
+                   data-labels="false"
+                   data-other="0"
                    class="rpt pie" id="carbonFootprintPieChart" width="600" height="400"></svg>
             </p>
           </section>
@@ -488,7 +492,7 @@
           <p class="narrative performance" data-q="TRAJECTORY_PERF">{{formatAnswer('TRAJECTORY_PERF')}}</p>
           <p>
             <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/carbon-trajectory.csv?maxPeriods=11"
-                data-colors="#0072ce,#0BBDE5,#0BDBC9"
+                data-colors="#a9d156,#003d61,#007ac3,#fbde06"
                 data-y-axis-label="Emissions (tCO&#x2082;e)"
                 class="rpt stacked" id="carbonTrajectoryGraph" width="600" height="400"></svg>
           </p>

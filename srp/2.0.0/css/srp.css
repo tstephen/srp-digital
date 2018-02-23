@@ -295,6 +295,22 @@ text.inverse {
   display:none;
   position:absolute;
 }
+.legend {
+  width: 2em;
+}
+.core_co2e_pct {
+  background-color: #a9d156;
+}
+.commissioning_co2e_pct {
+  background-color: #003d61;
+}
+.community_co2e_pct {
+  background-color: #fbde06;
+}
+.procurement_co2e_pct,
+.procurement_2017_co2e_pct {
+  background-color: #007ac3;
+}
 .macc-tooltip {
   border: 1px solid #666666;
   position: absolute;

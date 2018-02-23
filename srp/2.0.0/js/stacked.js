@@ -180,7 +180,7 @@ function renderStacked(selector, csvString, options) {
       .selectAll("g")
       .data(trendLines)
       .enter().append("g")
-        .attr("transform", function(d, i) { return "translate(0," + (i+4) * 20 + ")"; });
+        .attr("transform", function(d, i) { return "translate(0," + (i+5) * 20 + ")"; });
 
     var z2 = d3.scaleOrdinal().range(['#000',"#0B4BE5"]);
     legend2.append("rect")

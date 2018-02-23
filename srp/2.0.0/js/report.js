@@ -141,6 +141,8 @@ var ractive = new BaseRactive({
         //ractive.set(keypath,data);
         var options = {};
         if ($(ctrl).data('colors') != undefined) options.colors = $(ctrl).data('colors').split(',');
+        if ($(ctrl).data('labels') != undefined) options.labels = $(ctrl).data('labels');
+        if ($(ctrl).data('other') != undefined) options.other = parseFloat($(ctrl).data('other'));
         if ($(ctrl).data('x-axis-label') != undefined) options.xAxisLabel = $(ctrl).data('x-axis-label');
         if ($(ctrl).data('y-axis-label') != undefined) options.yAxisLabel = $(ctrl).data('y-axis-label');
 

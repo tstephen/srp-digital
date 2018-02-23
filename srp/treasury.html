@@ -90,6 +90,7 @@
           <h3>Carbon footprint (tCO<sub>2</sub>e)</h3>
           <p>
             <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/co2e.csv"
+                 data-colors="#a9d156,#003d61,#007ac3,#fbde06"
                  class="rpt stacked" id="emissionsProfileGraph" width="600" height="400"></svg>
           </p>
           <div class="rpt table" id="totalEmissionsTable"
@@ -103,6 +104,7 @@
           {{else}}
             <p>
               <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/co2e-by-population.csv"
+                   data-colors="#a9d156,#003d61,#007ac3,#fbde06"
                    data-y-axis-label="kg CO&#x2082;e"
                    class="rpt stacked" id="emissionsByPopulationGraph" width="600" height="400"></svg>
             </p>
@@ -118,6 +120,7 @@
           {{else}}
             <p>
               <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/co2e-by-floor-area.csv"
+                   data-colors="#a9d156,#003d61,#007ac3,#fbde06"
                    data-y-axis-label="kg CO&#x2082;e"
                    class="rpt stacked" id="emissionsByFloorAreaGraph" width="600" height="400"></svg>
             </p>
@@ -133,6 +136,7 @@
           {{else}}
             <p>
               <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/co2e-by-wte.csv"
+                   data-colors="#a9d156,#003d61,#007ac3,#fbde06"
                    class="rpt stacked" id="emissionsByWteGraph" width="600" height="400"></svg>
             </p>
             <div class="rpt table" id="co2eByWteRptTable"
@@ -147,6 +151,7 @@
           {{else}}
             <p>
               <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/co2e-by-beds.csv"
+                   data-colors="#a9d156,#003d61,#007ac3,#fbde06"
                    data-y-axis-label="kg CO&#x2082;e"
                    class="rpt stacked" id="emissionsByOccupiedBedsGraph" width="600" height="400"></svg>
             </p>
@@ -162,6 +167,7 @@
           {{else}}
             <p>
               <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/co2e-by-patient-contacts.csv"
+                   data-colors="#a9d156,#003d61,#007ac3,#fbde06"
                    data-y-axis-label="kg CO&#x2082;e"
                    class="rpt stacked" id="emissionsByPatientContactsGraph" width="600" height="400"></svg>
             </p>
@@ -177,6 +183,7 @@
           {{else}}
             <p>
               <svg data-src="/reports/{{org}}/{{surveyReturn.applicablePeriod}}/co2e-by-opex.csv"
+                   data-colors="#a9d156,#003d61,#007ac3,#fbde06"
                    data-y-axis-label="kg CO&#x2082;e"
                    class="rpt stacked" id="emissionsByOpexGraph" width="600" height="400"></svg>
             </p>

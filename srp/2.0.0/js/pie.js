@@ -1,4 +1,10 @@
-function renderPie(selector, csvString) {
+function renderPie(selector, csvString, options) {
+  var defaultOptions = {
+    colors: ["#0B4BE5", "#0072CE", "#0BBDE5", "#0BDBC9", "#00F299", "#A2FC00", "#FFEB00", "#FFAD00"],
+    labels: true,
+    other: 5
+  }
+  options = $.extend(defaultOptions, options == undefined ? {} : options);
 
   // If csvString missing or only header row without data
   if (csvString == undefined || csvString.trim().length==0 || csvString.trim().split('\n').length<2) {
@@ -12,7 +18,7 @@ function renderPie(selector, csvString) {
       radius = Math.min(width, height) / 2,
       g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-  var color = d3.scaleOrdinal([/*"#3B00F2", "#0008FC", "#0B4BE5",*/ "#0072ce", "#0BBDE5", "#0BDBC9", "#00F299", "#00E851", /*"#0CF91C",*/ "#3DE800"]);
+  var color = d3.scaleOrdinal(options.colors);
 
   var pie = d3.pie()
       .sort(null)
@@ -28,7 +34,7 @@ function renderPie(selector, csvString) {
 
   var other = 0;
   var data = d3.csvParse(csvString, function(d) {
-    if (d.percentage > 5) {
+    if (d.percentage > options.other) {
       d.percentage = +d.percentage;
       return d;
     } else {
@@ -47,8 +53,10 @@ function renderPie(selector, csvString) {
       .attr("d", path)
       .attr("fill", function(d) { return color(d.data.classification); });
 
-  arc.append("text")
-      .attr("transform", function(d) { return "translate(" + label.centroid(d) + ")"; })
-      .attr("dy", "0.35em")
-      .text(function(d) { return d.data.classification; });
+  if (options.labels) {
+    arc.append("text")
+        .attr("transform", function(d) { return "translate(" + label.centroid(d) + ")"; })
+        .attr("dy", "0.35em")
+        .text(function(d) { return d.data.classification; });
+  }
 }
