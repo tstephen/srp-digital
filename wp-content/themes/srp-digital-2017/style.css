@@ -562,7 +562,8 @@ footer .slide {
 }
 
 /* 8.0 BOARDWALK OVERRIDES, OMISSIONS */
-input[type="tel"] {
+input[type="tel"],
+select {
   padding: 5px;
   width: 100%;
   background: #f2f2f2;

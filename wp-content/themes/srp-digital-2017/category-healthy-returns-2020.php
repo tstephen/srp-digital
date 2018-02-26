@@ -1,14 +1,14 @@
 <?php get_header(); ?>
 
-<div class="container">
+<div class="container" style="margin-top:80px;">
   <div class="row">
-    <div class="col-md-4 col-xs-12">
+    <div class="col-sm-4 col-xs-12">
       <img class="img-responsive" src="/wp-content/uploads/2017/02/SDU-logo1.jpg"/>
     </div>
-    <div class="col-md-4 col-xs-12">
+    <div class="col-sm-4 col-xs-6">
       <img class="img-responsive" src="/wp-content/uploads/2017/11/EEVS-supporter-logo.jpg"/>
     </div>
-    <div class="col-md-4 col-xs-12">
+    <div class="col-sm-4 col-xs-6">
       <img class="img-responsive" src="/wp-content/uploads/2017/12/puffin-digital-healthy-returns-supporter-logo.png"/>
     </div>
   </div><!-- /.row -->
