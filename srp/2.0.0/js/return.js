@@ -197,6 +197,7 @@ var $r = (function ($, ractive, $auth) {
     ractive.set('q.about.options.previous', '$r.movePrevious()');
     ractive.set('q.about.options.next', '$r.moveNext()');
     ractive.set('q.about.options.finalSubmitButton', true);
+    ractive.set('q.submit.buttonText', 'View report');
     $('[data-id="ECLASS_USER"]').off().on('blur', function(ev) {
       var answer = $r.getAnswer('ECLASS_USER', _period);
       answer.response = ev.target.value;
