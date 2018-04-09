@@ -145,6 +145,19 @@ class wfUtils {
 
 		return round($bytes, $precision) . ' ' . $units[$pow];
 	}
+	
+	/**
+	 * Returns the PHP version formatted for display, stripping off the build information when present.
+	 * 
+	 * @return string
+	 */
+	public static function cleanPHPVersion() {
+		$version = phpversion();
+		if (preg_match('/^(\d+\.\d+\.\d+)/', $version, $matches)) {
+			return $matches[1];
+		}
+		return $version;
+	}
 
 	/**
 	 * Check if an IP address is in a network block
@@ -1055,7 +1068,7 @@ class wfUtils {
 	public static function clearScanLock(){
 		global $wpdb;
 		$wfdb = new wfDB();
-		$wfdb->truncate($wpdb->base_prefix . 'wfHoover');
+		$wfdb->truncate(wfDB::networkTable('wfHoover'));
 
 		wfConfig::set('wf_scanRunning', '');
 		wfIssues::updateScanStillRunning(false);
@@ -1073,8 +1086,7 @@ class wfUtils {
 		$IPs = array_unique($IPs);
 		$toResolve = array();
 		$db = new wfDB();
-		global $wpdb;
-		$locsTable = $wpdb->base_prefix . 'wfLocs';
+		$locsTable = wfDB::networkTable('wfLocs');
 		$IPLocs = array();
 		foreach($IPs as $IP){
 			$isBinaryIP = !self::isValidIP($IP);
@@ -1156,8 +1168,7 @@ class wfUtils {
 		}
 		
 		$db = new wfDB();
-		global $wpdb;
-		$reverseTable = $wpdb->base_prefix . 'wfReverseCache';
+		$reverseTable = wfDB::networkTable('wfReverseCache');
 		$IPn = wfUtils::inet_pton($IP);
 		$host = $db->querySingle("select host from " . $reverseTable . " where IP=%s and unix_timestamp() - lastUpdate < %d", $IPn, WORDFENCE_REVERSE_LOOKUP_CACHE_TIME);
 		if (!$host) {
@@ -1787,6 +1798,33 @@ class wfUtils {
 		return true;
 	}
 	
+	/**
+	 * Returns a v4 UUID.
+	 * 
+	 * @return string
+	 */
+	public static function uuid() {
+		return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+			// 32 bits for "time_low"
+			wfWAFUtils::random_int(0, 0xffff), wfWAFUtils::random_int(0, 0xffff),
+			
+			// 16 bits for "time_mid"
+			wfWAFUtils::random_int(0, 0xffff),
+			
+			// 16 bits for "time_hi_and_version",
+			// four most significant bits holds version number 4
+			wfWAFUtils::random_int(0, 0x0fff) | 0x4000,
+			
+			// 16 bits, 8 bits for "clk_seq_hi_res",
+			// 8 bits for "clk_seq_low",
+			// two most significant bits holds zero and one for variant DCE1.1
+			wfWAFUtils::random_int(0, 0x3fff) | 0x8000,
+			
+			// 48 bits for "node"
+			wfWAFUtils::random_int(0, 0xffff), wfWAFUtils::random_int(0, 0xffff), wfWAFUtils::random_int(0, 0xffff)
+		);
+	}
+	
 	public static function base32_encode($rawString, $rightPadFinalBits = false, $padFinalGroup = false, $padCharacter = '=') //Adapted from https://github.com/ademarre/binary-to-text-php
 	{
 		// Unpack string into an array of bytes
@@ -2207,6 +2245,20 @@ class wfUtils {
 		return self::callMBSafeStrFunction('strrpos', $args);
 	}
 	
+	public static function sets_equal($a1, $a2) {
+		if (!is_array($a1) || !is_array($a2)) {
+			return false;
+		}
+		
+		if (count($a1) != count($a2)) {
+			return false;
+		}
+		
+		sort($a1, SORT_NUMERIC);
+		sort($a2, SORT_NUMERIC);
+		return $a1 == $a2;
+	}
+	
 	public static function array_first($array) {
 		if (empty($array)) {
 			return null;
@@ -2260,6 +2312,35 @@ class wfUtils {
 	}
 	
 	/**
+	 * Returns the number of minutes for the time zone offset from UTC. If $timestamp and using a named time zone, 
+	 * it will be adjusted automatically to match whether or not the server's time zone is in Daylight Savings Time.
+	 * 
+	 * @param bool|int $timestamp Assumed to be in UTC. If false, defaults to the current timestamp.
+	 * @return int
+	 */
+	public static function timeZoneMinutes($timestamp = false) {
+		if ($timestamp === false) {
+			$timestamp = time();
+		}
+		
+		$tz = get_option('timezone_string');
+		if (!empty($tz)) {
+			$timezone = new DateTimeZone($tz);
+			$dtStr = gmdate("c", (int) $timestamp); //Have to do it this way because of PHP 5.2
+			$dt = new DateTime($dtStr, $timezone);
+			return (int) ($timezone->getOffset($dt) / 60);
+		}
+		else {
+			$gmt = get_option('gmt_offset');
+			if (!empty($gmt)) {
+				return (int) ($gmt * 60);
+			}
+		}
+		
+		return 0;
+	}
+	
+	/**
 	 * Formats and returns the given timestamp using the time zone set for the WordPress installation.
 	 * 
 	 * @param string $format See the PHP docs on DateTime for the format options. 
@@ -2295,6 +2376,79 @@ class wfUtils {
 			}
 		}
 		return $dt->format($format);
+	}
+	
+	/**
+	 * Parses the given time string and returns its DateTime with the server's configured time zone.
+	 * 
+	 * @param string $timestring
+	 * @return DateTime
+	 */
+	public static function parseLocalTime($timestring) {
+		$utc = new DateTimeZone('UTC');
+		$tz = get_option('timezone_string');
+		if (!empty($tz)) {
+			$tz = new DateTimeZone($tz);
+			return new DateTime($timestring, $tz);
+		}
+		else {
+			$gmt = get_option('gmt_offset');
+			if (!empty($gmt)) {
+				if (PHP_VERSION_ID < 50510) {
+					$timestamp = strtotime($timestring);
+					$dtStr = gmdate("c", (int) ($timestamp + $gmt * 3600)); //Have to do it this way because of < PHP 5.5.10
+					return new DateTime($dtStr, $utc);
+				}
+				else {
+					$direction = ($gmt > 0 ? '+' : '-');
+					$gmt = abs($gmt);
+					$h = (int) $gmt;
+					$m = ($gmt - $h) * 60;
+					$tz = new DateTimeZone($direction . str_pad($h, 2, '0', STR_PAD_LEFT) . str_pad($m, 2, '0', STR_PAD_LEFT));
+					return new DateTime($timestring, $tz);
+				}
+			}
+		}
+		return new DateTime($timestring);
+	}
+	
+	/**
+	 * Returns whether or not the OpenSSL version is before, after, or equal to the equivalent text version string.
+	 * 
+	 * @param string $compareVersion
+	 * @param int $openSSLVersion A version number in the format OpenSSL uses.
+	 * @return bool|int Returns -1 if $compareVersion is earlier, 0 if equal, 1 if later, and false if not a valid version string.
+	 */
+	public static function openssl_version_compare($compareVersion, $openSSLVersion = OPENSSL_VERSION_NUMBER) {
+		if (preg_match('/^(\d+)\.(\d+)\.(\d+)([a-z]?)/i', $compareVersion, $matches)) {
+			$primary = 0; $major = 0; $minor = 0; $fixLetterIndex = 0;
+			if (isset($matches[1])) { $primary = (int) $matches[1]; }
+			if (isset($matches[2])) { $major = (int) $matches[2]; }
+			if (isset($matches[3])) { $minor = (int) $matches[3]; }
+			if (isset($matches[4])) { $fixLetterIndex = strpos('abcdefghijklmnopqrstuvwxyz', strtolower($matches[1])) + 1; }
+			
+			$compareOpenSSLVersion = self::openssl_make_version($primary, $major, $minor, $fixLetterIndex, 0);
+			if ($compareOpenSSLVersion < $openSSLVersion) { return -1; }
+			else if ($compareOpenSSLVersion == $openSSLVersion) { return 0; }
+			return 1;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Builds a number that can be compared to OPENSSL_VERSION_NUMBER from the parameters given. This is a modified
+	 * version of the macro in the OpenSSL source.
+	 * 
+	 * @param int $primary The '1' in 1.0.2g.
+	 * @param int $major The '0' in 1.0.2g.
+	 * @param int $minor The '2' in 1.0.2g.
+	 * @param int $fixLetterIndex The 'g' in 1.0.2g.
+	 * @param int $patch
+	 * @return int
+	 */
+	public static function openssl_make_version($primary, $major, $minor, $fixLetterIndex = 0, $patch = 0) {
+		return ((($primary & 0xff) << 28) + (($major & 0xff) << 20) + (($minor & 0xff) << 12) + (($fixLetterIndex & 0xff) << 4) + $patch);
 	}
 }
 

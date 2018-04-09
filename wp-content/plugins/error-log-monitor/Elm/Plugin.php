@@ -284,7 +284,10 @@ class Elm_Plugin {
 	}
 
 	public function formatTimestamp($timestamp) {
-		return gmdate($this->settings->get('timestamp_format'), $timestamp);
+		return get_date_from_gmt(
+			gmdate('Y-m-d H:i:s', $timestamp),
+			$this->settings->get('timestamp_format')
+		);
 	}
 
 	/**

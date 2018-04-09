@@ -7,6 +7,8 @@ require_once('wfIssues.php');
 require_once('wfDB.php');
 require_once('wfUtils.php');
 class wfScanEngine {
+	const SCAN_MANUALLY_KILLED = -999;
+	
 	public $api = false;
 	private $dictWords = array();
 	private $forkRequested = false;
@@ -45,6 +47,7 @@ class wfScanEngine {
 	private $updateCheck = false;
 	private $pluginRepoStatus = array();
 	private $malwarePrefixesHash;
+	private $coreHashesHash;
 	private $scanMode = wfScanner::SCAN_TYPE_STANDARD;
 	private $pluginsCounted = false;
 	private $themesCounted = false;
@@ -130,9 +133,9 @@ class wfScanEngine {
 	}
 
 	public function __sleep(){ //Same order here as above for properties that are included in serialization
-		return array('hasher', 'jobList', 'i', 'wp_version', 'apiKey', 'startTime', 'maxExecTime', 'publicScanEnabled', 'fileContentsResults', 'scanner', 'scanQueue', 'hoover', 'scanData', 'statusIDX', 'userPasswdQueue', 'passwdHasIssues', 'suspectedFiles', 'dbScanner', 'knownFilesLoader', 'metrics', 'checkHowGetIPsRequestTime', 'gsbMultisiteBlogOffset', 'updateCheck', 'pluginRepoStatus', 'malwarePrefixesHash', 'scanMode', 'pluginsCounted', 'themesCounted');
+		return array('hasher', 'jobList', 'i', 'wp_version', 'apiKey', 'startTime', 'maxExecTime', 'publicScanEnabled', 'fileContentsResults', 'scanner', 'scanQueue', 'hoover', 'scanData', 'statusIDX', 'userPasswdQueue', 'passwdHasIssues', 'suspectedFiles', 'dbScanner', 'knownFilesLoader', 'metrics', 'checkHowGetIPsRequestTime', 'gsbMultisiteBlogOffset', 'updateCheck', 'pluginRepoStatus', 'malwarePrefixesHash', 'coreHashesHash', 'scanMode', 'pluginsCounted', 'themesCounted');
 	}
-	public function __construct($malwarePrefixesHash = '', $scanMode = wfScanner::SCAN_TYPE_STANDARD) {
+	public function __construct($malwarePrefixesHash = '', $coreHashesHash = '', $scanMode = wfScanner::SCAN_TYPE_STANDARD) {
 		$this->startTime = time();
 		$this->recordMetric('scan', 'start', $this->startTime);
 		$this->maxExecTime = self::getMaxExecutionTime();
@@ -142,6 +145,7 @@ class wfScanEngine {
 		$this->apiKey = wfConfig::get('apiKey');
 		$this->api = new wfAPI($this->apiKey, $this->wp_version);
 		$this->malwarePrefixesHash = $malwarePrefixesHash;
+		$this->coreHashesHash = $coreHashesHash;
 		include('wfDict.php'); //$dictWords
 		$this->dictWords = $dictWords;
 		$this->scanMode = $scanMode;
@@ -203,7 +207,7 @@ class wfScanEngine {
 		}
 		catch (wfScanEngineDurationLimitException $e) {
 			wfConfig::set('lastScanCompleted', $e->getMessage());
-			wfConfig::set('lastScanFailureType', 'duration');
+			wfConfig::set('lastScanFailureType', wfIssues::SCAN_FAILED_DURATION_REACHED);
 			$this->scanController->recordLastScanTime();
 			
 			$this->emailNewIssues(true);
@@ -216,7 +220,7 @@ class wfScanEngine {
 		}
 		catch (wfScanEngineCoreVersionChangeException $e) {
 			wfConfig::set('lastScanCompleted', $e->getMessage());
-			wfConfig::set('lastScanFailureType', 'versionchange');
+			wfConfig::set('lastScanFailureType', wfIssues::SCAN_FAILED_VERSION_CHANGE);
 			$this->scanController->recordLastScanTime();
 			
 			$this->recordMetric('scan', 'duration', (time() - $this->startTime));
@@ -226,9 +230,12 @@ class wfScanEngine {
 			wfScanEngine::refreshScanNotification($this->i);
 			throw $e;
 		}
-		catch(Exception $e) {
-			wfConfig::set('lastScanCompleted', $e->getMessage());
-			wfConfig::set('lastScanFailureType', 'general');
+		catch (Exception $e) {
+			if ($e->getCode() != wfScanEngine::SCAN_MANUALLY_KILLED) {
+				wfConfig::set('lastScanCompleted', $e->getMessage());
+				wfConfig::set('lastScanFailureType', wfIssues::SCAN_FAILED_GENERAL);
+			}
+			
 			$this->recordMetric('scan', 'duration', (time() - $this->startTime));
 			$this->recordMetric('scan', 'memory', wfConfig::get('wfPeakMemory', 0, false));
 			$this->recordMetric('scan', 'failure', $e->getMessage());
@@ -760,7 +767,7 @@ class wfScanEngine {
 		$knownFilesThemes = $this->getThemes();
 		$this->status(2, 'info', "Found " . sizeof($knownFilesThemes) . " themes");
 
-		$this->hasher = new wordfenceHash(strlen(ABSPATH), ABSPATH, $includeInKnownFilesScan, $knownFilesThemes, $knownFilesPlugins, $this, wfUtils::hex2bin($this->malwarePrefixesHash), $this->scanMode);
+		$this->hasher = new wordfenceHash(strlen(ABSPATH), ABSPATH, $includeInKnownFilesScan, $knownFilesThemes, $knownFilesPlugins, $this, wfUtils::hex2bin($this->malwarePrefixesHash), $this->coreHashesHash, $this->scanMode);
 	}
 	private function scan_knownFiles_main() {
 		$this->hasher->run($this); //Include this so we can call addIssue and ->api->
@@ -907,8 +914,7 @@ class wfScanEngine {
 			$blogs = self::getBlogsToScan('posts', $blogID);
 			$blog = array_shift($blogs);
 			
-			$prefix = $wpdb->get_blog_prefix($blogID);
-			$table = "{$prefix}posts";
+			$table = wfDB::blogTable('posts', $blogID);
 			
 			$row = $wfdb->querySingleRec("select ID, post_title, post_type, post_date, post_content from {$table} where ID = %d", $postID);
 			$found = $this->hoover->hoover($blogID . '-' . $row['ID'], $row['post_title'] . ' ' . $row['post_content'], wordfenceURLHoover::standardExcludedHosts());
@@ -947,8 +953,7 @@ class wfScanEngine {
 			$arr = explode('-', $idString);
 			$blogID = $arr[0];
 			$postID = $arr[1];
-			$prefix = $wpdb->get_blog_prefix($blogID);
-			$table = "{$prefix}posts";
+			$table = wfDB::blogTable('posts', $blogID);
 			$blog = null;
 			$post = null;
 			foreach ($hresults as $result) {
@@ -1050,8 +1055,7 @@ class wfScanEngine {
 			$blogID = $elem['blog'];
 			$commentID = $elem['comment'];
 			
-			$prefix = $wpdb->get_blog_prefix($blogID);
-			$table = "{$prefix}comments";
+			$table = wfDB::blogTable('comments', $blogID);
 			
 			$row = $wfdb->querySingleRec("select comment_ID, comment_date, comment_type, comment_author, comment_author_url, comment_content from {$table} where comment_ID=%d", $commentID);
 			$found = $this->hoover->hoover($blogID . '-' . $row['comment_ID'], $row['comment_author_url'] . ' ' . $row['comment_author'] . ' ' . $row['comment_content'], wordfenceURLHoover::standardExcludedHosts());
@@ -1182,29 +1186,24 @@ class wfScanEngine {
 	public static function getBlogsToScan($table, $withID = null){
 		$wfdb = new wfDB();
 		global $wpdb;
-		$prefix = $wpdb->base_prefix;
 		$blogsToScan = array();
 		if(is_multisite()){
 			if ($withID === null) {
-				$q1 = $wfdb->querySelect("select blog_id, domain, path from $prefix"."blogs where deleted=0 order by blog_id asc");
+				$q1 = $wfdb->querySelect("select blog_id, domain, path from {$wpdb->blogs} where deleted=0 order by blog_id asc");
 			}
 			else {
-				$q1 = $wfdb->querySelect("select blog_id, domain, path from $prefix"."blogs where deleted=0 and blog_id = %d", $withID);
+				$q1 = $wfdb->querySelect("select blog_id, domain, path from {$wpdb->blogs} where deleted=0 and blog_id = %d", $withID);
 			}
 			
 			foreach($q1 as $row){
 				$row['isMultisite'] = true;
-				if($row['blog_id'] == 1){
-					$row['table'] = $prefix . $table;
-				} else {
-					$row['table'] = $prefix . $row['blog_id'] . '_' . $table;
-				}
+				$row['table'] = wfDB::blogTable($table, $row['blog_id']);
 				$blogsToScan[] = $row; 
 			}
 		} else {
 			$blogsToScan[] = array(
 				'isMultisite' => false,
-				'table' => $prefix . $table,
+				'table' => wfDB::networkTable($table),
 				'blog_id' => '1',
 				'domain' => '',
 				'path' => '',
@@ -1240,7 +1239,7 @@ class wfScanEngine {
 			$result = $dbh->query($query);
 			if (!is_object($result)) {
 				return array(
-					'errorMsg' => "We were unable to generate the user list for your password audit.",
+					'errorMsg' => "We were unable to generate the user list for your password check.",
 				);
 			}
 			while ($rec = $result->fetch_assoc()) {
@@ -1350,33 +1349,44 @@ class wfScanEngine {
 		}
 	}
 	*/
-	private function scan_diskSpace(){
-		$this->statusIDX['diskSpace'] = wfIssues::statusStart("Scanning to check available disk space");
+	private function scan_diskSpace() {
+		$this->statusIDX['diskSpace'] = wfIssues::statusStart(__('Scanning to check available disk space', 'wordfence'));
 		$this->scanController->startStage(wfScanner::STAGE_SERVER_STATE);
 		wfUtils::errorsOff();
 		$total = @disk_total_space('.');
-		$free = @disk_free_space('.');
+		$free = @disk_free_space('.'); //Normally false if unreadable but can return 0 on some hosts even when there's space available
 		wfUtils::errorsOn();
-		if( (! $total) || (! $free )){ //If we get zeros it's probably not reading right. If free is zero then we're out of space and already in trouble.
-			wfIssues::statusEnd($this->statusIDX['diskSpace'], wfIssues::STATUS_FAILED);
-			$this->scanController->completeStage(wfScanner::STAGE_SERVER_STATE, wfIssues::STATUS_FAILED);
+		if (!$total || !$free) {
+			$this->status(2, 'info', __('Unable to access available disk space information', 'wordfence'));
+			wfIssues::statusEnd($this->statusIDX['diskSpace'], wfIssues::STATUS_SECURE);
+			$this->scanController->completeStage(wfScanner::STAGE_SERVER_STATE, wfIssues::STATUS_SECURE);
 			return;
 		}
-		$this->status(2, 'info', "Total disk space: " . sprintf('%.4f', ($total / 1024 / 1024 / 1024)) . "GB -- Free disk space: " . sprintf('%.4f', ($free / 1024 / 1024 / 1024)) . "GB");
-		$freeMegs = sprintf('%.2f', $free / 1024 / 1024);
-		$this->status(2, 'info', "The disk has $freeMegs MB space available");
-		if($freeMegs < 5){
+	  
+		
+		$this->status(2, 'info', sprintf(__('Total disk space: %s -- Free disk space: %s', 'wordfence'), wfUtils::formatBytes($total), wfUtils::formatBytes($free)));
+		$freeMegs = round($free / 1024 / 1024, 2);
+		$this->status(2, 'info', sprintf(__('The disk has %s MB available', 'wordfence'), $freeMegs));
+		if ($freeMegs < 5) {
 			$level = 1;
-		} else if($freeMegs < 20){
+		}
+		else if ($freeMegs < 20) {
 			$level = 2;
-		} else {
+		}
+		else {
 			wfIssues::statusEnd($this->statusIDX['diskSpace'], wfIssues::STATUS_SECURE);
 			$this->scanController->completeStage(wfScanner::STAGE_SERVER_STATE, wfIssues::STATUS_SECURE);
 			return;
 		}
 		$haveIssues = wfIssues::STATUS_SECURE;
-		$added = $this->addIssue('diskSpace', $level, 'diskSpace', 'diskSpace' . $level, "You have $freeMegs" . "MB disk space remaining", "You only have $freeMegs" . " Megabytes of your disk space remaining. Please free up disk space or your website may stop serving requests.", array(
-			'spaceLeft' => $freeMegs . "MB" ));
+		$added = $this->addIssue('diskSpace', 
+			$level, 
+			'diskSpace', 
+			'diskSpace' . $level, 
+			sprintf(__('You have %s disk space remaining', 'wordfence'), wfUtils::formatBytes($free)), 
+			sprintf(__('You only have %s of your disk space remaining. Please free up disk space or your website may stop serving requests.', 'wordfence'), wfUtils::formatBytes($free)), 
+			array('spaceLeft' => wfUtils::formatBytes($free))
+		);
 		if ($added == wfIssues::ISSUE_ADDED || $added == wfIssues::ISSUE_UPDATED) { $haveIssues = wfIssues::STATUS_PROBLEM; }
 		else if ($haveIssues != wfIssues::STATUS_SECURE && ($added == wfIssues::ISSUE_IGNOREP || $added == wfIssues::ISSUE_IGNOREC)) { $haveIssues = wfIssues::STATUS_IGNORED; }
 		wfIssues::statusEnd($this->statusIDX['diskSpace'], $haveIssues);
@@ -1624,10 +1634,10 @@ class wfScanEngine {
 		if ($this->isFullScan()) {
 			//Abandoned plugins
 			foreach ($this->pluginRepoStatus as $slug => $status) {
-				if ($status !== false && !is_wp_error($status) && property_exists($status, 'last_updated')) {
-					$lastUpdateTimestamp = strtotime($status->last_updated);
+				if ($status !== false && !is_wp_error($status) && ((is_object($status) && property_exists($status, 'last_updated')) || (is_array($status) && array_key_exists('last_updated', $status)))) {
+					$statusArray = (array) $status;
+					$lastUpdateTimestamp = strtotime($statusArray['last_updated']);
 					if ($lastUpdateTimestamp > 0 && (time() - $lastUpdateTimestamp) > 63072000 /* ~2 years */) {
-						$statusArray = (array) $status;
 						$statusArray['dateUpdated'] = wfUtils::formatLocalTime(get_option('date_format'), $lastUpdateTimestamp);
 						$severity = 2; //Warning
 						$statusArray['abandoned'] = true;
@@ -1869,6 +1879,30 @@ class wfScanEngine {
 		wfIssues::statusEnd($this->statusIDX['suspiciousOptions'], $haveIssues);
 		$this->scanController->completeStage(wfScanner::STAGE_OPTIONS_AUDIT, $haveIssues);
 	}
+	
+	public function scan_geoipSupport() {
+		$this->statusIDX['geoipSupport'] = wfIssues::statusStart("Checking for future GeoIP support");
+		$this->scanController->startStage(wfScanner::STAGE_SERVER_STATE);
+		$haveIssues = wfIssues::STATUS_SECURE;
+		
+		if (version_compare(phpversion(), '5.4') < 0 && wfConfig::get('isPaid') && wfBlock::hasCountryBlock()) {
+			$shortMsg = __('PHP Update Needed for Country Blocking', 'wordfence');
+			$longMsg = sprintf(__('The GeoIP database that is required for country blocking is being updated to a new format in April 2018. This new format requires sites to run PHP 5.4 or newer, and this site is on PHP %s. To ensure country blocking continues functioning, please update PHP prior to that date.', 'wordfence'), wfUtils::cleanPHPVersion());
+			
+			$longMsg .= ' <a href="' . wfSupportController::esc_supportURL(wfSupportController::ITEM_SCAN_RESULT_GEOIP_UPDATE) . '" target="_blank" rel="noopener noreferrer">Get more information.</a>';
+			
+			$this->status(2, 'info', "Adding issue: {$shortMsg}");
+			
+			$ignoreP = 'geoIPPHPDiscontinuing';
+			$ignoreC = $ignoreP;
+			$added = $this->addIssue('geoipSupport', 1, $ignoreP, $ignoreC, $shortMsg, $longMsg, array());
+			if ($added == wfIssues::ISSUE_ADDED || $added == wfIssues::ISSUE_UPDATED) { $haveIssues = wfIssues::STATUS_PROBLEM; }
+			else if ($haveIssues != wfIssues::STATUS_PROBLEM && ($added == wfIssues::ISSUE_IGNOREP || $added == wfIssues::ISSUE_IGNOREC)) { $haveIssues = wfIssues::STATUS_IGNORED; }
+		}
+		
+		wfIssues::statusEnd($this->statusIDX['geoipSupport'], $haveIssues);
+		$this->scanController->completeStage(wfScanner::STAGE_SERVER_STATE, $haveIssues);
+	}
 
 	public function status($level, $type, $msg){
 		wordfence::status($level, $type, $msg);
@@ -1894,7 +1928,7 @@ class wfScanEngine {
 		$kill = wfConfig::get('wfKillRequested', 0);
 		if($kill && time() - $kill < 600){ //Kill lasts for 10 minutes
 			wordfence::status(10, 'info', "SUM_KILLED:Previous scan was stopped successfully.");
-			throw new Exception("Scan was stopped on administrator request.");
+			throw new Exception("Scan was stopped on administrator request.", wfScanEngine::SCAN_MANUALLY_KILLED);
 		}
 	}
 	public static function startScan($isFork = false, $scanMode = false){
@@ -2287,7 +2321,8 @@ class wfCommonBackupFileTest {
 	public static function createAllForFile($file, $mode = self::MATCH_EXACT, $matcher = false) {
 		global $wpdb;
 		$escapedFile = esc_sql(preg_quote($file));
-		$files = $wpdb->get_col("SELECT path FROM {$wpdb->base_prefix}wfKnownFileList WHERE path REGEXP '(^|/){$escapedFile}$'");
+		$table_wfKnownFileList = wfDB::networkTable('wfKnownFileList');
+		$files = $wpdb->get_col("SELECT path FROM {$table_wfKnownFileList} WHERE path REGEXP '(^|/){$escapedFile}$'");
 		$tests = array();
 		foreach ($files as $f) {
 			$tests[] = new self(site_url($f), ABSPATH . $f, array(), $mode, $matcher);

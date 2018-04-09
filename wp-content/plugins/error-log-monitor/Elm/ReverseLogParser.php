@@ -25,7 +25,7 @@ class Elm_ReverseLogParser implements OuterIterator {
 	 * @var array A circular buffer used to implement backtracking.
 	 */
 	private $backtrackBuffer = array();
-	const BACKTRACKING_BUFFER_SIZE = 100;
+	private $backtrackingBufferSize = 200;
 
 	/**
 	 * @var int Next read index. Must not exceed the write index.
@@ -53,6 +53,13 @@ class Elm_ReverseLogParser implements OuterIterator {
 		$this->lineIterator = $lineIterator;
 		$this->isXdebugTraceEnabled = function_exists('extension_loaded') && extension_loaded('xdebug');
 		$this->isPhpDefaultTraceEnabled = version_compare(phpversion(), '5.4', '>=');
+		$this->backtrackingBufferSize = max(
+			min(
+				intval(ini_get('xdebug.max_nesting_level')) + 10,
+				$this->backtrackingBufferSize
+			),
+			1000
+		);
 	}
 
 	/**
@@ -213,7 +220,7 @@ class Elm_ReverseLogParser implements OuterIterator {
 
 		//We expect log entries to be structured like this: "[date-and-time] Optional severity: error message".
 		$pattern = '/
-			^(?:\[(?P<timestamp>[\w \-+:]{6,50}?)\]\ )?
+			^(?:\[(?P<timestamp>[\w \-+:\/]{6,50}?)\]\ )?
 			(?P<message>
 			    (?:(?:PHP\ )?(?P<severity>[a-zA-Z][a-zA-Z ]{3,40}?):\ )?
 			.+)$
@@ -255,12 +262,19 @@ class Elm_ReverseLogParser implements OuterIterator {
 	private function readNextLine($skipEmptyLines = true) {
 		//Check the internal buffer first.
 		while ( $this->bufferReadIndex < $this->bufferWriteIndex ) {
-			$line = $this->backtrackBuffer[$this->bufferReadIndex % self::BACKTRACKING_BUFFER_SIZE];
+			$line = $this->backtrackBuffer[$this->bufferReadIndex % $this->backtrackingBufferSize];
 			$this->bufferReadIndex++;
 
 			if ( !$skipEmptyLines || ($line !== '') ) {
 				return $line;
 			}
+		}
+
+		$isBacktrackingBufferFull = !empty($this->backtrackingIndexStack)
+			&& (($this->bufferWriteIndex - $this->backtrackingIndexStack[0]) === $this->backtrackingBufferSize);
+		if ( $isBacktrackingBufferFull ) {
+			//The current log entry is malformed or too large to fit in the buffer.
+			return null;
 		}
 
 		//Then check the actual file iterator.
@@ -269,12 +283,14 @@ class Elm_ReverseLogParser implements OuterIterator {
 			$this->lineIterator->next();
 
 			if ( !empty($this->backtrackingIndexStack) ) {
-				$this->backtrackBuffer[$this->bufferWriteIndex % self::BACKTRACKING_BUFFER_SIZE] = $line;
+				$this->backtrackBuffer[$this->bufferWriteIndex % $this->backtrackingBufferSize] = $line;
 				$this->bufferWriteIndex++;
 				$this->bufferReadIndex = $this->bufferWriteIndex;
 
-				if ( $this->bufferWriteIndex - $this->backtrackingIndexStack[0] > self::BACKTRACKING_BUFFER_SIZE ) {
-					throw new RuntimeException('Backtrack buffer overflow');
+				if ( $this->bufferWriteIndex - $this->backtrackingIndexStack[0] > $this->backtrackingBufferSize ) {
+					//This should never happen in practice. Instead of overfilling the buffer,
+					//the plugin should abort the current parse and fall back to something else.
+					throw new LogicException('Backtrack buffer overflow');
 				};
 			}
 

@@ -38,6 +38,7 @@ if (!defined('WORDFENCE_VERSION')) { exit; }
 				array("litespeed", __('LiteSpeed/lsapi', 'wordfence'), $serverInfo->isLiteSpeed(), wfWAFAutoPrependHelper::helper('litespeed')->getFilesNeededForBackup()),
 				array("nginx", __('NGINX', 'wordfence'), $serverInfo->isNGINX(), wfWAFAutoPrependHelper::helper('nginx')->getFilesNeededForBackup()),
 				array("iis", __('Windows (IIS)', 'wordfence'), $serverInfo->isIIS(), wfWAFAutoPrependHelper::helper('iis')->getFilesNeededForBackup()),
+				array("manual", __('Manual Configuration', 'wordfence'), false, array()),
 			);
 			
 			$hasRecommendedOption = false;
@@ -53,13 +54,15 @@ if (!defined('WORDFENCE_VERSION')) { exit; }
 			if (!$hasRecommendedOption): ?>
 				<p><?php _e('If you know your web server\'s configuration, please select it from the list below.', 'wordfence'); ?></p>
 			<?php else: ?>
-				<p><?php _e('We\'ve preselected your server configuration based on our tests, but if you know your web server\'s configuration, please select it now.', 'wordfence'); ?></p>
+				<p><?php _e('We\'ve preselected your server configuration based on our tests, but if you know your web server\'s configuration, please select it now. You can also choose "Manual Configuration" for alternate installation details.', 'wordfence'); ?></p>
 			<?php endif; ?>
 			<select name='serverConfiguration' id='wf-waf-server-config'>
 				<?php echo $wafPrependOptions; ?>
 			</select>
-			<div class="wf-notice wf-nginx-waf-config" style="display: none;"><?php printf(__('Part of the Firewall configuration procedure for NGINX depends on creating a <code>%s</code> file in the root of your WordPress installation. This file can contain sensitive information and public access to it should be restricted. We have <a href="%s">instructions on our documentation site</a> on what directives to put in your nginx.conf to fix this.', 'wordfence'), esc_html(ini_get('user_ini.filename')), wfSupportController::esc_supportURL(wfSupportController::ITEM_FIREWALL_WAF_INSTALL_NGINX)); ?></div>
-			<p><?php _e('Please download a backup of the following files before we make the necessary changes:', 'wordfence'); ?></p>
+			<div class="wf-notice wf-nginx-waf-config" style="display: none;"><?php printf(__('Part of the Firewall configuration procedure for NGINX depends on creating a <code>%s</code> file in the root of your WordPress installation. This file can contain sensitive information and public access to it should be restricted. We have <a href="%s">instructions on our documentation site</a> on what directives to put in your nginx.conf to fix this.', 'wordfence'), esc_html(ini_get('user_ini.filename') ? ini_get('user_ini.filename') : __('(.user.ini)', 'wordfence')), wfSupportController::esc_supportURL(wfSupportController::ITEM_FIREWALL_WAF_INSTALL_NGINX)); ?></div>
+			<div class="wf-manual-waf-config" style="display: none;">
+				<p><?php printf(__('If you are using a web server not listed in the dropdown or if file permissions prevent the installer from completing successfully, you will need to perform the change manually. Click Continue below to create the required file and view manual installation instructions.', 'wordfence')); ?></p>
+			</div>
 			<?php
 			$adminURL = network_admin_url('admin.php?page=WordfenceWAF&subpage=waf_options&action=configureAutoPrepend');
 			$wfnonce = wp_create_nonce('wfWAFAutoPrepend');
@@ -71,6 +74,7 @@ if (!defined('WORDFENCE_VERSION')) { exit; }
 				$jsonBackups = json_encode(array_map('basename', $backups));
 				?>
 				<div class="wf-waf-backups wf-waf-backups-<?php echo $class; ?>" style="display: none;" data-backups="<?php echo esc_attr($jsonBackups); ?>">
+					<?php if (count($backups)): ?><p><?php _e('Please download a backup of the following files before we make the necessary changes:', 'wordfence'); ?></p><?php endif; ?>
 					<ul class="wf-waf-backup-file-list">
 						<?php
 						foreach ($backups as $index => $backup) {

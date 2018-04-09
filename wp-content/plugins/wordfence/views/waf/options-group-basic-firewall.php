@@ -50,13 +50,13 @@ if (!isset($collapseable)) {
 								<script type="application/javascript">
 									(function($) {
 										$(function() {
-											$('#input-wafStatus').select2({
+											$('#input-wafStatus').wfselect2({
 												minimumResultsForSearch: -1,
 												width: '200px'
 											}).on('change', function() {
 												var select = $(this);
 												var value = select.val();
-												var container = $($(this).data('select2').$container);
+												var container = $($(this).data('wfselect2').$container);
 												container.removeClass('wafStatus-enabled wafStatus-learning-mode wafStatus-disabled')
 													.addClass('wafStatus-' + value);
 
@@ -81,7 +81,11 @@ if (!isset($collapseable)) {
 											}).val(<?php echo json_encode($wafStatus) ?>).triggerHandler('change');
 
 											$('#waf-learning-mode-grace-period .wf-datetime').datetimepicker({
-												timeFormat: 'hh:mmtt z'
+												dateFormat: 'yy-mm-dd',
+												timezone: <?php echo (int) wfUtils::timeZoneMinutes($config->getConfig('learningModeGracePeriod') ? (int) $config->getConfig('learningModeGracePeriod') : false); ?>,
+												showTime: false,
+												showTimepicker: false,
+												showMonthAfterYear: true
 											}).each(function() {
 												var el = $(this);
 												if (el.attr('data-value')) {
@@ -293,7 +297,10 @@ if (!isset($collapseable)) {
 												}
 											});
 
-											$('#wf-waf-server-config').select2();
+											$('#wf-waf-server-config').wfselect2({
+												minimumResultsForSearch: -1,
+												width: WFAD.isSmallScreen ? '300px' : '500px'
+											});
 
 											$('#wf-waf-include-prepend > li').each(function(index, element) {
 												$(element).on('click', function(e) {
@@ -308,10 +315,24 @@ if (!isset($collapseable)) {
 													});
 												});
 											});
-
+											
 											var nginxNotice = $('.wf-nginx-waf-config');
+											var manualNotice = $('.wf-manual-waf-config');
 											$('#wf-waf-server-config').on('change', function() {
 												var el = $(this);
+												if (manualNotice.length) {
+													if (el.val() == 'manual') {
+														manualNotice.fadeIn(400, function () {
+															$.wfcolorbox.resize();
+														});
+													}
+													else {
+														manualNotice.fadeOut(400, function () {
+															$.wfcolorbox.resize();
+														});
+													}
+												}
+												
 												$('.wf-waf-backups').hide();
 												$('.wf-waf-backups-' + el.val().replace(/[^a-z0-9\-]/i, '')).show();
 
@@ -326,11 +347,12 @@ if (!isset($collapseable)) {
 															$.wfcolorbox.resize();
 														});
 													}
-												}
-												else {
-													$.wfcolorbox.resize();
+
+													validateContinue();
+													return;
 												}
 
+												$.wfcolorbox.resize();
 												validateContinue();
 											}).triggerHandler('change');
 
@@ -349,6 +371,11 @@ if (!isset($collapseable)) {
 											$('#wf-waf-uninstall-continue').on('click', function(e) {
 												e.preventDefault();
 												e.stopPropagation();
+
+												if ($('.wf-manual-waf-config').is(':visible')) {
+													WFAD.colorboxClose();
+													return;
+												}
 
 												var serverConfiguration = $('#wf-waf-server-config').val();
 

@@ -221,10 +221,11 @@ class Elm_DashboardWidget {
 		echo '<ul class="', esc_attr(implode(' ', $listClasses)), '"><tbody>';
 		foreach ($lines as $line) {
 			printf(
-				'<li class="elm-entry%s" data-raw-message="%s">%s <p class="elm-timestamp">%s</p>',
+				'<li class="elm-entry%s" data-raw-message="%s">%s <p class="elm-timestamp" title="%s">%s</p>',
 				!empty($line['stacktrace']) ? ' elm-has-stack-trace' : '',
 				esc_attr($line['message']),
 				$actions,
+				!empty($line['timestamp']) ? gmdate('Y-m-d H:i:s e', $line['timestamp']) : '',
 				!empty($line['timestamp']) ? $this->plugin->formatTimestamp($line['timestamp']) : ''
 			);
 
