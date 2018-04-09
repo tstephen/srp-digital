@@ -6,6 +6,12 @@
 *.sql.gz
 ~*
 
+# Apps overlaid
+*html
+admin/*
+questionnaire/*
+srp/*
+
 .htaccess
 .maintenance
 
