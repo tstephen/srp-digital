@@ -22,8 +22,9 @@
     if ($a['msg_name']=='') $a['msg_name'] = $form->post_name;
 
     $form_content = $form->post_content;
-    $form_content = apply_filters('the_content', $form_content);
+    //$form_content = apply_filters('the_content', $form_content);
     $form_content = str_replace(']]>', ']]&gt;', $form_content);
+    $form_content = str_replace('<br>', '', $form_content);
 
     $temp_content .= '<script>';
     $temp_content .= '  webshims.setOptions("waitReady", false);';

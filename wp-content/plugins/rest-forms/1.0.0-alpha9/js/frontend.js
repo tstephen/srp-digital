@@ -687,7 +687,7 @@ var $p = (function ($) {
 
     var cmd;
     switch (true) {
-    case (t.val().length==0):
+    case (t.val().trim().length==0):
       console.log('have empty value');
       cmd = t.data('p-bind')+'=null;';
       break;
@@ -707,7 +707,7 @@ var $p = (function ($) {
       if (eval('$p.'+formObj+'==undefined')) eval('$p.'+formObj+'={}');
       cmd = '$p.'+formObj+'.'+ev.target.name+'="'+ev.target.value+'"';
     default:
-      cmd = t.data('p-bind')+'='+JSON.stringify(t.val())+';';
+      cmd = t.data('p-bind')+'='+JSON.stringify(t.val().trim())+';';
     }
     console.log('updating data model for '+t.name+' using '+cmd);
     eval(cmd);

@@ -120,6 +120,11 @@ The form's JSON payload may be accessed as $_REQUEST['json'].
 
 == Changelog ==
 
+= 1.0.0.alpha9 =
+
+- #26 trim field values before submitting form
+- trim down space between form fields
+
 = 1.0.0.alpha8 =
 
 - #23 radio button binding fix
