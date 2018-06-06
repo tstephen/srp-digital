@@ -1,14 +1,15 @@
 <?php
 require_once('wfDB.php');
 class wfSchema {
-	private $deprecatedTables = array(
+	private static $deprecatedTables = array(
 		'wfBlocks',
 		'wfBlocksAdv',
 		'wfLockedOut',
-		'wfThrottleLog',	
+		'wfThrottleLog',
+		'wfNet404s',
 	);
 	
-	private $tables = array(
+	private static $tables = array(
 "wfBadLeechers" => "(
   `eMin` int(10) unsigned NOT NULL,
   `IP` binary(16) NOT NULL DEFAULT '\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0',
@@ -167,13 +168,6 @@ class wfSchema {
   KEY `k1` (`ctime`),
   KEY `k2` (`type`)
 ) DEFAULT CHARSET=utf8",
-'wfNet404s' => "(
-  `sig` binary(16) NOT NULL,
-  `ctime` int(10) unsigned NOT NULL,
-  `URI` varchar(1000) NOT NULL,
-  PRIMARY KEY (`sig`),
-  KEY `k1` (`ctime`)
-) DEFAULT CHARSET=utf8",
 'wfHoover' => "(
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `owner` text,
@@ -272,23 +266,27 @@ class wfSchema {
 		$this->db = new wfDB();
 	}
 	public function dropAll(){
-		foreach($this->tables as $table => $def){
+		foreach(self::$tables as $table => $def){
 			$this->db->queryWrite("drop table if exists " . wfDB::networkTable($table));
 		}
 		
-		foreach ($this->deprecatedTables as $table) {
+		foreach (self::$deprecatedTables as $table) {
 			$this->db->queryWrite("drop table if exists " . wfDB::networkTable($table));
 		}
 	}
 	public function createAll(){
-		foreach($this->tables as $table => $def){
+		foreach(self::$tables as $table => $def){
 			$this->db->queryWrite("create table IF NOT EXISTS " . wfDB::networkTable($table) . " " . $def);
 		}
 	}
 	public function create($table){
-		$this->db->queryWrite("create table IF NOT EXISTS " . wfDB::networkTable($table) . " " . $this->tables[$table]);
+		$this->db->queryWrite("create table IF NOT EXISTS " . wfDB::networkTable($table) . " " . self::$tables[$table]);
 	}
 	public function drop($table){
 		$this->db->queryWrite("drop table if exists " . wfDB::networkTable($table));
+	}
+	
+	public static function tableList() {
+		return array_keys(self::$tables);
 	}
 }
