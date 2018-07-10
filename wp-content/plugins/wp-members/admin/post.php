@@ -5,13 +5,13 @@
  * Functions to manage the post/page editor screens.
  * 
  * This file is part of the WP-Members plugin by Chad Butler
- * You can find out more about this plugin at http://rocketgeek.com
- * Copyright (c) 2006-2017 Chad Butler
+ * You can find out more about this plugin at https://rocketgeek.com
+ * Copyright (c) 2006-2018 Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @author Chad Butler
- * @copyright 2006-2017
+ * @copyright 2006-2018
  *
  * Functions included:
  * - wpmem_bulk_posts_action
@@ -42,10 +42,12 @@ function wpmem_bulk_posts_action() {
 	if ( ( isset( $_GET['post_type'] ) && ( 'page' == $_GET['post_type'] || 'post' == $_GET['post_type'] || array_key_exists( $_GET['post_type'], $wpmem->post_types ) ) ) || ! isset( $_GET['post_type'] ) ) { ?>
 	<script type="text/javascript">
 		jQuery(document).ready(function() {
-		jQuery('<option>').val('block').text('<?php   _e( 'Block',   'wp-members' ) ?>').appendTo("select[name='action']");
 		jQuery('<option>').val('unblock').text('<?php _e( 'Unblock', 'wp-members' ) ?>').appendTo("select[name='action']");
-		jQuery('<option>').val('block').text('<?php   _e( 'Block',   'wp-members' ) ?>').appendTo("select[name='action2']");
+		jQuery('<option>').val('block').text('<?php   _e( 'Block',   'wp-members' ) ?>').appendTo("select[name='action']");
+		jQuery('<option>').val('hide').text('<?php    _e( 'Hide',    'wp-members' ) ?>').appendTo("select[name='action']");
 		jQuery('<option>').val('unblock').text('<?php _e( 'Unblock', 'wp-members' ) ?>').appendTo("select[name='action2']");
+		jQuery('<option>').val('block').text('<?php   _e( 'Block',   'wp-members' ) ?>').appendTo("select[name='action2']");
+		jQuery('<option>').val('hide').text('<?php    _e( 'Hide', 'wp-members' ) ?>').appendTo("select[name='action2']");
 		});
 	</script><?php
 	}
@@ -69,39 +71,32 @@ function wpmem_posts_page_load() {
 
 	switch ( $action ) {
 
-		case ( 'block' ):
 		case ( 'unblock' ):
+		case ( 'block'   ):
+		case ( 'hide'    ):
 			// Validate nonce.
 			check_admin_referer( 'bulk-posts' );
 			// Get the posts.
 			$posts = ( isset( $_REQUEST['post'] ) ) ? $_REQUEST['post'] : '';
+			// Convert action.
+			$status = ( 'hide' == $action ) ? 2 : ( ( 'block' == $action ) ? 1 : 0 );
 			// Update posts.
 			$x = '';
 			if ( $posts ) {
 				foreach ( $posts as $post_id ) {
+					// Keep a count of posts updated.
 					$x++;
+					// Make sure $post_id is just an integer.
+					$post_id = (int)$post_id;
+					// Get the post type.
 					$post = get_post( $post_id );
 					$type = $post->post_type;
 					// Update accordingly.
-					if ( $wpmem->block[ $type ] == 0 ) {
-						if ( $action == 'block' ) {
-							update_post_meta( $post_id, '_wpmem_block', 1 );
-						} else {
-							delete_post_meta( $post_id, '_wpmem_block' );
-						}
-					}
-
-					if ( $wpmem->block[ $type ] == 1 ) {
-						if ( $action == 'unblock' ) {
-							update_post_meta( $post_id, '_wpmem_block', 0 );
-						} else {
-							delete_post_meta( $post_id, '_wpmem_block' );
-						}
-					}
+					wpmem_set_block_status( $status, $post_id, $post->post_type );
 				}
 				// Set the return message.
 				$arr = array( 
-					'a' => $action,
+					'a' => 'updated',
 					'n' => $x,
 					'post_type' => $type,
 				);
@@ -205,23 +200,31 @@ function wpmem_block_meta() {
 	$post_type = $wp_post_types[ $post->post_type ];
 
 	if ( isset( $wpmem->block[ $post->post_type ] ) && $wpmem->block[ $post->post_type ] == 1 ) {
-		$block = 0;
+		$notice_icon = '<span class="dashicons dashicons-lock"></span>';
 		$notice_text = sprintf( __( '%s are blocked by default.', 'wp-members' ), $post_type->labels->name );
-		$text = sprintf( __( 'Unblock this %s', 'wp-members' ), strtolower( $post_type->labels->singular_name ) );
 	} else {
-		$block = 1;
+		$notice_icon = '<span class="dashicons dashicons-unlock"></span>';
 		$notice_text = sprintf( __( '%s are not blocked by default.', 'wp-members' ), $post_type->labels->name );
-		$text = sprintf( __( 'Block this %s', 'wp-members' ), strtolower( $post_type->labels->singular_name ) );
 	}
-	$meta = '_wpmem_block';
-	$admin_url = get_admin_url(); ?>
 	
+	$post_meta_value = get_post_meta( $post->ID, '_wpmem_block', true );
+
+	$post_meta_value = ( null == $post_meta_value ) ? $wpmem->block[ $post->post_type ] : $post_meta_value;
+	$post_meta_settings = array(
+		'0' => __( 'Unblock', 'wp-members' ),
+		'1' => __( 'Block',   'wp-members' ),
+		'2' => __( 'Hide',    'wp-members' ),
+	); ?>
 	<p>
-		<?php echo $notice_text . '&nbsp;&nbsp;<a href="' . add_query_arg( 'page', 'wpmem-settings', get_admin_url() . 'options-general.php' ) . '">' . __( 'Edit', 'wp-members' ) . '</a>'; ?>
+		<?php echo $notice_icon . ' ' . $notice_text . '&nbsp;&nbsp;<a href="' . add_query_arg( 'page', 'wpmem-settings', get_admin_url() . 'options-general.php' ) . '">' . __( 'Edit', 'wp-members' ) . '</a>'; ?>
 	</p>
 	<p>
-		<input type="checkbox" id="wpmem_block" name="wpmem_block" value="<?php echo $block; ?>" <?php checked( get_post_meta( $post->ID, $meta, true ), $block ); ?> />
-		<label for="wpmem_block"><?php echo $text; ?></label>
+		<select id="wpmem_block" name="wpmem_block">
+		<?php foreach ( $post_meta_settings as $key => $value ) {
+			echo '<option value="' . $key . '" ' . selected( $post_meta_value, $key, false ) . '>' . $value . '</option>';
+		} ?>
+		</select>
+		<label for="wpmem_block"><?php echo 'this ' . strtolower( $post_type->labels->singular_name ); ?><?php //echo $text; ?></label>
 	</p>
 	<?php
 	/**
@@ -230,11 +233,12 @@ function wpmem_block_meta() {
 	 * Allows actions at the end of the block meta box on pages and posts.
 	 *
 	 * @since 2.8.8
+	 * @since 3.2.0 Changed to $post_meta_value (same as $block).
 	 *
-	 * @param $post  object  The WP Post Object.
-	 * @param $block boolean The WP-Members block value.
+	 * @param $post           object  The WP Post Object.
+	 * @param post_meta_value string  The WP-Members block value: 0|1|2 for unblock|block|hide.
 	 */
-	do_action( 'wpmem_admin_after_block_meta', $post, $block );
+	do_action( 'wpmem_admin_after_block_meta', $post, $post_meta_value );
 }
 
 
@@ -244,37 +248,35 @@ function wpmem_block_meta() {
  * @since 2.8
  *
  * @global object $post
- * @param  int $post_id The post ID
+ * @global object $wpmem
+ * @param  int    $post_id The post ID
  */
 function wpmem_block_meta_save( $post_id ) {
+	
+	global $post, $wpmem;
 
 	// Quit if we are doing autosave.
 	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
 		return;
 	}
-
 	// Quit if the nonce isn't there, or is wrong.
 	if ( ! isset( $_POST['wpmem_block_meta_nonce'] ) || ! wp_verify_nonce( $_POST['wpmem_block_meta_nonce'], 'wpmem_block_meta_nonce' ) ) {
 		return;
 	}
-
+	// Quit if it's a post revision
+	if ( false !== wp_is_post_revision( $post_id ) ) {
+		return;
+	}
 	// Quit if the current user cannot edit posts.
 	if ( ! current_user_can( 'edit_posts' ) ) {
 		return;
 	}
-
+	
 	// Get value.
 	$block = ( isset( $_POST['wpmem_block'] ) ) ? sanitize_text_field( $_POST['wpmem_block'] ) : null;
-
-	// Need the post object.
-	global $post; 
-
-	// Update accordingly.
-	if ( $block != null ) {
-		update_post_meta( $post_id, '_wpmem_block', $block );
-	} else {
-		delete_post_meta( $post_id, '_wpmem_block' );
-	}
+	
+	// Set the value.
+	wpmem_set_block_status( $block, $post_id, $post->post_type );
 
 	/**
 	 * Fires after the post block meta box is saved.
@@ -336,8 +338,9 @@ function wpmem_post_columns_content( $column_name, $post_ID ) {
 			$block_meta = ( $old_block ) ? 1 : ( ( $old_unblock ) ? 0 : $block_meta );
 		}
 
-		echo ( $wpmem->block[ $post_type ] == 1 && $block_meta == '0' ) ? __( 'Yes' ) : '';
-		echo ( $wpmem->block[ $post_type ] == 0 && $block_meta == '1' ) ? __( 'Yes' ) : '';
+		echo ( $wpmem->block[ $post_type ] == 1 && $block_meta == '0' ) ? '<span class="dashicons dashicons-unlock" style="color:red"></span>' : '';
+		echo ( $wpmem->block[ $post_type ] == 0 && $block_meta == '1' ) ? '<span class="dashicons dashicons-lock" style="color:green"></span>' : '';
+		echo ( 2 == $block_meta ) ? '<span class="dashicons dashicons-hidden"></span>' : '';
 	}
 }
 
@@ -355,6 +358,41 @@ function wpmem_load_tinymce() {
 		global $wpmem_shortcode;
 		include( WPMEM_PATH . 'admin/includes/class-wp-members-tinymce-buttons.php' );
 		$wpmem_shortcode = new WP_Members_TinyMCE_Buttons;
+	}
+}
+
+/**
+ * Sets custom block status for a post.
+ *
+ * @since 3.2.0
+ *
+ * @global object $wpmem     The WP_Members object class.
+ * @param  int    $status    0|1|2 for unblock|block|hide
+ * @param  int    $post_id   The post ID to set a meta value.
+ * @param  string $post_type The post type.
+ */
+function wpmem_set_block_status( $status, $post_id, $post_type ) {
+	global $wpmem;
+	
+	// Previous value.
+	$prev_value = get_post_meta( $post_id, '_wpmem_block', true );
+
+	// Update accordingly.
+	if ( $prev_value && $status != $prev_value ) {
+		if ( $status == $wpmem->block[ $post_type ] ) {
+			delete_post_meta( $post_id, '_wpmem_block' );
+		} else {
+			update_post_meta( $post_id, '_wpmem_block', $status );
+		}
+	} elseif ( ! $prev_value && $status != $wpmem->block[ $post_type ] ) {
+		update_post_meta( $post_id, '_wpmem_block', $status );
+	} else { 
+		delete_post_meta( $post_id, '_wpmem_block' );
+	}
+	
+	// If the value is to hide, delete the transient so that it updates.
+	if ( 2 == $status || ( 2 == $prev_value && $status != $prev_value ) ) {
+		$wpmem->update_hidden_posts();
 	}
 }
 

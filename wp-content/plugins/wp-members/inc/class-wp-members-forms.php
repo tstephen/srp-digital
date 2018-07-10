@@ -33,8 +33,10 @@ class WP_Members_Forms {
 	 * @since 3.1.2 Changed $valtochk to $compare.
 	 * @since 3.1.6 Added $placeholder.
 	 * @since 3.1.7 Added number type & $min, $max, $title and $pattern attributes.
+	 * @since 3.2.0 Added $id argument.
 	 *
 	 * @param array  $args {
+	 *     @type string  $id
 	 *     @type string  $name
 	 *     @type string  $type
 	 *     @type string  $value
@@ -54,8 +56,9 @@ class WP_Members_Forms {
 	 */
 	function create_form_field( $args ) {
 		
-		$name        = $args['name'];
-		$type        = $args['type'];
+		$id          = ( isset( $args['id'] ) ) ? esc_attr( $args['id'] ) : esc_attr( $args['name'] );
+		$name        = esc_attr( $args['name'] );
+		$type        = esc_attr( $args['type'] );
 		$value       = maybe_unserialize( $args['value'] );
 		$compare     = ( isset( $args['compare']     ) ) ? $args['compare']     : '';
 		$class       = ( isset( $args['class']       ) ) ? $args['class']       : 'textbox';
@@ -72,7 +75,7 @@ class WP_Members_Forms {
 		case "email":
 		case "number":
 		case "date":
-			$class = ( 'textbox' == $class ) ? "textbox" : $class;
+			$class = ( 'textbox' == $class ) ? "textbox" : $this->sanitize_class( $class );
 			switch ( $type ) {
 				case 'url':
 					$value = esc_url( $value );
@@ -87,36 +90,40 @@ class WP_Members_Forms {
 					break;
 			}
 			$required    = ( $required    ) ? ' required' : '';
-			$placeholder = ( $placeholder ) ? ' placeholder="' . $placeholder . '"' : '';
-			$pattern     = ( $pattern     ) ? ' pattern="' . $pattern . '"' : '';
-			$title       = ( $title       ) ? ' title="' . $title . '"' : '';
-			$min         = ( isset( $args['min'] ) && $args['min'] != '' ) ? ' min="' . $args['min'] . '"' : '';
-			$max         = ( isset( $args['max'] ) && $args['max'] != '' ) ? ' max="' . $args['max'] . '"' : '';
-			$str = "<input name=\"$name\" type=\"$type\" id=\"$name\" value=\"$value\" class=\"$class\"$placeholder$title$pattern$min$max" . ( ( $required ) ? " required " : "" ) . " />";
+			$placeholder = ( $placeholder ) ? ' placeholder="' . esc_attr( $placeholder ) . '"' : '';
+			$pattern     = ( $pattern     ) ? ' pattern="' . esc_attr( $pattern ) . '"' : '';
+			$title       = ( $title       ) ? ' title="' . esc_attr( $title ) . '"' : '';
+			$min         = ( isset( $args['min'] ) && $args['min'] != '' ) ? ' min="' . esc_attr( $args['min'] ) . '"' : '';
+			$max         = ( isset( $args['max'] ) && $args['max'] != '' ) ? ' max="' . esc_attr( $args['max'] ). '"' : '';
+			$str = "<input name=\"$name\" type=\"$type\" id=\"$id\" value=\"$value\" class=\"$class\"$placeholder$title$pattern$min$max" . ( ( $required ) ? " required " : "" ) . " />";
 			break;
 		
 		case "password":
-			$placeholder = ( $placeholder ) ? ' placeholder="' . $placeholder . '"' : '';
-			$str = "<input name=\"$name\" type=\"$type\" id=\"$name\" class=\"$class\"$placeholder" . ( ( $required ) ? " required " : "" ) . " />";
+			$class = $this->sanitize_class( $class );
+			$placeholder = ( $placeholder ) ? ' placeholder="' . esc_attr( $placeholder ) . '"' : '';
+			$pattern     = ( $pattern     ) ? ' pattern="' . esc_attr( $pattern ) . '"' : '';
+			$title       = ( $title       ) ? ' title="' . esc_attr( $title ) . '"' : '';
+			$str = "<input name=\"$name\" type=\"$type\" id=\"$id\" class=\"$class\"$placeholder$title$pattern" . ( ( $required ) ? " required " : "" ) . " />";
 			break;
 		
 		case "image":
 		case "file":
-			$class = ( 'textbox' == $class ) ? "file" : $class;
-			$str = "<input name=\"$name\" type=\"file\" id=\"$name\" value=\"$value\" class=\"$class\"" . ( ( $required ) ? " required " : "" ) . " />";
+			$class = ( 'textbox' == $class ) ? "file" : $this->sanitize_class( $class );
+			$str = "<input name=\"$name\" type=\"file\" id=\"$id\" value=\"$value\" class=\"$class\"" . ( ( $required ) ? " required " : "" ) . " />";
 			break;
 	
 		case "checkbox":
-			$class = ( 'textbox' == $class ) ? "checkbox" : $class;
-			$str = "<input name=\"$name\" type=\"$type\" id=\"$name\" value=\"" . esc_attr( $value ) . "\"" . checked( $value, $compare, false ) . ( ( $required ) ? " required " : "" ) . " />";
+			$class = ( 'textbox' == $class ) ? "checkbox" : $this->sanitize_class( $class );
+			$str = "<input name=\"$name\" type=\"$type\" id=\"$id\" value=\"" . esc_attr( $value ) . "\"" . checked( $value, $compare, false ) . ( ( $required ) ? " required " : "" ) . " />";
 			break;
 	
 		case "textarea":
-			$value = stripslashes( $value ); // stripslashes( esc_textarea( $value ) );
-			$class = ( 'textbox' == $class ) ? "textarea" : $class;
-			$rows  = ( isset( $args['rows'] ) ) ? $args['rows'] : '5';
-			$cols  = ( isset( $args['cols'] ) ) ? $args['cols'] : '20';
-			$str = "<textarea cols=\"$cols\" rows=\"$rows\" name=\"$name\" id=\"$name\" class=\"$class\"" . ( ( $required ) ? " required " : "" ) . ">$value</textarea>";
+			$value = esc_textarea( stripslashes( $value ) ); // stripslashes( esc_textarea( $value ) );
+			$class = ( 'textbox' == $class ) ? "textarea" : $this->sanitize_class( $class );
+			$placeholder = ( $placeholder ) ? ' placeholder="' . esc_attr( $placeholder ) . '"' : '';
+			$rows  = ( isset( $args['rows'] ) && $args['rows'] ) ? esc_attr( $args['rows'] ) : '5';
+			$cols  = ( isset( $args['cols'] ) && $args['cols'] ) ? esc_attr( $args['cols'] ) : '20';
+			$str = "<textarea cols=\"$cols\" rows=\"$rows\" name=\"$name\" id=\"$id\" class=\"$class\"$placeholder" . ( ( $required ) ? " required " : "" ) . ">$value</textarea>";
 			break;
 	
 		case "hidden":
@@ -132,7 +139,7 @@ class WP_Members_Forms {
 			$class = ( 'textbox' == $class ) ? "dropdown" : $class;
 			$class = ( 'multiselect' == $type ) ? "multiselect" : $class;
 			$pname = ( 'multiselect' == $type ) ? $name . "[]" : $name;
-			$str = "<select name=\"$pname\" id=\"$name\" class=\"$class\"" . ( ( 'multiselect' == $type ) ? " multiple " : "" ) . ( ( $required ) ? " required " : "" ) . ">\n";
+			$str = "<select name=\"$pname\" id=\"$id\" class=\"$class\"" . ( ( 'multiselect' == $type ) ? " multiple " : "" ) . ( ( $required ) ? " required " : "" ) . ">\n";
 			foreach ( $value as $option ) {
 				$pieces = explode( '|', $option );
 				if ( 'multiselect' == $type ) {
@@ -161,28 +168,29 @@ class WP_Members_Forms {
 				$chk = ( isset( $pieces[2] ) && '' == $compare ) ? $pieces[1] : '';
 				if ( isset( $pieces[1] ) && '' != $pieces[1] ) {
 					$str = $str . $this->create_form_field( array(
+						'id'      => $id . '[' . $pieces[1] . ']',
 						'name'    => $name . '[]',
 						'type'    => 'checkbox',
 						'value'   => $pieces[1],
 						'compare' => ( in_array( $pieces[1], $values ) ) ? $pieces[1] : $chk,
-					) ) . "&nbsp;" . $pieces[0] . "<br />\n";
+					) ) . "&nbsp;" . esc_html( $pieces[0] ) . "<br />\n";
 				} else {
-					$str = $str . '<span class="div_multicheckbox_separator">' . $pieces[0] . "</span><br />\n";
+					$str = $str . '<span class="div_multicheckbox_separator">' . esc_html( $pieces[0] ) . "</span><br />\n";
 				}
 			}
 			break;
 			
 		case "radio":
-			$class = ( 'textbox' == $class ) ? "radio" : $class;
+			$class = ( 'textbox' == $class ) ? "radio" : $this->sanitize_class( $class );
 			$str = '';
 			$num = 1;
 			foreach ( $value as $option ) {
 				$pieces = explode( '|', $option );
-				$id = $name . '_' . $num;
+				$id = $this->sanitize_class( $id . '_' . $num );
 				if ( isset( $pieces[1] ) && '' != $pieces[1] ) {
-					$str = $str . "<input type=\"radio\" name=\"$name\" id=\"$id\" value=\"$pieces[1]\"" . checked( $pieces[1], $compare, false ) . ( ( $required ) ? " required " : " " ) . "> " . __( $pieces[0], 'wp-members' ) . "<br />\n";
+					$str = $str . "<input type=\"radio\" name=\"$name\" id=\"$id\" value=\"" . esc_attr( $pieces[1] ) . '"' . checked( $pieces[1], $compare, false ) . ( ( $required ) ? " required " : " " ) . "> " . esc_html( __( $pieces[0], 'wp-members' ) ) . "<br />\n";
 				} else {
-					$str = $str . '<span class="div_radio_separator">' . __( $pieces[0], 'wp-members' ) . "</span><br />\n";
+					$str = $str . '<span class="div_radio_separator">' . esc_html( __( $pieces[0], 'wp-members' ) ) . "</span><br />\n";
 				}
 				$num++;
 			}
@@ -224,13 +232,41 @@ class WP_Members_Forms {
 			$class = ( $type == 'password' || $type == 'email' || $type == 'url' ) ? 'text' : $type;
 		}
 
-		$label = '<label for="' . $meta_key . '" class="' . $class . '">' . __( $label, 'wp-members' );
+		$label = '<label for="' . esc_attr( $meta_key ) . '" class="' . $this->sanitize_class( $class ) . '">' . __( $label, 'wp-members' );
 		$label = ( $required ) ? $label . $req_mark : $label;
 		$label = $label . '</label>';
 		
 		return $label;
 	}
 	
+	/**
+	 * Sanitizes classes passed to the WP-Members form building functions.
+	 *
+	 * This generally uses just sanitize_html_class() but allows for 
+	 * whitespace so multiple classes can be passed (such as "regular-text code").
+	 *
+	 * @since 3.2.0
+	 *
+	 * @param	string $class
+	 * @return	string sanitized_class
+	 */
+	function sanitize_class( $class ) {
+		// If no whitespace, just return WP sanitized class.
+		if ( ! strpos( $class, ' ' ) ) {
+			return sanitize_html_class( $class );
+		} else {
+			// Break string by whitespace, sanitize individual class names.
+			$class_array = explode( ' ', $class );
+			$len = count( $class_array ); $i = 0;
+			$sanitized_class = '';
+			foreach ( $class_array as $single_class ) {
+				$sanitized_class .= sanitize_html_class( $single_class );
+				$sanitized_class .= ( $i == $len - 1 ) ? '' : ' ';
+				$i++;
+			}
+			return $sanitized_class;
+		}
+	}
 	/**
 	 * Uploads file from the user.
 	 *
@@ -358,7 +394,27 @@ class WP_Members_Forms {
 	 * }
 	 * @return string $form  The HTML for the form as a string.
 	 */
-	function login_form( $page, $arr ) {
+	function login_form( $mixed, $arr = array() ) {
+
+		// Handle legacy use.
+		if ( is_array( $mixed ) ) {
+			$page = $mixed['page'];
+			$arr  = $mixed;
+		} else {
+			$page = $mixed;
+		}
+		
+		
+		// Set up redirect_to @todo This could be done in a separate method usable by both login & reg.
+		if ( isset( $_REQUEST['redirect_to'] ) ) {
+			$redirect_to = $_REQUEST['redirect_to'];
+		} else {
+			if ( isset( $arr['redirect_to'] ) ) {
+				$redirect_to = $arr['redirect_to'];
+			} else {
+				$redirect_to = ( isset( $_SERVER['REQUEST_URI'] ) ) ? $_SERVER['REQUEST_URI'] : get_permalink();
+			}
+		}
 
 		global $wpmem;
 
@@ -378,11 +434,13 @@ class WP_Members_Forms {
 			'row_after'       => '',
 			'buttons_before'  => '<div class="button_div">',
 			'buttons_after'   => '</div>',
-			'link_before'     => '<div align="right" class="link-text">',
+			'link_before'     => '<div class="link-text">',
 			'link_after'      => '</div>',
+			'link_span_before' => '<span class="link-text-%s">',
+			'link_span_after'  => '</span>',
 
 			// classes & ids
-			'form_id'         => '',
+			'form_id'         => 'wpmem_' . $arr['action'],
 			'form_class'      => 'form',
 			'button_id'       => '',
 			'button_class'    => 'buttons',
@@ -393,7 +451,7 @@ class WP_Members_Forms {
 			'remember_check'  => true,
 			'n'               => "\n",
 			't'               => "\t",
-			'redirect_to'     => ( isset( $_REQUEST['redirect_to'] ) ) ? esc_url( $_REQUEST['redirect_to'] ) : ( ( isset( $arr['redirect_to'] ) ) ? $arr['redirect_to'] : get_permalink() ),
+			'redirect_to'     => $redirect_to,
 			'login_form_action' => true,
 
 		);
@@ -416,9 +474,9 @@ class WP_Members_Forms {
 
 		// Build the input rows.
 		foreach ( $arr['inputs'] as $input ) {
-			$label = '<label for="' . $input['tag'] . '">' . $input['name'] . '</label>';
+			$label = '<label for="' . esc_attr( $input['tag'] ) . '">' . $input['name'] . '</label>';
 			$field = wpmem_create_formfield( $input['tag'], $input['type'], '', '', $input['class'] );
-			$field_before = ( $args['wrap_inputs'] ) ? '<div class="' . $input['div'] . '">' : '';
+			$field_before = ( $args['wrap_inputs'] ) ? '<div class="' . sanitize_html_class( $input['div'] ) . '">' : '';
 			$field_after  = ( $args['wrap_inputs'] ) ? '</div>' : '';
 			$rows[] = array( 
 				'row_before'   => $args['row_before'],
@@ -464,7 +522,7 @@ class WP_Members_Forms {
 		}
 
 		// Build hidden fields, filter, and add to the form.
-		$hidden = wpmem_create_formfield( 'redirect_to', 'hidden', $args['redirect_to'] ) . $args['n'];
+		$hidden = wpmem_create_formfield( 'redirect_to', 'hidden', esc_url( $args['redirect_to'] ) ) . $args['n'];
 		$hidden = $hidden . wpmem_create_formfield( 'a', 'hidden', $arr['action'] ) . $args['n'];
 		$hidden = ( $arr['action'] != 'login' ) ? $hidden . wpmem_create_formfield( 'formsubmit', 'hidden', '1' ) : $hidden;
 
@@ -481,9 +539,9 @@ class WP_Members_Forms {
 		// Build the buttons, filter, and add to the form.
 		if ( $arr['action'] == 'login' ) {
 			$args['remember_check'] = ( $args['remember_check'] ) ? $args['t'] . wpmem_create_formfield( 'rememberme', 'checkbox', 'forever' ) . '&nbsp;' . '<label for="rememberme">' . $wpmem->get_text( 'remember_me' ) . '</label>&nbsp;&nbsp;' . $args['n'] : '';
-			$buttons =  $args['remember_check'] . $args['t'] . '<input type="submit" name="Submit" value="' . $arr['button_text'] . '" class="' . $args['button_class'] . '" />' . $args['n'];
+			$buttons =  $args['remember_check'] . $args['t'] . '<input type="submit" name="Submit" value="' . esc_attr( $arr['button_text'] ) . '" class="' . sanitize_html_class( $args['button_class'] ) . '" />' . $args['n'];
 		} else {
-			$buttons = '<input type="submit" name="Submit" value="' . $arr['button_text'] . '" class="' . $args['button_class'] . '" />' . $args['n'];
+			$buttons = '<input type="submit" name="Submit" value="' . esc_attr( $arr['button_text'] ) . '" class="' . sanitize_html_class( $args['button_class'] ) . '" />' . $args['n'];
 		}
 
 		/**
@@ -530,7 +588,9 @@ class WP_Members_Forms {
 				 * @param string The raw link.
 				 */
 				$link = apply_filters( "wpmem_{$tag}_link", $value['link'] );
-				$str  = $wpmem->get_text( "{$key}_link_before" ) . '<a href="' . $link . '">' . $wpmem->get_text( "{$key}_link" ) . '</a>';
+				$str  = $wpmem->get_text( "{$key}_link_before" ) . '<a href="' . esc_url( $link ) . '">' . $wpmem->get_text( "{$key}_link" ) . '</a>';
+				$link_str = $args['link_before'];
+				$link_str.= ( '' != $args['link_span_before'] ) ? sprintf( $args['link_span_before'], $key ) : '';
 				/**
 				 * Filters the register, forgot password, and forgot username links HTML.
 				 *
@@ -541,7 +601,9 @@ class WP_Members_Forms {
 				 * @param string $str  The link HTML.
 				 * @param string $link The link.
 				 */
-				$link = $args['link_before'] . apply_filters( "wpmem_{$tag}_link_str", $str, $link ) . $args['link_after'] . $args['n'];
+				$link_str.= apply_filters( "wpmem_{$tag}_link_str", $str, $link );
+				$link_str.= ( '' != $args['link_span_after'] ) ? $args['link_span_after'] : '';
+				$link_str.= $args['link_after'] . $args['n'];
 				/*
 				 * If this is the register link, and the current post type is set to
 				 * display the register form, and the current page is not the login
@@ -549,17 +611,17 @@ class WP_Members_Forms {
 				 */
 				if ( 'register' == $key ) {
 					if ( isset( $wpmem->user_pages['login'] ) && $wpmem->user_pages['login'] != '' ) {
-						$form = ( 1 == $wpmem->show_reg[ get_post_type( get_the_ID() ) ] && wpmem_current_url() != wpmem_login_url() ) ? $form : $form . $link;
+						$form = ( 1 == $wpmem->show_reg[ get_post_type( get_the_ID() ) ] && wpmem_current_url( true, false ) != wpmem_login_url() ) ? $form : $form . $link_str;
 					} else {
 						global $post;
 						if ( has_shortcode( $post->post_content, 'wpmem_profile' ) ) {
 							$form = $form;
 						} else {
-							$form = ( 1 == $wpmem->show_reg[ get_post_type( get_the_ID() ) ] && ! has_shortcode( $post->post_content, 'wpmem_form' ) ) ? $form : $form . $link;
+							$form = ( 1 == $wpmem->show_reg[ get_post_type( get_the_ID() ) ] && ! has_shortcode( $post->post_content, 'wpmem_form' ) ) ? $form : $form . $link_str;
 						}
 					}
 				} else {
-					$form = $form . $link;
+					$form = $form . $link_str;
 				}
 			}
 		}
@@ -571,10 +633,10 @@ class WP_Members_Forms {
 		$form = $args['fieldset_before'] . $args['n'] . $form . $args['fieldset_after'] . $args['n'];
 
 		// Apply form wrapper.
-		$form = '<form action="' . get_permalink() . '" method="POST" id="' . $args['form_id'] . '" class="' . $args['form_class'] . '">' . $args['n'] . $form . '</form>';
+		$form = '<form action="' . esc_url( get_permalink() ) . '" method="POST" id="' . sanitize_html_class( $args['form_id'] ) . '" class="' . sanitize_html_class( $args['form_class'] ) . '">' . $args['n'] . $form . '</form>';
 
 		// Apply anchor.
-		$form = '<a name="' . $arr['action'] . '"></a>' . $args['n'] . $form;
+		$form = '<a id="' . esc_attr( $arr['action'] ) . '"></a>' . $args['n'] . $form;
 
 		// Apply main wrapper.
 		$form = $args['main_div_before'] . $args['n'] . $form . $args['n'] . $args['main_div_after'];
@@ -622,11 +684,20 @@ class WP_Members_Forms {
 	 * @global object $wpmem        The WP_Members object.
 	 * @global string $wpmem_regchk Used to determine if the form is in an error state.
 	 * @global array  $userdata     Used to get the user's registration data if they are logged in (user profile edit).
-	 * @param  string $tag          (optional) Toggles between new registration ('new') and user profile edit ('edit').
+	 * @param  mixed  $mixed        (optional) String toggles between new registration ('new') and user profile edit ('edit'), or array containing settings arguments.
 	 * @param  string $heading      (optional) The heading text for the form, null (default) for new registration.
 	 * @return string $form         The HTML for the entire form as a string.
 	 */
-	function register_form( $tag = 'new', $heading = '', $redirect_to = null ) {
+	function register_form( $mixed = 'new', $heading = '', $redirect_to = null ) {
+		
+		// Handle legacy use.
+		if ( is_array( $mixed ) ) {
+			$tag         = $mixed['tag'];
+			$heading     = $mixed['heading'];
+			$redirect_to = $mixed['redirect_to'];
+		} else {
+			$tag = $mixed;
+		}
 
 		global $wpmem, $wpmem_regchk, $userdata; 
 
@@ -648,7 +719,7 @@ class WP_Members_Forms {
 			'buttons_after'    => '</div>',
 
 			// Classes & ids.
-			'form_id'          => '',
+			'form_id'          => ( 'new' == $tag ) ? 'wpmem_register' : 'wpmem_profile',
 			'form_class'       => 'form',
 			'button_id'        => '',
 			'button_class'     => 'buttons',
@@ -666,6 +737,7 @@ class WP_Members_Forms {
 			'submit_update'    => $wpmem->get_text( 'profile_submit' ),
 
 			// Other.
+			'post_to'          => get_permalink(),
 			'strip_breaks'     => true,
 			'use_nonce'        => false,
 			'wrap_inputs'      => true,
@@ -689,43 +761,23 @@ class WP_Members_Forms {
 
 		// Merge $args with defaults.
 		$args = wp_parse_args( $args, $defaults );
+		
+		// Get fields.
+		$wpmem_fields = wpmem_fields( $tag );
+		
+		// Fields to skip for user profile update.
 
-		// Username is editable if new reg, otherwise user profile is not.
 		if ( 'edit' == $tag ) {
-			// This is the User Profile edit - username is not editable.
-			$val   = $userdata->user_login;
-			$label = '<label for="user_login" class="text">' . $wpmem->get_text( 'profile_username' ) . '</label>';
-			$input = '<p class="noinput">' . $val . '</p>';
-			$field_before = ( $args['wrap_inputs'] ) ? '<div class="div_text">' : '';
-			$field_after  = ( $args['wrap_inputs'] ) ? '</div>' : '';
-		} else { 
-			// This is a new registration.
-			$val   = ( isset( $_POST['user_login'] ) ) ? stripslashes( $_POST['user_login'] ) : '';
-			$label = '<label for="user_login" class="text">' . $wpmem->get_text( 'register_username' ) . $args['req_mark'] . '</label>';
-			$input = wpmem_form_field( array( 
-				'name'     => 'user_login',
-				'type'     => 'text',
-				'value'    => $val,
-				'compare'  => '',
-				'required' => true,
-			) );
-
+			$pass_arr = array( 'username', 'password', 'confirm_password', 'password_confirm' );
+			// Skips tos on user edit page, unless they haven't got a value for tos.
+			if ( isset( $wpmem_fields['tos'] ) && ( $wpmem_fields['tos']['checked_value'] == get_user_meta( $userdata->ID, 'tos', true ) ) ) { 
+				$pass_arr[] = 'tos';
+			}
+			foreach ( $pass_arr as $pass ) {
+				unset( $wpmem_fields[ $pass ] );
+			}
 		}
-
-		// Add the username row to the array.
-		$rows['username'] = array( 
-			'meta'         => 'username',
-			'type'         => 'text',
-			'value'        => $val,
-			'label_text'   => $wpmem->get_text( 'register_username' ),
-			'row_before'   => $args['row_before'],
-			'label'        => $label,
-			'field_before' => ( $args['wrap_inputs'] ) ? '<div class="div_text">' : '',
-			'field'        => $input,
-			'field_after'  => ( $args['wrap_inputs'] ) ? '</div>': '',
-			'row_after'    => $args['row_after'],
-		);
-
+		
 		/**
 		 * Filter the array of form fields.
 		 *
@@ -740,9 +792,9 @@ class WP_Members_Forms {
 		 * @param array        The array of form fields.
 		 * @param string $tag  Toggle new registration or profile update. new|edit.
 		 */
-		$wpmem_fields = apply_filters( 'wpmem_register_fields_arr', wpmem_fields( $tag ), $tag );
+		$wpmem_fields = apply_filters( 'wpmem_register_fields_arr', $wpmem_fields, $tag );
 
-		$hidden = '';
+		$hidden_rows = array();
 
 		// Loop through the remaining fields.
 		foreach ( $wpmem_fields as $meta_key => $field ) {
@@ -750,43 +802,28 @@ class WP_Members_Forms {
 			// Start with a clean row.
 			$val = ''; $label = ''; $input = ''; $field_before = ''; $field_after = '';
 
-			// Skips user selected passwords for profile update.
-			$pass_arr = array( 'password', 'confirm_password', 'password_confirm' );
-			$do_row = ( 'edit' == $tag && in_array( $meta_key, $pass_arr ) ) ? false : true;
-
-			// Skips tos, makes tos field hidden on user edit page, unless they haven't got a value for tos.
-			if ( 'tos' == $meta_key && 'edit' == $tag && ( get_user_meta( $userdata->ID, 'tos', true ) ) ) { 
-				$do_row = false; 
-				$hidden_tos = wpmem_form_field( array(
-					'name'  => $meta_key, 
-					'type'  => 'hidden', 
-					'value' => get_user_meta( $userdata->ID, 'tos', true )
-				) );
-			}
-
-			// Handle hidden fields
-			if ( 'hidden' == $field['type'] ) {
-				$do_row = false;
-				$hidden.= wpmem_form_field( array( 
-					'name'     => $meta_key,
-					'type'     => $field['type'],
-					'value'    => $field['value'],
-					'compare'  => $valtochk,
-					//'class'    => ( $class ) ? $class : 'textbox',
-					'required' => $field['required'],
-				) );
-			}
-
 			// If the field is set to display and we aren't skipping, construct the row.
-			if ( $do_row && $field['register'] ) {
+			if ( $field['register'] ) {
+				
+				// Handle hidden fields
+				if ( 'hidden' == $field['type'] ) {
+					$do_row = false;
+					$hidden_rows[ $meta_key ] = wpmem_form_field( array( 
+						'name'     => $meta_key,
+						'type'     => $field['type'],
+						'value'    => $field['value'],
+						'compare'  => $valtochk,
+						'required' => $field['required'],
+					) );
+				}
 
 				// Label for all but TOS.
-				if ( $meta_key != 'tos' ) {
+				if ( 'tos' != $meta_key ) {
 
 					$class = ( $field['type'] == 'password' || $field['type'] == 'email' || $field['type'] == 'url' ) ? 'text' : $field['type'];
 					
 					$label = wpmem_form_label( array(
-						'meta_key' => $meta_key, 
+						'meta_key' => $meta_key, //( 'username' == $meta_key ) ? 'user_login' : $meta_key, 
 						'label'    => __( $field['label'], 'wp-members' ), 
 						'type'     => $field['type'], 
 						'class'    => $class, 
@@ -796,9 +833,8 @@ class WP_Members_Forms {
 
 				} 
 
-				// Gets the field value for both edit profile and submitted reg w/ error.
-				if ( ( 'edit' == $tag ) && ( '' == $wpmem->regchk ) ) {
-
+				// Gets the field value for edit profile.
+				if ( ( 'edit' == $tag ) && ( '' == $wpmem->regchk ) ) { 
 					switch ( $meta_key ) {
 						case( 'description' ):
 						case( 'textarea' == $field['type'] ):
@@ -834,7 +870,7 @@ class WP_Members_Forms {
 				// Does the tos field.
 				if ( 'tos' == $meta_key ) {
 
-					$val = ( isset( $_POST[ $meta_key ] ) ) ? $_POST[ $meta_key ] : ''; 
+					$val = sanitize_text_field( wpmem_get( $meta_key, '' ) ); 
 
 					// Should be checked by default? and only if form hasn't been submitted.
 					$val   = ( ! $_POST && $field['checked_default'] ) ? $field['checked_value'] : $val;
@@ -848,9 +884,9 @@ class WP_Members_Forms {
 
 					// Determine if TOS is a WP page or not.
 					$tos_content = stripslashes( get_option( 'wpmembers_tos' ) );
-					if ( has_shortcode( $tos_content, 'wp-members' ) || has_shortcode( $tos_content, 'wpmem_tos' ) ) {	
+					if ( has_shortcode( $tos_content, 'wpmem_tos' ) || has_shortcode( $tos_content, 'wp-members' ) ) {	
 						$link = do_shortcode( $tos_content );
-						$tos_pop = '<a href="' . $link . '" target="_blank">';
+						$tos_pop = '<a href="' . esc_url( $link ) . '" target="_blank">';
 					} else { 
 						$tos_pop = "<a href=\"#\" onClick=\"window.open('" . WPMEM_DIR . "/wp-members-tos.php','mywindow');\">";
 					}
@@ -863,7 +899,22 @@ class WP_Members_Forms {
 					 * @param string       The link text.
 					 * @param string $tag  Toggle new registration or profile update. new|edit.
 					 */
-					$input.= apply_filters( 'wpmem_tos_link_txt', sprintf( $wpmem->get_text( 'register_tos' ), $tos_pop, '</a>' ), $tag );
+					$tos_link_text = apply_filters( 'wpmem_tos_link_txt', $wpmem->get_text( 'register_tos' ), $tag );
+					
+					// If filtered value is not the default label, use that, otherwise use label.
+					// @note: if default changes, this check must change.
+					if ( __( 'Please indicate that you agree to the %s Terms of Service %s', 'wp-members' ) == $tos_link_text ) {
+						if ( __( 'TOS', 'wp-members' ) != $field['label'] && __( 'Terms of Service', 'wp-members' ) != $field['label'] ) {
+							$tos_link_text = $field['label'];
+						}
+					}
+					
+					// If tos string does not contain link identifiers (%s), wrap the whole string.
+					if ( ! strpos( $tos_link_text, '%s' ) ) {
+						$tos_link_text = '%s' . $tos_link_text . '%s';
+					}
+					
+					$input .= ' ' . sprintf( $tos_link_text, $tos_pop, '</a>' );
 
 					// In previous versions, the div class would end up being the same as the row before.
 					$field_before = ( $args['wrap_inputs'] ) ? '<div class="div_text">' : '';
@@ -892,9 +943,9 @@ class WP_Members_Forms {
 						$attachment_url = wp_get_attachment_url( $val );
 						$empty_file = '<span class="description">' . __( 'None' ) . '</span>';
 						if ( 'file' == $field['type'] ) {
-							$input = ( $attachment_url ) ? '<a href="' . $attachment_url . '">' . get_the_title( $val ) . '</a>' : $empty_file;
+							$input = ( $attachment_url ) ? '<a href="' . esc_url( $attachment_url ) . '">' . get_the_title( $val ) . '</a>' : $empty_file;
 						} else {
-							$input = ( $attachment_url ) ? '<img src="' . $attachment_url . '">' : $empty_file;
+							$input = ( $attachment_url ) ? '<img src="' . esc_url( $attachment_url ) . '">' : $empty_file;
 						}
 						$input.= '<br />' . $wpmem->get_text( 'profile_upload' ) . '<br />';
 						$input.= wpmem_form_field( array(
@@ -907,9 +958,8 @@ class WP_Members_Forms {
 					} else {
 
 						// For all other input types.
-						//$input = wpmem_create_formfield( $meta_key, $field['type'], $val, $valtochk );
 						$formfield_args = array( 
-							'name'     => $meta_key,
+							'name'     => $meta_key, // ( 'username' == $meta_key ) ? 'user_login' : $meta_key,
 							'type'     => $field['type'],
 							'value'    => $val,
 							'compare'  => $valtochk,
@@ -920,6 +970,8 @@ class WP_Members_Forms {
 							'title'       => ( isset( $field['title']       ) ) ? $field['title']       : false,
 							'min'         => ( isset( $field['min']         ) ) ? $field['min']         : false,
 							'max'         => ( isset( $field['max']         ) ) ? $field['max']         : false,
+							'rows'        => ( isset( $field['rows']        ) ) ? $field['rows']        : false,
+							'cols'        => ( isset( $field['cols']        ) ) ? $field['cols']        : false,
 						);
 						if ( 'multicheckbox' == $field['type'] || 'multiselect' == $field['type'] ) {
 							$formfield_args['delimiter'] = $field['delimiter'];
@@ -1009,11 +1061,21 @@ class WP_Members_Forms {
 		 * @param string $tag  Toggle new registration or profile update. new|edit.
 		 */
 		$rows = apply_filters( 'wpmem_register_form_rows', $rows, $tag );
+		
+		// Make sure all keys are set.
+		$row_keys = array( 'meta', 'type', 'value', 'values', 'label_text', 'row_before', 'label', 'field_before', 'field', 'field_after', 'row_after' );
+		foreach ( $rows as $meta_key => $row ) {
+			foreach ( $row_keys as $check_key ) {
+				$rows[ $meta_key ][ $check_key ] = ( isset( $rows[ $meta_key ][ $check_key ] ) ) ? $rows[ $meta_key ][ $check_key ] : '';
+			}
+		}
 
 		// Put the rows from the array into $form.
 		$form = ''; $enctype = '';
 		foreach ( $rows as $row_item ) {
+			// Check form to see if we need multipart enctype.
 			$enctype = ( $row_item['type'] == 'file' ||  $row_item['type'] == 'image' ) ? "multipart/form-data" : $enctype;
+			// Assemble row pieces.
 			$row  = ( $row_item['row_before']   != '' ) ? $row_item['row_before'] . $args['n'] . $row_item['label'] . $args['n'] : $row_item['label'] . $args['n'];
 			$row .= ( $row_item['field_before'] != '' ) ? $row_item['field_before'] . $args['n'] . $args['t'] . $row_item['field'] . $args['n'] . $row_item['field_after'] . $args['n'] : $row_item['field'] . $args['n'];
 			$row .= ( $row_item['row_after']    != '' ) ? $row_item['row_after'] . $args['n'] : '';
@@ -1029,7 +1091,7 @@ class WP_Members_Forms {
 			// Start with a clean row.
 			$row = '';
 			$row = '<div class="clear"></div>';
-			$row.= '<div align="right" class="captcha">' . wpmem_inc_recaptcha( $wpmem_captcha['recaptcha'] ) . '</div>';
+			$row.= '<div class="captcha">' . wpmem_inc_recaptcha( $wpmem_captcha['recaptcha'] ) . '</div>';
 
 			// Add the captcha row to the form.
 			/**
@@ -1046,12 +1108,27 @@ class WP_Members_Forms {
 		// Create hidden fields.
 		$var         = ( $tag == 'edit' ) ? 'update' : 'register';
 		$redirect_to = ( isset( $_REQUEST['redirect_to'] ) ) ? $_REQUEST['redirect_to'] : ( ( $redirect_to ) ? $redirect_to : get_permalink() );
-		$hidden     .= '<input name="a" type="hidden" value="' . esc_attr( $var ) . '" />' . $args['n'];
-		$hidden     .= '<input name="wpmem_reg_page" type="hidden" value="' . esc_url( get_permalink() ) . '" />' . $args['n'];
+		$hidden_rows['_wpmem_a']        = '<input name="a" type="hidden" value="' . esc_attr( $var ) . '" />';
+		$hidden_rows['_wpmem_reg_page'] = '<input name="wpmem_reg_page" type="hidden" value="' . esc_url( get_permalink() ) . '" />';
 		if ( $redirect_to != get_permalink() ) {
-			$hidden.= '<input name="redirect_to" type="hidden" value="' . esc_url( $redirect_to ) . '" />' . $args['n'];
+			$hidden_rows['_wpmem_redirect_to'] = '<input name="redirect_to" type="hidden" value="' . esc_url( $redirect_to ) . '" />';
 		}
-		$hidden      = ( isset( $hidden_tos ) ) ? $hidden . $hidden_tos . $args['n'] : $hidden;
+		
+		/**
+		 * Filter the hidden form rows.
+		 *
+		 * @since 3.2.0
+		 *
+		 * @param array  $hidden_rows
+		 * @param string $tag
+		 */
+		$hidden_rows = apply_filters( 'wpmem_register_hidden_rows', $hidden_rows, $tag );
+		
+		// Assemble hidden fields HTML.
+		$hidden = '';
+		foreach ( $hidden_rows as $hidden_row ) {
+			$hidden .= $hidden_row . $args['n'];
+		}
 
 		/**
 		 * Filter the hidden field HTML.
@@ -1068,8 +1145,8 @@ class WP_Members_Forms {
 
 		// Create buttons and wrapper.
 		$button_text = ( $tag == 'edit' ) ? $args['submit_update'] : $args['submit_register'];
-		$buttons = ( $args['show_clear_form'] ) ? '<input name="reset" type="reset" value="' . $args['clear_form'] . '" class="' . $args['button_class'] . '" /> ' . $args['n'] : '';
-		$buttons.= '<input name="submit" type="submit" value="' . $button_text . '" class="' . $args['button_class'] . '" />' . $args['n'];
+		$buttons = ( $args['show_clear_form'] ) ? '<input name="reset" type="reset" value="' . esc_attr( $args['clear_form'] ) . '" class="' . sanitize_html_class( $args['button_class'] ) . '" /> ' . $args['n'] : '';
+		$buttons.= '<input name="submit" type="submit" value="' . esc_attr( $button_text ) . '" class="' . sanitize_html_class( $args['button_class'] ) . '" />' . $args['n'];
 
 		/**
 		 * Filter the HTML for form buttons.
@@ -1112,11 +1189,10 @@ class WP_Members_Forms {
 
 		// Apply form wrapper.
 		$enctype = ( $enctype == 'multipart/form-data' ) ? ' enctype="multipart/form-data"' : '';
-		$post_to = get_permalink();
-		$form = '<form name="form" method="post"' . $enctype . ' action="' . $post_to . '" id="' . $args['form_id'] . '" class="' . $args['form_class'] . '">' . $args['n'] . $form . $args['n'] . '</form>';
+		$form = '<form name="form" method="post"' . $enctype . ' action="' . esc_attr( $args['post_to'] ) . '" id="' . sanitize_html_class( $args['form_id'] ) . '" class="' . sanitize_html_class( $args['form_class'] ) . '">' . $args['n'] . $form . $args['n'] . '</form>';
 
 		// Apply anchor.
-		$form = '<a name="register"></a>' . $args['n'] . $form;
+		$form = '<a id="register"></a>' . $args['n'] . $form;
 
 		// Apply main div wrapper.
 		$form = $args['main_div_before'] . $args['n'] . $form . $args['n'] . $args['main_div_after'] . $args['n'];
@@ -1198,5 +1274,294 @@ class WP_Members_Forms {
 		}
 		return $form;
 	}
+	
+	/**
+	 * Login Dialog.
+	 *
+	 * Loads the login form for user login.
+	 *
+	 * @since 1.8
+	 * @since 3.1.4 Global $wpmem_regchk no longer needed.
+	 * @since 3.2.0 Moved to forms class, renamed do_login_form().
+	 *
+	 * @global object $post         The WordPress Post object.
+	 * @global object $wpmem        The WP_Members object.
+	 * @param  string $page         If the form is being displayed in place of blocked content. Default: page.
+	 * @param  string $redirect_to  Redirect URL. Default: null.
+	 * @param  string $show         If the form is being displayed in place of blocked content. Default: show.
+	 * @return string $str          The generated html for the login form.
+	 */
+	function do_login_form( $page = "page", $redirect_to = null, $show = 'show' ) {
+
+		global $post, $wpmem;
+
+		$str = '';
+
+		if ( $page == "page" ) {
+
+			 if ( $wpmem->regchk != "success" ) {
+
+				$dialogs = get_option( 'wpmembers_dialogs' );
+
+				// This shown above blocked content.
+				$msg = $wpmem->get_text( 'restricted_msg' );
+				$msg = ( $dialogs['restricted_msg'] == $msg ) ? $msg : __( stripslashes( $dialogs['restricted_msg'] ), 'wp-members' );
+				$str = '<div id="wpmem_restricted_msg"><p>' . $msg . '</p></div>';
+
+				/**
+				 * Filter the post restricted message.
+				 *
+				 * @since 2.7.3
+				 * @since 3.2.0 Added raw message string and HTML as separate params.
+				 *
+				 * @param string $str The post restricted message with HTML.
+				 * @param string $msg The raw message string.
+				 * @param string      The 'before' HTML wrapper.
+				 * @param string      The 'after' HTML wrapper.
+				 */
+				$str = apply_filters( 'wpmem_restricted_msg', $str, $msg, '<div id="wpmem_restricted_msg"><p>', '</p></div>' );
+
+			} 	
+		} 
+
+		// Create the default inputs.
+		$default_inputs = array(
+			array(
+				'name'   => $wpmem->get_text( 'login_username' ), 
+				'type'   => 'text', 
+				'tag'    => 'log',
+				'class'  => 'username',
+				'div'    => 'div_text',
+			),
+			array( 
+				'name'   => $wpmem->get_text( 'login_password' ), 
+				'type'   => 'password', 
+				'tag'    => 'pwd', 
+				'class'  => 'password',
+				'div'    => 'div_text',
+			),
+		);
+
+		/**
+		 * Filter the array of login form fields.
+		 *
+		 * @since 2.9.0
+		 *
+		 * @param array $default_inputs An array matching the elements used by default.
+		 */
+		$default_inputs = apply_filters( 'wpmem_inc_login_inputs', $default_inputs );
+
+		$defaults = array( 
+			'heading'      => $wpmem->get_text( 'login_heading' ), 
+			'action'       => 'login', 
+			'button_text'  => $wpmem->get_text( 'login_button' ),
+			'inputs'       => $default_inputs,
+			'redirect_to'  => $redirect_to,
+		);	
+
+		/**
+		 * Filter the arguments to override login form defaults.
+		 *
+		 * @since 2.9.0
+		 *
+		 * @param array $args An array of arguments to use. Default null.
+		 */
+		$args = apply_filters( 'wpmem_inc_login_args', '' );
+
+		$arr  = wp_parse_args( $args, $defaults );
+
+		$str  = ( $show == 'show' ) ? $str . wpmem_login_form( $page, $arr ) : $str;
+
+		return $str;
+	}
+
+	/**
+	 * Change Password Dialog.
+	 *
+	 * Loads the form for changing password.
+	 *
+	 * @since 2.0.0
+	 * @since 3.2.0 Moved to forms class, renamed do_changepassword_form().
+	 *
+	 * @global object $wpmem The WP_Members object.
+	 * @return string $str   The generated html for the change password form.
+	 */
+	function do_changepassword_form() {
+
+		global $wpmem;
+
+		// create the default inputs
+		$default_inputs = array(
+			array(
+				'name'   => $wpmem->get_text( 'pwdchg_password1' ), 
+				'type'   => 'password',
+				'tag'    => 'pass1',
+				'class'  => 'password',
+				'div'    => 'div_text',
+			),
+			array( 
+				'name'   => $wpmem->get_text( 'pwdchg_password2' ), 
+				'type'   => 'password', 
+				'tag'    => 'pass2',
+				'class'  => 'password',
+				'div'    => 'div_text',
+			),
+		);
+
+		/**
+		 * Filter the array of change password form fields.
+		 *
+		 * @since 2.9.0
+		 *
+		 * @param array $default_inputs An array matching the elements used by default.
+		 */	
+		$default_inputs = apply_filters( 'wpmem_inc_changepassword_inputs', $default_inputs );
+
+		$defaults = array(
+			'heading'      => $wpmem->get_text( 'pwdchg_heading' ), 
+			'action'       => 'pwdchange', 
+			'button_text'  => $wpmem->get_text( 'pwdchg_button' ), 
+			'inputs'       => $default_inputs,
+		);
+
+		/**
+		 * Filter the arguments to override change password form defaults.
+		 *
+		 * @since 2.9.0
+		 *
+		 * @param array $args An array of arguments to use. Default null.
+		 */
+		$args = apply_filters( 'wpmem_inc_changepassword_args', '' );
+
+		$arr  = wp_parse_args( $args, $defaults );
+
+		$str  = wpmem_login_form( 'page', $arr );
+
+		return $str;
+	}
+	
+	/**
+	 * Reset Password Dialog.
+	 *
+	 * Loads the form for resetting password.
+	 *
+	 * @since 2.1.0
+	 * @since 3.2.0 Moved to forms class, renamed do_resetpassword_form().
+	 *
+	 * @global object $wpmem The WP_Members object.
+	 * @return string $str   The generated html fo the reset password form.
+	 */
+	function do_resetpassword_form() { 
+
+		global $wpmem;
+
+		// Create the default inputs.
+		$default_inputs = array(
+			array(
+				'name'   => $wpmem->get_text( 'pwdreset_username' ), 
+				'type'   => 'text',
+				'tag'    => 'user', 
+				'class'  => 'username',
+				'div'    => 'div_text',
+			),
+			array( 
+				'name'   => $wpmem->get_text( 'pwdreset_email' ), 
+				'type'   => 'text', 
+				'tag'    => 'email', 
+				'class'  => 'password',
+				'div'    => 'div_text',
+			),
+		);
+
+		/**
+		 * Filter the array of reset password form fields.
+		 *
+		 * @since 2.9.0
+		 *
+		 * @param array $default_inputs An array matching the elements used by default.
+		 */	
+		$default_inputs = apply_filters( 'wpmem_inc_resetpassword_inputs', $default_inputs );
+
+		$defaults = array(
+			'heading'      => $wpmem->get_text( 'pwdreset_heading' ),
+			'action'       => 'pwdreset', 
+			'button_text'  => $wpmem->get_text( 'pwdreset_button' ), 
+			'inputs'       => $default_inputs,
+		);
+
+		/**
+		 * Filter the arguments to override reset password form defaults.
+		 *
+		 * @since 2.9.0
+		 *
+		 * @param array $args An array of arguments to use. Default null.
+		 */
+		$args = apply_filters( 'wpmem_inc_resetpassword_args', '' );
+
+		$arr  = wp_parse_args( $args, $defaults );
+
+		$str  = wpmem_login_form( 'page', $arr );
+
+		return $str;
+	}
+	
+	/**
+	 * Forgot Username Form.
+	 *
+	 * Loads the form for retrieving a username.
+	 *
+	 * @since 3.0.8
+	 * @since 3.2.0 Moved to forms class, renamed do_forgotusername_form().
+	 *
+	 * @global object $wpmem The WP_Members object class.
+	 * @return string $str   The generated html for the forgot username form.
+	 */
+	function do_forgotusername_form() {
+		
+		global $wpmem;
+		
+		// create the default inputs
+		$default_inputs = array(
+			array(
+				'name'   => $wpmem->get_text( 'username_email' ), 
+				'type'   => 'text',
+				'tag'    => 'user_email',
+				'class'  => 'username',
+				'div'    => 'div_text',
+			),
+		);
+
+		/**
+		 * Filter the array of forgot username form fields.
+		 *
+		 * @since 2.9.0
+		 *
+		 * @param array $default_inputs An array matching the elements used by default.
+		 */	
+		$default_inputs = apply_filters( 'wpmem_inc_forgotusername_inputs', $default_inputs );
+
+		$defaults = array(
+			'heading'      => $wpmem->get_text( 'username_heading' ), 
+			'action'       => 'getusername', 
+			'button_text'  => $wpmem->get_text( 'username_button' ),
+			'inputs'       => $default_inputs,
+		);
+
+		/**
+		 * Filter the arguments to override change password form defaults.
+		 *
+		 * @since 
+		 *
+		 * @param array $args An array of arguments to use. Default null.
+		 */
+		$args = apply_filters( 'wpmem_inc_forgotusername_args', '' );
+
+		$arr  = wp_parse_args( $args, $defaults );
+
+		$str  = wpmem_login_form( 'page', $arr );
+
+		return $str;
+	}
+
 
 } // End of WP_Members_Forms class.

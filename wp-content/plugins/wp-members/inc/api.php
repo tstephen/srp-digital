@@ -3,14 +3,14 @@
  * WP-Members API Functions
  * 
  * This file is part of the WP-Members plugin by Chad Butler
- * You can find out more about this plugin at http://rocketgeek.com
- * Copyright (c) 2006-2017  Chad Butler
+ * You can find out more about this plugin at https://rocketgeek.com
+ * Copyright (c) 2006-2018  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @subpackage WP-Members API Functions
  * @author Chad Butler 
- * @copyright 2006-2017
+ * @copyright 2006-2018
  *
  * Functions included:
  * - wpmem_redirect_to_login
@@ -34,6 +34,10 @@
  * - wpmem_array_insert
  * - wpmem_is_user_activated
  * - wpmem_current_post_id
+ * - wpmem_user_data
+ * - wpmem_update_user_role
+ * - wpmem_display_message
+ * - wpmem_user_has_access
  */
 
 // Exit if accessed directly.
@@ -166,11 +170,22 @@ function wpmem_current_url( $slash = true, $getq = true ) {
 }
 
 /**
+ * Returns a post ID for the current URL.
+ *
+ * @since 3.2.0
+ */
+function wpmem_current_postid() {
+	return url_to_postid( wpmem_current_url() );
+}
+
+/**
  * Wrapper for $wpmem->create_form_field().
  *
  * @since 3.1.2
+ * @since 3.2.0 Accepts wpmem_create_formfield() arguments.
  *
- * @param array  $args {
+ * @global object $wpmem    The WP_Members object class.
+ * @param string|array  $args {
  *     @type string  $name        (required) The field meta key.
  *     @type string  $type        (required) The field HTML type (url, email, image, file, checkbox, text, textarea, password, hidden, select, multiselect, multicheckbox, radio).
  *     @type string  $value       (required) The field's value (can be a null value).
@@ -183,11 +198,29 @@ function wpmem_current_url( $slash = true, $getq = true ) {
  *     @type string  $title       (optional) Defines the title attribute.
  *     @type string  $min         (optional) Adds a min attribute (HTML5).
  *     @type string  $max         (optional) Adds a max attribute (HTML5).
+ *     @type string  $rows        (optional) Adds rows attribute to textarea.
+ *     @type string  $cols        (optional) Adds cols attribute to textarea.
  * }
- * @return string The HTML of the form field.
+ * @param  string $type     The field type.
+ * @param  string $value    The default value for the field.
+ * @param  string $valtochk Optional for comparing the default value of the field.
+ * @param  string $class    Optional for setting a specific CSS class for the field.
+ * @return string           The HTML of the form field.
  */
-function wpmem_form_field( $args ) {
+//function wpmem_form_field( $args ) {
+function wpmem_form_field( $name, $type=null, $value=null, $valtochk=null, $class='textbox' ) {
 	global $wpmem;
+	if ( is_array( $name ) ) {
+		$args = $name;
+	} else {
+		$args = array(
+			'name'     => $name,
+			'type'     => $type,
+			'value'    => $value,
+			'compare'  => $valtochk,
+			'class'    => $class,
+		);
+	}
 	return $wpmem->forms->create_form_field( $args );
 }
 
@@ -199,7 +232,7 @@ function wpmem_form_field( $args ) {
  * @global object $wpmem
  * @param array  $args {
  *     @type string $meta_key
- *     @type string $label_text
+ *     @type string $label
  *     @type string $type
  *     @type string $class      (optional)
  *     @type string $required   (optional)
@@ -292,6 +325,7 @@ function wpmem_use_custom_dialog( $defaults, $tag, $dialogs ) {
  * @since 3.1.1
  * @since 3.1.6 Include accepting an array of roles to check.
  * @since 3.1.9 Return false if user is not logged in.
+ * @since 3.2.0 Change return false to not logged in AND no user id.
  *
  * @global object        $current_user Current user object.
  * @global object        $wpmem        WP_Members object.
@@ -300,7 +334,7 @@ function wpmem_use_custom_dialog( $defaults, $tag, $dialogs ) {
  * @return boolean       $has_role     True if user has the role, otherwise false.
  */
 function wpmem_user_has_role( $role, $user_id = false ) {
-	if ( ! is_user_logged_in() ) {
+	if ( ! is_user_logged_in() && ! $user_id ) {
 		return false;
 	}
 	global $current_user, $wpmem;
@@ -350,13 +384,15 @@ function wpmem_user_has_meta( $meta, $value = false, $user_id = false ) {
  * Creates a membership number.
  *
  * @since 3.1.1
+ * @since 3.2.0 Changed "lead" to "pad".
  *
  * @param  array  $args {
- *     @type string $option
- *     @type string $meta_key
- *     @type int    $start     (optional, default 0)
- *     @type int    $increment (optional, default 1)
- *     @type int    $lead
+ *     @type string $option    The wp_options name for the counter setting (required).
+ *     @type string $meta_key  The field's meta key (required).
+ *     @type int    $start     Number to start with (optional, default 0).
+ *     @type int    $increment Number to increment by (optional, default 1).
+ *     @type int    $digits    Number of digits for the number (optional).
+ *     @type boolen $pad       Pad leading zeros (optional, default true).
  * }
  * @return string $membersip_number
  */
@@ -388,6 +424,9 @@ function wpmem_login_status( $echo = true ) {
 
 /**
  * Utility function to validate $_POST, $_GET, and $_REQUEST.
+ *
+ * While this function retrieves data, remember that the data should generally be
+ * sanitized or escaped depending on how it is used.
  *
  * @since 3.1.3
  *
@@ -528,6 +567,88 @@ function wpmem_is_user_activated( $user_id = false ) {
  */
 function wpmem_current_post_id() {
 	return url_to_postid( wpmem_current_url() );
+}
+
+/**
+ * Gets an array of the user's registration data.
+ *
+ * Returns an array keyed by meta keys of the user's registration data for
+ * all fields in the WP-Members Fields.  Returns the current user unless
+ * a user ID is specified.
+ *
+ * @since 3.2.0
+ *
+ * @global object  $wpmem
+ * @param  integer $user_id
+ * @return array   $user_fields
+ */
+function wpmem_user_data( $user_id = false ) {
+	global $wpmem;
+	return $wpmem->user_fields( $user_id );
+}
+
+/**
+ * Updates a user's role.
+ *
+ * This is a wrapper for $wpmem->update_user_role(). It can add a role to a
+ * user, change or remove the user's role. If no action is specified it will
+ * change the role.
+ *
+ * @since 3.2.0
+ *
+ * @global object  $wpmem
+ * @param  integer $user_id (required)
+ * @param  string  $role    (required)
+ * @param  string  $action  (optional add|remove|set default:set)
+ */
+function wpmem_update_user_role( $user_id, $role, $action = 'set' ) {
+	global $wpmem;
+	$wpmem->user->update_user_role( $user_id, $role, $action );
+}
+
+/**
+ * Dispalays requested dialog.
+ *
+ * @since 3.2.0
+ *
+ * @todo Needs testing and finalization before release.
+ */
+function wpmem_display_message( $tag, $echo = true ) {
+	if ( $echo ) {
+		echo wpmem_inc_regmessage( $tag );
+	} else {
+		return wpmem_inc_regmessage( $tag );
+	}
+}
+
+/**
+ * A function for checking user access criteria.
+ *
+ * @since 3.2.0
+ *
+ * @param  integer $user_id User ID (optional|default: false).
+ * @return boolean $access  If user has access.
+ */
+function wpmem_user_has_access( $user_id = false, $product = false ) {
+	global $wpmem; 
+	
+	$user_id = ( ! $user_id ) ? get_current_user_id() : $user_id;
+	$access  = ( is_user_logged_in() ) ? true : false;
+	
+	// @todo
+	$access = ( ! $wpmem->user->has_access( $product, $user_id ) ) ? true : $access;
+	
+	/**
+	 * Filter the access result.
+	 *
+	 * @since 3.2.0
+	 *
+	 * @param  boolean $access
+	 * @param  integer $user_id
+	 * @param  array   $args
+	 */
+	$access = apply_filters( 'wpmem_user_has_access', $access, $user_id );
+	return $access;
 }
 
 // End of file.

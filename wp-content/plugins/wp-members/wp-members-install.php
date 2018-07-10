@@ -5,13 +5,13 @@
  * Functions to install and upgrade WP-Members.
  * 
  * This file is part of the WP-Members plugin by Chad Butler
- * You can find out more about this plugin at http://rocketgeek.com
- * Copyright (c) 2006-2017  Chad Butler
+ * You can find out more about this plugin at https://rocketgeek.com
+ * Copyright (c) 2006-2018  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @author Chad Butler
- * @copyright 2006-2017
+ * @copyright 2006-2018
  *
  * Functions included:
  * - wpmem_do_install
@@ -50,6 +50,7 @@ function wpmem_do_install() {
 
 	if ( ! get_option( 'wpmembers_settings' ) || $chk_force == true ) {
 
+		// New install.
 		$wpmem_settings = wpmem_install_settings();
 		wpmem_install_fields();
 		wpmem_install_dialogs();
@@ -58,9 +59,11 @@ function wpmem_do_install() {
 
 	} else {
 		
+		// Upgrade.
 		$wpmem_settings = wpmem_upgrade_settings();
 		wpmem_upgrade_captcha();
 		wpmem_append_email();
+		wpmem_upgrade_fields();
 		
 	}
 	
@@ -88,6 +91,14 @@ function wpmem_upgrade_settings() {
 
 	// If install is 3.0 or higher.
 	if ( $is_three ) {
+		
+		if ( ! isset( $wpmem_settings['enable_products'] ) ) {
+			$wpmem_settings['enable_products'] = 0;
+		}
+		
+		if ( ! isset( $wpmem_settings['clone_menus'] ) ) {
+			$wpmem_settings['clone_menus'] = 0;
+		}
 		
 		// reCAPTCHA v1 is obsolete.
 		if ( isset( $wpmem_settings['captcha'] ) && 1 == $wpmem_settings['captcha'] ) {
@@ -120,14 +131,11 @@ function wpmem_upgrade_settings() {
 			$wpmem_settings['form_tags'] = array( 'default' => 'Registration Default' );
 		}
 		
-		// If email is not set, add it with existing setting or default.
-		if ( ! isset( $wpmem_settings['email'] ) ) {
-			$from = get_option( 'wpmembers_email_wpfrom' );
-			$name = get_option( 'wpmembers_email_wpname' );
-			$wpmem_settings['email'] = array(
-				'from'      => ( $from ) ? $from : '',
-				'from_name' => ( $name ) ? $name : '',
-			);
+		// If email is set in the settings array, change it back to the pre-3.1 option.
+		if ( isset( $wpmem_settings['email'] ) ) {
+			update_option( 'wpmembers_email_wpfrom', $wpmem_settings['email']['from'] );
+			update_option( 'wpmembers_email_wpname', $wpmem_settings['email']['from_name'] );
+			unset( $wpmem_settings['email'] );
 		}
 		
 		// Version number should be updated no matter what.
@@ -172,6 +180,8 @@ function wpmem_upgrade_settings() {
 			'cssurl'     => get_option( 'wpmembers_cssurl' ),
 			'style'      => get_option( 'wpmembers_style'  ),
 			'attrib'     => get_option( 'wpmembers_attrib' ),
+			'clone_menus'     => 0,
+			'enable_products' => 0,
 		);
 		// Handle auto excerpt setting change and add to setting array.
 		$autoex = get_option( 'wpmembers_autoex' );
@@ -188,12 +198,6 @@ function wpmem_upgrade_settings() {
 		// Add new settings.
 		$wpmem_newsettings['post_types'] = array();
 		$wpmem_settings['form_tags'] = array( 'default' => 'Registration Default' );
-		$from = get_option( 'wpmembers_email_wpfrom' );
-		$name = get_option( 'wpmembers_email_wpname' );
-		$wpmem_settings['email'] = array(
-			'from'      => ( $from ) ? $from : '',
-			'from_name' => ( $name ) ? $name : '',
-		);
 		
 		// Merge settings.
 		$wpmem_newsettings = array_merge( $wpmem_settings, $wpmem_newsettings ); 
@@ -482,6 +486,8 @@ function wpmem_install_settings() {
 			'post' => array( 'enabled' => 0, 'length' => '' ),
 			'page' => array( 'enabled' => 0, 'length' => '' ),
 		),
+		'enable_products' => 0,
+		'clone_menus'     => 0,
 		'notify'    => 0,
 		'mod_reg'   => 0,
 		'captcha'   => 0,
@@ -498,7 +504,6 @@ function wpmem_install_settings() {
 		'attrib'    => 0,
 		'post_types' => array(),
 		'form_tags'  => array( 'default' => 'Registration Default' ),
-		'email'      => array( 'from' => '', 'from_name' => '' ),
 	);
 	
 	// Using update_option to allow for forced update.
@@ -528,22 +533,23 @@ function wpmem_install_settings() {
  */
 function wpmem_install_fields() {
 	$fields = array(
-		array( 1,  'First Name',         'first_name',       'text',     'y', 'y', 'y' ),
-		array( 2,  'Last Name',          'last_name',        'text',     'y', 'y', 'y' ),
-		array( 3,  'Address 1',          'addr1',            'text',     'y', 'y', 'n' ),
-		array( 4,  'Address 2',          'addr2',            'text',     'y', 'n', 'n' ),
-		array( 5,  'City',               'city',             'text',     'y', 'y', 'n' ),
-		array( 6,  'State',              'thestate',         'text',     'y', 'y', 'n' ),
-		array( 7,  'Zip',                'zip',              'text',     'y', 'y', 'n' ),
-		array( 8,  'Country',            'country',          'text',     'y', 'y', 'n' ),
-		array( 9,  'Day Phone',          'phone1',           'text',     'y', 'y', 'n' ),
-		array( 10, 'Email',              'user_email',       'email',    'y', 'y', 'y' ),
-		array( 11, 'Confirm Email',      'confirm_email',    'email',    'n', 'n', 'n' ),
-		array( 12, 'Website',            'user_url',         'url',      'n', 'n', 'y' ),
-		array( 13, 'Biographical Info',  'description',      'textarea', 'n', 'n', 'y' ),
-		array( 14, 'Password',           'password',         'password', 'n', 'n', 'n' ),
-		array( 15, 'Confirm Password',   'confirm_password', 'password', 'n', 'n', 'n' ),
-		array( 16, 'TOS',                'tos',              'checkbox', 'n', 'n', 'n', 'agree', 'n' ),
+		array( 0,  'Choose a Username', 'username',          'text',     'y', 'y', 'y' ),
+		array( 1,  'First Name',        'first_name',        'text',     'y', 'y', 'y' ),
+		array( 2,  'Last Name',         'last_name',         'text',     'y', 'y', 'y' ),
+		array( 3,  'Address 1',         'billing_address_1', 'text',     'y', 'y', 'n' ),
+		array( 4,  'Address 2',         'billing_address_2', 'text',     'y', 'n', 'n' ),
+		array( 5,  'City',              'billing_city',      'text',     'y', 'y', 'n' ),
+		array( 6,  'State',             'billing_state',     'text',     'y', 'y', 'n' ),
+		array( 7,  'Zip',               'billing_postcode',  'text',     'y', 'y', 'n' ),
+		array( 8,  'Country',           'billing_country',   'text',     'y', 'y', 'n' ),
+		array( 9,  'Phone',             'billing_phone',     'text',     'y', 'y', 'n' ),
+		array( 10, 'Email',             'user_email',        'email',    'y', 'y', 'y' ),
+		array( 11, 'Confirm Email',     'confirm_email',     'email',    'n', 'n', 'n' ),
+		array( 12, 'Website',           'user_url',          'url',      'n', 'n', 'y' ),
+		array( 13, 'Biographical Info', 'description',       'textarea', 'n', 'n', 'y' ),
+		array( 14, 'Password',          'password',          'password', 'n', 'n', 'n' ),
+		array( 15, 'Confirm Password',  'confirm_password',  'password', 'n', 'n', 'n' ),
+		array( 16, 'Terms of Service',  'tos',               'checkbox', 'n', 'n', 'n', 'agree', 'n' ),
 	);
 	update_option( 'wpmembers_fields', $fields, '', 'yes' ); // using update_option to allow for forced update
 	return $fields;
@@ -572,4 +578,24 @@ function wpmem_install_dialogs() {
 	update_option( 'wpmembers_dialogs', $wpmem_dialogs_arr, '', 'yes' ); // using update_option to allow for forced update
 }
 
+/**
+ * Upgrades fields settings.
+ *
+ * @since 3.2.0
+ */
+function wpmem_upgrade_fields() {
+	$fields = get_option( 'wpmembers_fields' );
+	$old_style = false;
+	foreach ( $fields as $key => $val ) {
+		if ( is_numeric( $key ) ) {
+			$old_style = true;
+			$check_array[] = $val[2];
+		}
+	}
+	if ( $old_style && ! in_array( 'username', $check_array ) ) {
+		$username_array = array( 0, 'Choose a Username', 'username', 'text', 'y', 'y', 'y' );
+		array_unshift( $fields, $username_array );
+		update_option( 'wpmembers_fields', $fields, '', 'yes' );
+	}
+}
 // End of file.

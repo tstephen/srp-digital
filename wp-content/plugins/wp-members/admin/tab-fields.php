@@ -5,13 +5,13 @@
  * Functions to manage the fields tab.
  * 
  * This file is part of the WP-Members plugin by Chad Butler
- * You can find out more about this plugin at http://rocketgeek.com
- * Copyright (c) 2006-2017  Chad Butler
+ * You can find out more about this plugin at https://rocketgeek.com
+ * Copyright (c) 2006-2018  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @author Chad Butler
- * @copyright 2006-2017
+ * @copyright 2006-2018
  */
 
 // Exit if accessed directly.
@@ -29,10 +29,10 @@ if( ! class_exists( 'WP_List_Table' ) ) {
 /**
  * Filters and Actions.
  */
-add_action( 'wpmem_admin_do_tab',            'wpmem_a_fields_tab', 99, 1  );
+add_action( 'wpmem_admin_do_tab',            'wpmem_a_fields_tab', 5      );
 add_action( 'wpmem_after_admin_init',        'wpmem_admin_fields_update'  );
 add_action( 'admin_print_styles',            'wpmem_a_fields_tab_scripts' );
-add_action( 'wp_ajax_wpmem_a_field_reorder', 'wpmem_a_do_field_reorder'  );
+add_action( 'wp_ajax_wpmem_a_field_reorder', 'wpmem_a_do_field_reorder'   );
 
 /**
  * Calls the function to reorder fields.
@@ -148,7 +148,7 @@ function wpmem_a_render_fields_tab() {
 		} ?>
 		<h3><span><?php _e( 'Need help?', 'wp-members' ); ?></span></h3>
 		<div class="inside">
-			<strong><i><a href="http://rocketgeek.com/plugins/wp-members/docs/plugin-settings/fields/" target="_blank"><?php _e( 'Field Manager Documentation', 'wp-members' ); ?></a></i></strong>
+			<strong><i><a href="https://rocketgeek.com/plugins/wp-members/docs/plugin-settings/fields/" target="_blank"><?php _e( 'Field Manager Documentation', 'wp-members' ); ?></a></i></strong>
 		</div>
 		<?php
 	}
@@ -184,14 +184,14 @@ function wpmem_a_render_fields_tab_field_edit( $mode, $wpmem_fields, $meta_key )
 		<ul>
 			<li>
 				<label><?php _e( 'Field Label', 'wp-members' ); ?> <?php echo $span_required; ?></label>
-				<input type="text" name="add_name" value="<?php echo ( $mode == 'edit' ) ? $field['label'] : false; ?>" />
+				<input type="text" name="add_name" value="<?php echo ( $mode == 'edit' ) ? $field['label'] : false; ?>" required />
 				<?php _e( 'The name of the field as it will be displayed to the user.', 'wp-members' ); ?>
 			</li>
 			<li>
 				<label><?php _e( 'Meta Key', 'wp-members' ); ?> <?php echo $span_required; ?></label>
 				<?php if ( $mode == 'edit' ) { 
 					echo "<span>$meta_key</span>"; ?>
-					<input type="hidden" name="add_option" value="<?php echo $meta_key; ?>" /> 
+					<input type="hidden" name="add_option" value="<?php echo $meta_key; ?>" required /> 
 				<?php } else { ?>
 					<input type="text" name="add_option" value="" />
 					<?php _e( 'The database meta value for the field. It must be unique and contain no spaces (underscores are ok).', 'wp-members' ); ?>
@@ -224,11 +224,21 @@ function wpmem_a_render_fields_tab_field_edit( $mode, $wpmem_fields, $meta_key )
 			</li>
 			<li>
 				<label><?php _e( 'Display?', 'wp-members' ); ?></label>
+				<?php if ( 'username' != $meta_key && 'user_email' != $meta_key ) { ?>
 				<input type="checkbox" name="add_display" value="y" <?php echo ( $mode == 'edit' ) ? checked( true, $field['register'] ) : false; ?> />
+				<?php } else { ?>
+				<span><?php _e( 'This field is always displayed', 'wp-members' ); ?></span>
+				<input type="hidden" name="add_display" value="y" />
+				<?php } ?>
 			</li>
 			<li>
 				<label><?php _e( 'Required?', 'wp-members' ); ?></label>
+				<?php if ( 'username' != $meta_key && 'user_email' != $meta_key ) { ?>
 				<input type="checkbox" name="add_required" value="y" <?php echo ( $mode == 'edit' ) ? checked( true, $field['required'] ) : false; ?> />
+				<?php } else { ?>
+				<span><?php _e( 'This field is always required', 'wp-members' ); ?></span>
+				<input type="hidden" name="add_required" value="y" />
+				<?php } ?>
 			</li>
 			<!--<div id="wpmem_allowhtml">
 			<li>
@@ -271,6 +281,18 @@ function wpmem_a_render_fields_tab_field_edit( $mode, $wpmem_fields, $meta_key )
 			</li>
 		<?php echo ( $mode == 'add' ) ? '</div>' : ''; ?>
 		<?php } ?>
+		<?php if ( $mode == 'add' || ( $mode == 'edit' && ( in_array( $field['type'], array( 'textarea' ) ) ) ) ) { ?>
+		<?php echo ( $mode == 'add' ) ? '<div id="wpmem_rows_cols">' : ''; ?>
+			<li>
+				<label><?php _e( 'Rows', 'wp-members' ); ?></label>
+				<input type="number" name="add_rows" value="<?php echo ( $mode == 'edit' ) ? ( isset( $field['rows'] ) ? $field['rows'] : false ) : false; ?>" /> <?php echo $span_optional; ?>
+			</li>
+			<li>
+				<label><?php _e( 'Columns', 'wp-members' ); ?></label>
+				<input type="number" name="add_cols" value="<?php echo ( $mode == 'edit' ) ? ( isset( $field['cols'] ) ? $field['cols'] : false ) : false; ?>" /> <?php echo $span_optional; ?>
+			</li>
+		<?php echo ( $mode == 'add' ) ? '</div>' : ''; ?>
+		<?php } ?>
 		<?php if ( $mode == 'add' || ( $mode == 'edit' && ( $field['type'] == 'file' || $field['type'] == 'image' ) ) ) { ?>
 		<?php echo ( $mode == 'add' ) ? '<div id="wpmem_file_info">' : ''; ?>
 			<li>
@@ -291,7 +313,7 @@ function wpmem_a_render_fields_tab_field_edit( $mode, $wpmem_fields, $meta_key )
 			</li>
 			<li>
 				<label><?php _e( 'Stored value if checked:', 'wp-members' ); ?> <span class="req"><?php _e( '(required)', 'wp-members' ); ?></span></label>
-				<input type="text" name="add_checked_value" value="<?php echo ( $mode == 'edit' && $field['type'] == 'checkbox' ) ? $field['checked_value'] : false; ?>" />
+				<input type="text" name="add_checked_value" id="add_checked_value" value="<?php echo ( $mode == 'edit' && $field['type'] == 'checkbox' ) ? $field['checked_value'] : false; ?>" />
 			</li>
 		<?php echo ( $mode == 'add' ) ? '</div>' : ''; ?>
 		<?php } 
@@ -321,7 +343,7 @@ function wpmem_a_render_fields_tab_field_edit( $mode, $wpmem_fields, $meta_key )
 			} ?>
 			<li>
 				<label style="vertical-align:top"><?php _e( 'Values (Displayed|Stored):', 'wp-members' ); ?> <?php echo $span_required; ?></label>
-				<textarea name="add_dropdown_value" rows="5" cols="40"><?php
+				<textarea name="add_dropdown_value" id="add_dropdown_value" rows="5" cols="40"><?php
 // Accomodate editing the current dropdown values or create dropdown value example.
 if ( $mode == 'edit' ) {
 for ( $row = 0; $row < count( $field['values'] ); $row++ ) {
@@ -349,7 +371,7 @@ Last Row|last_row<?php } } ?></textarea>
 			</li>
 			<li>
 				<label>&nbsp;</label>
-				<span class="description"><a href="http://rocketgeek.com/plugins/wp-members/users-guide/registration/choosing-fields/" target="_blank"><?php _e( 'Visit plugin site for more information', 'wp-members' ); ?></a></span>
+				<span class="description"><a href="https://rocketgeek.com/plugins/wp-members/users-guide/registration/choosing-fields/" target="_blank"><?php _e( 'Visit plugin site for more information', 'wp-members' ); ?></a></span>
 			</li>
 		<?php echo ( $mode == 'add' ) ? '</div>' : ''; ?>
 		<?php } ?>
@@ -357,7 +379,7 @@ Last Row|last_row<?php } } ?></textarea>
 		<?php echo ( $mode == 'add' ) ? '<div id="wpmem_hidden_info">' : ''; ?>
 			<li>
 				<label><?php _e( 'Value', 'wp-members' ); ?> <?php echo $span_required; ?></label>
-				<input type="text" name="add_hidden_value" value="<?php echo ( $mode == 'edit' && $field['type'] == 'hidden' ) ? $field['value'] : ''; ?>" />
+				<input type="text" name="add_hidden_value" id="add_hidden_value" value="<?php echo ( $mode == 'edit' && $field['type'] == 'hidden' ) ? $field['value'] : ''; ?>" />
 			</li>
 		<?php echo ( $mode == 'add' ) ? '</div>' : ''; ?>
 		<?php } ?>
@@ -392,9 +414,9 @@ Last Row|last_row<?php } } ?></textarea>
 function wpmem_a_render_fields_tab_field_table() {
 	global $wpmem; 
 
-	$wpmem_ut_fields_skip = array( 'user_email', 'confirm_email', 'password', 'confirm_password' );	
+	$wpmem_ut_fields_skip = array( 'username', 'user_email', 'confirm_email', 'password', 'confirm_password' );	
 	$wpmem_ut_fields = get_option( 'wpmembers_utfields' );
-	$wpmem_us_fields_skip = array( 'user_email', 'confirm_email', 'password', 'confirm_password' );	
+	$wpmem_us_fields_skip = array( 'username', 'user_email', 'confirm_email', 'password', 'confirm_password' );	
 	$wpmem_us_fields = get_option( 'wpmembers_usfields' );
 
 	$wpmem_fields = get_option( 'wpmembers_fields', array() );
@@ -411,8 +433,8 @@ function wpmem_a_render_fields_tab_field_table() {
 				'label'    => $field[1],
 				'meta'     => $meta,
 				'type'     => $field[3],
-				'display'  => ( $meta != 'user_email' ) ? wpmem_create_formfield( $meta . "_display",  'checkbox', 'y', $field[4] ) : '',
-				'req'      => ( $meta != 'user_email' ) ? wpmem_create_formfield( $meta . "_required", 'checkbox', 'y', $field[5] ) : '',
+				'display'  => ( 'user_email' != $meta && 'username' != $meta ) ? wpmem_create_formfield( $meta . "_display",  'checkbox', 'y', $field[4] ) : '',
+				'req'      => ( 'user_email' != $meta && 'username' != $meta ) ? wpmem_create_formfield( $meta . "_required", 'checkbox', 'y', $field[5] ) : '',
 				//'profile'  => ( $meta != 'user_email' ) ? wpmem_create_formfield( $meta . "_profile",  'checkbox', true, $field[6] ) : '',
 				'edit'     => wpmem_fields_edit_link( $meta ),
 				'userscrn' => ( ! in_array( $meta, $wpmem_ut_fields_skip ) ) ? wpmem_create_formfield( 'ut_fields[' . $meta . ']', 'checkbox', $field[1], $ut_checked ) : '',
@@ -486,7 +508,7 @@ class WP_Members_Fields_Table extends WP_List_Table {
 	
 	private $excludes = array( 'user_registered', 'active', 'wpmem_reg_ip', 'exp_type', 'expires', 'user_id' );
 	
-	private $no_delete = array( 'user_email', 'first_name', 'last_name', 'user_url' );
+	private $no_delete = array( 'username', 'user_email', 'first_name', 'last_name', 'user_url' );
 	
 	/**
 	 * Checkbox at start of row.
@@ -580,7 +602,7 @@ class WP_Members_Fields_Table extends WP_List_Table {
 	 */
 	function column_delete( $item ) {
 		$can_delete = ( $item['meta_key'] == 'user_nicename' || $item['meta_key'] == 'display_name' || $item['meta_key'] == 'nickname' ) ? true : false;
-		return ( ( $can_delete ) || $item['native'] != true ) ? sprintf( '<input type="checkbox" name="field[%s]" value="delete" />', $item['meta'] ) : '';
+		return ( ( $can_delete ) || ! $item['native'] ) ? sprintf( $item['native'] . '<input type="checkbox" name="field[%s]" value="delete" />', $item['meta'] ) : '';
 	}
 	
 	/**
@@ -696,7 +718,7 @@ function wpmem_admin_fields_update() {
 			// Update display/required settings
 			foreach ( $wpmem_fields as $key => $field ) {
 				$meta_key = $field[2];
-				if ( 'user_email' == $meta_key ) {
+				if ( 'username' == $meta_key || 'user_email' == $meta_key ) {
 					$wpmem_fields[ $key ][4] = 'y';
 					$wpmem_fields[ $key ][5] = 'y';
 				} else {
@@ -743,7 +765,7 @@ function wpmem_admin_fields_update() {
 			// Error check for reserved terms.
 			$reserved_terms = wpmem_wp_reserved_terms();
 			if ( in_array( strtolower( $add_option ), $reserved_terms ) ) {
-				$add_field_err_msg = sprintf( __( 'Sorry, "%s" is a <a href="https://codex.wordpress.org/Function_Reference/register_taxonomy#Reserved_Terms" target="_blank">reserved term</a>. Field was not added.', 'wp-members' ), $submitted_term );
+				$add_field_err_msg = sprintf( __( 'Sorry, "%s" is a <a href="https://codex.wordpress.org/Function_Reference/register_taxonomy#Reserved_Terms" target="_blank">reserved term</a>. Field was not added.', 'wp-members' ), $add_option );
 			}
 
 			// Error check option name for spaces and replace with underscores.
@@ -759,7 +781,10 @@ function wpmem_admin_fields_update() {
 			$arr[3] = $type;
 			$arr[4] = ( 'y' == wpmem_get( 'add_display', 'n'  ) ) ? 'y' : 'n';
 			$arr[5] = ( 'y' == wpmem_get( 'add_required', 'n' ) ) ? 'y' : 'n';
-			$arr[6] = ( $us_option == 'user_nicename' || $us_option == 'display_name' || $us_option == 'nickname' ) ? 'y' : 'n';
+			
+			// Mark native fields:
+			$native_fields = array( 'user_login', 'user_pass', 'user_nicename', 'user_email', 'user_url', 'user_registered', 'display_name', 'first_name', 'last_name', 'nickname', 'description' );
+			$arr[6] = ( in_array( $us_option, $native_fields ) ) ? 'y' : 'n';
 
 			if ( 'text' == $type || 'email' == $type || 'textarea' == $type || 'password' == $type || 'url' == $type || 'number' == $type || 'date' == $type ) {
 				$arr['placeholder'] = sanitize_text_field( stripslashes( wpmem_get( 'add_placeholder' ) ) );
@@ -773,6 +798,11 @@ function wpmem_admin_fields_update() {
 			if ( 'number' == $type || 'date' == $type ) {
 				$arr['min'] = filter_var( wpmem_get( 'add_min' ), FILTER_SANITIZE_NUMBER_INT );
 				$arr['max'] = filter_var( wpmem_get( 'add_max' ), FILTER_SANITIZE_NUMBER_INT );
+			}
+			
+			if ( 'textarea' == $type ) {
+				$arr['rows'] = filter_var( wpmem_get( 'add_rows' ), FILTER_SANITIZE_NUMBER_INT );
+				$arr['cols'] = filter_var( wpmem_get( 'add_cols' ), FILTER_SANITIZE_NUMBER_INT );
 			}
 
 			if ( $type == 'checkbox' ) {

@@ -6,14 +6,14 @@
  * situations. Includes commonly used utility functions.
  * 
  * This file is part of the WP-Members plugin by Chad Butler
- * You can find out more about this plugin at http://rocketgeek.com
- * Copyright (c) 2006-2017  Chad Butler
+ * You can find out more about this plugin at https://rocketgeek.com
+ * Copyright (c) 2006-2018  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @subpackage WP-Members Utility Functions
  * @author Chad Butler 
- * @copyright 2006-2017
+ * @copyright 2006-2018
  *
  * Functions included:
  * - wpmem_create_formfield
@@ -30,36 +30,6 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit();
 }
-
-if ( ! function_exists( 'wpmem_create_formfield' ) ):
-/**
- * Creates form fields
- *
- * Creates various form fields and returns them as a string.
- *
- * @since 1.8.0
- * @since 3.1.0 Converted to wrapper for create_form_field() in utlities object.
- *
- * @global object $wpmem    The WP_Members object class.
- * @param  string $name     The name of the field.
- * @param  string $type     The field type.
- * @param  string $value    The default value for the field.
- * @param  string $valtochk Optional for comparing the default value of the field.
- * @param  string $class    Optional for setting a specific CSS class for the field.
- * @return string $str      The field returned as a string.
- */
-function wpmem_create_formfield( $name, $type, $value, $valtochk=null, $class='textbox' ) {
-	global $wpmem;
-	$args = array(
-		'name'     => $name,
-		'type'     => $type,
-		'value'    => $value,
-		'compare'  => $valtochk,
-		'class'    => $class,
-	);
-	return $wpmem->forms->create_form_field( $args );
-}
-endif;
 
 
 if ( ! function_exists( 'wpmem_texturize' ) ):
@@ -105,8 +75,7 @@ if ( ! function_exists( 'wpmem_enqueue_style' ) ):
  */
 function wpmem_enqueue_style() {
 	global $wpmem;
-	wp_register_style( 'wp-members', $wpmem->cssurl, '', WPMEM_VERSION );
-	wp_enqueue_style ( 'wp-members' );
+	wp_enqueue_style ( 'wp-members', $wpmem->cssurl, '', WPMEM_VERSION );
 }
 endif;
 
@@ -330,6 +299,53 @@ function wpmem_convert_tag( $tag ) {
 			break;
 	}
 	return $tag;
+}
+
+/**
+ * String manipulation utility.
+ *
+ * Manipulates a given string based on the location of another string to return
+ * a requested part or parts of the original string.  For extracting a string
+ * to get what is before or after, the returned result is a string.  If the
+ * string is requested to be "split" by the needle string, an array containing
+ * the parts before, after, and the "needle" are returned.
+ *
+ * @since 3.2.0
+ *
+ * @param  string       $needle
+ * @param  string       $haystack
+ * @param  string       $position (before|after|split default: 'after')
+ * @param  boolean      $keep_needle (default:true)
+ * @return string|array $new {
+ *     An array of the original string, as split by the "needle" string.
+ *
+ *     @type string $before
+ *     @type string $after
+ *     @type string $needle
+ * }
+ */
+function wpmem_get_sub_str( $needle, $haystack, $position = 'after', $keep_needle = true ) {
+	$pos = strpos( $haystack, $needle );
+	if ( false === $pos ) {
+		return $haystack;
+	} else {
+		if ( 'before' == $position ) {
+			$new = ( substr( $haystack, 0, $pos ) );
+			$new = ( $keep_needle ) ? $string . $needle : $new;
+		} elseif ( 'after' == $position ) {
+			$new = ( substr( $haystack, $pos+strlen( $needle ) ) );
+			$new = ( $keep_needle ) ? $needle . $string : $new;
+		} elseif ( 'split' == $position ) {
+			$before = ( substr( $haystack, 0, $pos ) );
+			$after  = ( substr( $haystack, $pos+strlen( $needle ) ) );
+			$new    = array(
+				'before' => $before,
+				'after'  => $after,
+				'needle' => $needle,
+			);
+		}
+	}
+	return $new;
 }
 
 // End of file.

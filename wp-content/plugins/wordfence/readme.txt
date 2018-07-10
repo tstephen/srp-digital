@@ -4,7 +4,7 @@ Tags: security, firewall, malware scanner, web application firewall, antivirus, 
 Requires at least: 3.9
 Requires PHP: 5.2
 Tested up to: 4.9.6
-Stable tag: 7.1.7
+Stable tag: 7.1.8
 
 Secure your website with the most comprehensive WordPress security plugin. Firewall, malware scan, blocking, live traffic, login security & more.
 
@@ -171,6 +171,13 @@ Secure your website with Wordfence.
 
 
 == Changelog ==
+
+= 7.1.8 =
+* Improvement: Better detection of removal status when uninstalling the WAF's auto-prepend file.
+* Improvement: Switched optional mailing list signup to go directly through our servers rather than a third party.
+* Fix: Fixed the dashboard erroneously showing the payment method as missing for some payment methods.
+* Fix: If a premium license is deleted from wordfence.com, the plugin will now automatically downgrade rather than get stuck in an intermediate state.
+* Fix: Changed some wording to consistently use "License" or "License Key".
 
 = 7.1.7 =
 * Improvement: Added better support for keyboard navigation of options.

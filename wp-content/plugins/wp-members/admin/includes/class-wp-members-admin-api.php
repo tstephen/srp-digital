@@ -62,6 +62,9 @@ class WP_Members_Admin_API {
 		
 		// Load default dialogs.
 		$dialogs = $this->default_dialogs();
+
+		global $wpmem;
+		$wpmem->membership->admin = new WP_Members_Products_Admin();
 	}
 
 	/**
@@ -72,48 +75,24 @@ class WP_Members_Admin_API {
 	 * @since 3.1.7 Loads all admin dependent files.
 	 */
 	function load_dependencies() {
-
-		/**
-		 * Filter permission defaults.
-		 *
-		 * @since 3.1.8
-		 *
-		 * @param  array $defaults
-		 *
-		 * @todo Still needs final evaluation.
-		 */
-		$permissions = apply_filters( 'wpmem_load_admin_permissions',  array( 
-			'main'    => 'edit_theme_options',
-			'users'   => 'list_users',
-			'options' => 'manage_options',
-			'posts'   => 'edit_posts',
-		) );
 		
-		if ( current_user_can( $permissions['main'] ) ) {
-			require_once(  WPMEM_PATH . 'admin/admin.php' );
-		}
-		if ( current_user_can( $permissions['users'] ) ) { 
-			require_once( WPMEM_PATH . 'admin/users.php' );
-			require_once( WPMEM_PATH . 'admin/user-profile.php' );
-			require_once( WPMEM_PATH . 'admin/includes/class-wp-members-user-search.php' );
-		}
-		if ( current_user_can( $permissions['options'] ) ) {
-			require_once( WPMEM_PATH . 'admin/tab-options.php' );
-			require_once( WPMEM_PATH . 'admin/tab-fields.php' );
-			require_once( WPMEM_PATH . 'admin/tab-emails.php' );
-			require_once( WPMEM_PATH . 'admin/tab-captcha.php' );
-			require_once( WPMEM_PATH . 'admin/tab-about.php' );
-			require_once( WPMEM_PATH . 'admin/tab-dialogs.php' );
-			require_once( WPMEM_PATH . 'admin/tab-dropins.php' );
-			require_once( WPMEM_PATH . 'admin/dialogs.php' );
-		}
-		if ( current_user_can( $permissions['posts'] ) ) {
-			require_once( WPMEM_PATH . 'admin/post.php' );
-		}
-		require_once( WPMEM_PATH . 'admin/includes/api.php' );
-		include_once( WPMEM_PATH . 'inc/wp-registration.php' );
-		//require_once( WPMEM_PATH . 'admin/includes/class-wp-members-user-profile.php' );
+		include_once( WPMEM_PATH . 'admin/admin.php' );
+		include_once( WPMEM_PATH . 'admin/users.php' );
+		include_once( WPMEM_PATH . 'admin/includes/class-wp-members-user-search.php' );
+		include_once( WPMEM_PATH . 'admin/includes/class-wp-members-products-admin.php' );
+		include_once( WPMEM_PATH . 'admin/dialogs.php' );
+		include_once( WPMEM_PATH . 'admin/post.php' );
+		include_once( WPMEM_PATH . 'admin/includes/api.php' );
 		require_once( WPMEM_PATH . 'inc/class-wp-members-user-profile.php' );
+		include_once( WPMEM_PATH . 'admin/tab-fields.php' ); // Fields tab is used for field reorder (which is ! wpmem-settings).
+		if ( 'wpmem-settings' == wpmem_get( 'page', false, 'get' ) ) {
+			include_once( WPMEM_PATH . 'admin/tab-options.php' );
+			include_once( WPMEM_PATH . 'admin/tab-emails.php' );
+			include_once( WPMEM_PATH . 'admin/tab-captcha.php' );
+			include_once( WPMEM_PATH . 'admin/tab-about.php' );
+			include_once( WPMEM_PATH . 'admin/tab-dialogs.php' );
+			include_once( WPMEM_PATH . 'admin/tab-dropins.php' );
+		}
 	}
 
 	/**
@@ -121,15 +100,22 @@ class WP_Members_Admin_API {
 	 *
 	 * @since 3.1.0
 	 * @since 3.1.7 Loads all admin hooks.
+	 *
+	 * @global object $wpmem
 	 */
 	function load_hooks() {
 		
-		add_action( 'admin_enqueue_scripts',         'wpmem_dashboard_enqueue_scripts' );
-		add_action( 'wpmem_admin_do_tab',            'wpmem_admin_do_tab' );
+		global $wpmem;
+		
+		add_action( 'admin_enqueue_scripts',         array( $this, 'dashboard_enqueue_scripts' ) );
 		add_action( 'wp_ajax_wpmem_a_field_reorder', 'wpmem_a_do_field_reorder' );
 		add_action( 'user_new_form',                 'wpmem_admin_add_new_user' );
-		add_filter( 'plugin_action_links',           'wpmem_admin_plugin_links', 10, 2 );
+		add_filter( 'plugin_action_links',           array( $this, 'plugin_links' ), 10, 2 );
 		add_filter( 'wpmem_admin_tabs',              'wpmem_add_about_tab'       );
+		
+		add_action( 'wpmem_admin_do_tab',            'wpmem_a_options_tab', 1 );
+		add_action( 'wpmem_admin_do_tab',            'wpmem_a_dialogs_tab', 10 );
+		add_action( 'wpmem_admin_do_tab',            'wpmem_a_emails_tab', 15 );
 		add_action( 'wpmem_admin_do_tab',            'wpmem_a_about_tab', 999, 1 );
 		
 		// If user has a role that cannot edit users, set profile actions for non-admins.
@@ -145,11 +131,17 @@ class WP_Members_Admin_API {
 			add_action( 'admin_notices',              'wpmem_users_admin_notices' );
 			add_filter( 'views_users',                'wpmem_users_views' );
 			add_filter( 'manage_users_columns',       'wpmem_add_user_column' );
-			add_action( 'manage_users_custom_column', 'wpmem_add_user_column_content', 10, 3 );
+			add_filter( 'manage_users_custom_column', 'wpmem_add_user_column_content', 10, 3 );
 			add_action( 'wpmem_post_register_data',   'wpmem_set_new_user_non_active' );
 			add_action( 'wpmem_user_activated',       'wpmem_set_activated_user' );
 			add_action( 'wpmem_user_deactivated',     'wpmem_set_deactivated_user' );
 			add_filter( 'user_row_actions',           'wpmem_insert_activate_link', 10, 2 );
+			add_action( 'wpmem_admin_after_profile',  array( 'WP_Members_User_Profile', '_show_activate'   ), 7 );
+			add_action( 'wpmem_admin_after_profile',  array( 'WP_Members_User_Profile', '_show_expiration' ), 8 );
+			add_action( 'wpmem_admin_after_profile',  array( 'WP_Members_User_Profile', '_show_ip'         ), 9 );
+			if ( 1 == $wpmem->enable_products ) {
+				add_action( 'wpmem_admin_after_profile',  array( 'WP_Members_User_Profile', '_show_product' ), 10 );
+			}
 		}
 	
 		// If user has a role that can edit posts, add the block/unblock meta boxes and custom post/page columns.
@@ -161,11 +153,6 @@ class WP_Members_Admin_API {
 			add_action( 'manage_posts_custom_column', 'wpmem_post_columns_content', 10, 2 );
 			add_filter( 'manage_pages_columns',       'wpmem_post_columns' );
 			add_action( 'manage_pages_custom_column', 'wpmem_post_columns_content', 10, 2 );
-			
-			add_action( 'wpmem_admin_after_profile',  'wpmem_profile_show_activate',   7 );
-			add_action( 'wpmem_admin_after_profile',  'wpmem_profile_show_expiration', 8 );
-			add_action( 'wpmem_admin_after_profile',  'wpmem_profile_show_ip',         9 );
-			
 			add_action( 'admin_footer-edit.php', 'wpmem_bulk_posts_action'   );
 			add_action( 'load-edit.php',         'wpmem_posts_page_load'     );
 			add_action( 'admin_notices',         'wpmem_posts_admin_notices' );
@@ -511,6 +498,47 @@ class WP_Members_Admin_API {
 		return esc_url( $url );
 	}
 	
+	/**
+	 * Enqueues the admin javascript and css files.
+	 *
+	 * Replaces wpmem_admin_enqueue_scripts().
+	 * Only loads the js and css on admin screens that use them.
+	 *
+	 * @since 3.1.7
+	 * @deprecated 3.2.0 Moved to admin object, rename dashboard_enqueue_scripts().
+	 *
+	 * @param str $hook The admin screen hook being loaded.
+	 */
+	function dashboard_enqueue_scripts( $hook ) {
+		if ( $hook == 'edit.php' || $hook == 'settings_page_wpmem-settings' ) {
+			wp_enqueue_style( 'wpmem-admin', WPMEM_DIR . 'admin/css/admin.css', '', WPMEM_VERSION );
+		}
+		if ( $hook == 'settings_page_wpmem-settings' ) {
+			wp_enqueue_script( 'wpmem-admin', WPMEM_DIR . 'admin/js/admin.js', '', WPMEM_VERSION );
+		}
+	}
+
+	/**
+	 * Filter to add link to settings from plugin panel.
+	 *
+	 * @since 2.4.0
+	 * @since 3.2.0 Moved to admin API class, renamed from wpmem_admin_plugin_links().
+	 *
+	 * @param  array  $links
+	 * @param  string $file
+	 * @return array  $links
+	 */
+	function plugin_links( $links, $file ) {
+		static $wpmem_plugin;
+		if ( ! $wpmem_plugin ) {
+			$wpmem_plugin = plugin_basename( WPMEM_PATH . '/wp-members.php' );
+		}
+		if ( $file == $wpmem_plugin ) {
+			$settings_link = '<a href="' . add_query_arg( 'page', 'wpmem-settings', 'options-general.php' ) . '">' . __( 'Settings', 'wp-members' ) . '</a>';
+			$links = array_merge( array( $settings_link ), $links );
+		}
+		return $links;
+	}
 } // End of WP_Members_Admin_API class.
 
 // End of file.

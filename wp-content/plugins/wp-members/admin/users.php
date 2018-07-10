@@ -5,13 +5,13 @@
  * Functions to manage the Users > All Users page.
  * 
  * This file is part of the WP-Members plugin by Chad Butler
- * You can find out more about this plugin at http://rocketgeek.com
- * Copyright (c) 2006-2017  Chad Butler
+ * You can find out more about this plugin at https://rocketgeek.com
+ * Copyright (c) 2006-2018  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @author Chad Butler
- * @copyright 2006-2017
+ * @copyright 2006-2018
  *
  * Functions included:
  * - wpmem_bulk_user_action
@@ -45,11 +45,13 @@ function wpmem_bulk_user_action() {
 	<script type="text/javascript">
 		jQuery(document).ready(function() {
 	<?php if( $wpmem->mod_reg == 1 ) { ?>
-		jQuery('<option>').val('activate').text('<?php _e( 'Activate' )?>').appendTo("select[name='action']");
+		jQuery('<option>').val('activate').text('<?php _e( 'Activate', 'wp-members' )?>').appendTo("select[name='action']");
+		jQuery('<option>').val('deactivate').text('<?php _e( 'Deactivate', 'wp-members' )?>').appendTo("select[name='action']");
 	<?php } ?>
 		jQuery('<option>').val('export').text('<?php _e( 'Export', 'wp-members' )?>').appendTo("select[name='action']");
 	<?php if( $wpmem->mod_reg == 1 ) { ?>
-		jQuery('<option>').val('activate').text('<?php _e( 'Activate' )?>').appendTo("select[name='action2']");
+		jQuery('<option>').val('activate').text('<?php _e( 'Activate', 'wp-members' )?>').appendTo("select[name='action2']");
+		jQuery('<option>').val('deactivate').text('<?php _e( 'Deactivate', 'wp-members' )?>').appendTo("select[name='action2']");
 	<?php } ?>
 		jQuery('<option>').val('export').text('<?php _e( 'Export', 'wp-members' )?>').appendTo("select[name='action2']");
 		jQuery('<input id="export_all" name="export_all" class="button action" type="submit" value="<?php _e( 'Export All Users', 'wp-members' ); ?>" />').appendTo(".bottom .bulkactions");
@@ -257,7 +259,7 @@ function wpmem_users_views( $views ) {
 		
 		// We need a count of total users.
 		// @todo - need a more elegant way of this entire process.
-		$sql = "SELECT COUNT(*) FROM " . $wpdb->prefix . "users";
+		$sql = "SELECT COUNT(*) FROM " . $wpdb->users;
 		$users = $wpdb->get_var( $sql );
 
 		// What needs to be counted?		
@@ -274,6 +276,7 @@ function wpmem_users_views( $views ) {
 		}
 		if ( $wpmem->mod_reg == 1 ) {
 			$count_metas['notactive'] = 'active';
+			$count_metas['deactivated'] = 'deactivated';
 		}
 		$count_metas['notexported'] = 'exported';
 		
@@ -284,10 +287,10 @@ function wpmem_users_views( $views ) {
 				$users_with_meta = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->usermeta WHERE meta_key='$meta_key' AND meta_value=1" );
 				$count = $users - $users_with_meta;
 			}
-			if ( 'trial' == $key || 'subscription' == $key ) {
-				$count = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->usermeta WHERE meta_key = 'exp_type' AND meta_value = \"$key\"" );
+			if ( 'deactivated' == $key ) {
+				$count = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->usermeta WHERE meta_key = 'active' AND meta_value = 0" );
 			}
-			if ( 'pending' == $key ) {
+			if ( 'trial' == $key || 'subscription' == $key || 'pending' == $key ) {
 				$count = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->usermeta WHERE meta_key = 'exp_type' AND meta_value = \"$key\"" );
 			}
 			if ( 'expired' == $key ) {
@@ -300,44 +303,29 @@ function wpmem_users_views( $views ) {
 
 	$arr = array();
 	if ( defined( 'WPMEM_EXP_MODULE' ) && $wpmem->use_exp == 1 ) {
-		$arr[] = 'Pending';
-	}
-	if ( $wpmem->use_trial == 1 ) {
-		$arr[] = 'Trial';
-	}
-	if ( defined( 'WPMEM_EXP_MODULE' ) && $wpmem->use_exp == 1 ) {
-		$arr[] = 'Subscription';
-		$arr[] = 'Expired';
+		$arr['pending']      = __( 'Pending',       'wp-members' );
+		$arr['trial']        = __( 'Trial',         'wp-members' );
+		$arr['subscription'] = __( 'Subscription',  'wp-members' );
+		$arr['expired']      = __( 'Expired',       'wp-members' );
 	}
 	if ( $wpmem->mod_reg == 1 ) {
-		$arr[] = 'Not Active';
+		$arr['notactive']    = __( 'Not Activated', 'wp-members' );
+		$arr['deactivated']  = __( 'Deactivated',   'wp-members' );
 	}
-	$arr[] = 'Not Exported';
+	$arr['notexported']      = __( 'Not Exported',  'wp-members' );
 	$show = ( isset( $_GET['show'] ) ) ? sanitize_text_field( $_GET['show'] ) : false;
 
-	for ( $row = 0; $row < count( $arr ); $row++ ) {
-		$link = "users.php?action=show&amp;show=";
-		$lcas = str_replace( " ", "", strtolower( $arr[$row] ) );
-		$link.= $lcas;
-		$curr = ( $show == $lcas ) ? ' class="current"' : '';
-
-		$echolink = true;
-		if ( $lcas == "notactive" && $wpmem->mod_reg != 1 ) {
-			$echolink = false;
-		}
-		
-		if ( $echolink ) {
-			$views[$lcas] = sprintf(
-					'<a href="%s" %s>%s <span class="count">(%d)</span></a>',
-					$link,
-					$curr,
-					$arr[$row],
-					isset( $user_counts[ $lcas ] ) ? $user_counts[ $lcas ] : ''
-			   );
-		}
+	foreach ( $arr as $key => $val ) {
+		$link = "users.php?action=show&amp;show=" . $key;
+		$curr = ( $show == $key ) ? ' class="current"' : '';
+		$views[$key] = sprintf(
+				'<a href="%s" %s>%s <span class="count">(%d)</span></a>',
+				esc_url( $link ),
+				$curr,
+				$val,
+				isset( $user_counts[ $key ] ) ? $user_counts[ $key ] : ''
+		   );
 	}
-
-	/** @todo if $show, then run function search query for the users */
 
 	return $views;
 }
@@ -401,7 +389,7 @@ function wpmem_add_user_column_content( $value, $column_name, $user_id ) {
 			 * If the column is "active", then return the value or empty.
 			 * Returning in here keeps us from displaying another value.
 			 */
-				return ( get_user_meta( $user_id , 'active', 'true' ) != 1 ) ? __( 'No' ) : '';
+				return ( get_user_meta( $user_id , 'active', 'true' ) != 1 ) ? __( 'No', 'wp-members' ) : '';
 			} else {
 				return;
 			}
@@ -469,7 +457,7 @@ function wpmem_a_activate_user( $user_id, $chk_pass = false ) {
 	}
 
 	// Generate and send user approved email to user.
-	wpmem_inc_regemail( $user_id, $new_pass, 2 );
+	$wpmem->email->to_user( $user_id, $new_pass, 2 );
 
 	// Set the active flag in usermeta.
 	update_user_meta( $user_id, 'active', 1 );
@@ -516,36 +504,37 @@ function wpmem_a_deactivate_user( $user_id ) {
  *
  * @since 2.8.3
  *
+ * @todo Currently, not activated query returns users who are deactivated. This
+ *       may be confusing for admins, so work on a query that displays only
+ *       users who have never been activated.
+ *
  * @param $user_search
  */
 function wpmem_a_pre_user_query( $user_search ) {
 
 	global $wpdb;
-	$show = $_GET['show'];
+	$show = sanitize_text_field( $_GET['show'] );
 	switch ( $show ) {
 
 		case 'notactive':
 		case 'notexported':
-			$key = ( $show == 'notactive' ) ? 'active' : 'exported';
-			$replace_query = "WHERE 1=1 AND {$wpdb->users}.ID NOT IN (
+		case 'deactivated':
+			$key = ( 'notactive' == $show || 'deactivated' == $show  ) ? 'active' : 'exported';
+			$in  = ( 'deactivated' == $show ) ? 'IN' : 'NOT IN';
+			$val = ( 'deactivated' == $show ) ? '0'  : '1';
+			$replace_query = "WHERE 1=1 AND {$wpdb->users}.ID " . esc_sql( $in ) . " (
 			 SELECT {$wpdb->usermeta}.user_id FROM $wpdb->usermeta 
-				WHERE {$wpdb->usermeta}.meta_key = \"$key\"
-				AND {$wpdb->usermeta}.meta_value = '1' )";
+				WHERE {$wpdb->usermeta}.meta_key = \"" . esc_sql( $key ) . "\"
+				AND {$wpdb->usermeta}.meta_value = \"" . esc_sql( $val ) . "\" )";
 			break;
 
 		case 'trial':
 		case 'subscription':
-			$replace_query = "WHERE 1=1 AND {$wpdb->users}.ID IN (
-			 SELECT {$wpdb->usermeta}.user_id FROM $wpdb->usermeta 
-				WHERE {$wpdb->usermeta}.meta_key = 'exp_type'
-				AND {$wpdb->usermeta}.meta_value = \"$show\" )";
-			break;
-
 		case 'pending':
 			$replace_query = "WHERE 1=1 AND {$wpdb->users}.ID IN (
 			 SELECT {$wpdb->usermeta}.user_id FROM $wpdb->usermeta 
 				WHERE {$wpdb->usermeta}.meta_key = 'exp_type'
-				AND {$wpdb->usermeta}.meta_value = \"$show\" )";
+				AND {$wpdb->usermeta}.meta_value = \"" . esc_sql( $show ) . "\" )";
 			break;
 
 		case 'expired':
@@ -557,7 +546,7 @@ function wpmem_a_pre_user_query( $user_search ) {
 			break;
 	}
 
-	$user_search->query_where = str_replace( 'WHERE 1=1', $replace_query,	$user_search->query_where );
+	$user_search->query_where = str_replace( 'WHERE 1=1', $replace_query, $user_search->query_where );
 }
 
 
