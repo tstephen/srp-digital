@@ -236,7 +236,11 @@ class WP_Members_User_Profile {
 		$wpmem_fields = ( 'admin' == $display ) ? wpmem_fields( 'admin_profile_update' ) : wpmem_fields( 'dashboard_profile_update' );
 		
 		$exclude = wpmem_get_excluded_meta( $display . '-profile' );
-		
+
+		foreach ( $exclude as $excluded ) {
+			unset( $wpmem_fields[ $excluded ] );
+		}
+
 		// If tos is an active field, this is the dashboard profile, and user has current field value.
 		if ( isset( $wpmem_fields['tos'] ) && get_user_meta( $user_id, 'tos', true ) == $wpmem_fields['tos']['checked_value'] ) {
 			unset( $wpmem_fields['tos'] );
@@ -482,7 +486,7 @@ class WP_Members_User_Profile {
 			foreach ( $wpmem->membership->products as $key => $label ) {
 				$checked = ( $user_products && array_key_exists( $key, $user_products ) ) ? "checked" : "";
 				echo "<tr>";
-				echo '<td style="padding:0px 0px;">
+				echo '<td style="padding:5px 5px;">
 				<select name="_wpmem_membership_product[' . $key . ']">
 					<option value="">----</option>
 					<option value="enable">'  . __( 'Enable', 'wp-members'  ) . '</option>
@@ -490,6 +494,7 @@ class WP_Members_User_Profile {
 				</select></td><td style="padding:0px 0px;">' . $label . '</td>
 				<td style="padding:0px 0px;">';
 				if ( isset( $user_products[ $key ] ) ) {
+					echo '<span id="wpmem_product_enabled" class="dashicons dashicons-yes"></span>';
 					if ( $user_products[ $key ] !== true ) {
 						echo __( 'Expires:', 'wp-members' ) . ' ' . $user_products[ $key ];
 					} else {

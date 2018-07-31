@@ -25,7 +25,16 @@ class WP_Members {
 	 * @access public
 	 * @var    string
 	 */
-	public $version;
+	public $version = WPMEM_VERSION;
+	
+	/**
+	 * Database version
+	 *
+	 * @since  3.2.2
+	 * @access public
+	 * @var    string
+	 */
+	public $db_version = WPMEM_DB_VERSION;
 	
 	/**
 	 * Content block settings.
@@ -238,7 +247,10 @@ class WP_Members {
 		$settings = apply_filters( 'wpmem_settings', get_option( 'wpmembers_settings' ) );
 
 		// Validate that v3 settings are loaded.
-		if ( ! isset( $settings['version'] ) || $settings['version'] != WPMEM_VERSION ) {
+		if ( ! isset( $settings['version'] ) 
+			|| $settings['version'] != $this->version
+			|| ! isset( $settings['db_version'] ) 
+			|| $settings['db_version'] != $this->db_version ) {
 			/**
 			 * Load installation routine.
 			 */
@@ -1085,7 +1097,7 @@ class WP_Members {
 		// Default excluded fields.
 		$excluded_fields = array( 'password', 'confirm_password', 'confirm_email', 'password_confirm', 'email_confirm' );
 		
-		if ( 'update' == $tag ) {
+		if ( 'update' == $tag || 'admin-profile' == $tag || 'user-profile' == $tag || 'wp-register' == $tag ) {
 			$excluded_fields[] = 'username';
 		}
 

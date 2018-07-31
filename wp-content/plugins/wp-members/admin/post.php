@@ -47,7 +47,7 @@ function wpmem_bulk_posts_action() {
 		jQuery('<option>').val('hide').text('<?php    _e( 'Hide',    'wp-members' ) ?>').appendTo("select[name='action']");
 		jQuery('<option>').val('unblock').text('<?php _e( 'Unblock', 'wp-members' ) ?>').appendTo("select[name='action2']");
 		jQuery('<option>').val('block').text('<?php   _e( 'Block',   'wp-members' ) ?>').appendTo("select[name='action2']");
-		jQuery('<option>').val('hide').text('<?php    _e( 'Hide', 'wp-members' ) ?>').appendTo("select[name='action2']");
+		jQuery('<option>').val('hide').text('<?php    _e( 'Hide',    'wp-members' ) ?>').appendTo("select[name='action2']");
 		});
 	</script><?php
 	}
@@ -197,34 +197,34 @@ function wpmem_block_meta() {
 
 	wp_nonce_field( 'wpmem_block_meta_nonce', 'wpmem_block_meta_nonce' );
 
-	$post_type = $wp_post_types[ $post->post_type ];
-
-	if ( isset( $wpmem->block[ $post->post_type ] ) && $wpmem->block[ $post->post_type ] == 1 ) {
-		$notice_icon = '<span class="dashicons dashicons-lock"></span>';
-		$notice_text = sprintf( __( '%s are blocked by default.', 'wp-members' ), $post_type->labels->name );
-	} else {
-		$notice_icon = '<span class="dashicons dashicons-unlock"></span>';
-		$notice_text = sprintf( __( '%s are not blocked by default.', 'wp-members' ), $post_type->labels->name );
-	}
-	
+	$post_type       = $wp_post_types[ $post->post_type ];
 	$post_meta_value = get_post_meta( $post->ID, '_wpmem_block', true );
-
 	$post_meta_value = ( null == $post_meta_value ) ? $wpmem->block[ $post->post_type ] : $post_meta_value;
 	$post_meta_settings = array(
-		'0' => __( 'Unblock', 'wp-members' ),
-		'1' => __( 'Block',   'wp-members' ),
-		'2' => __( 'Hide',    'wp-members' ),
+		'0' => array( 'text' => __( 'Unblocked', 'wp-members' ), 'icon' => '<span id="wpmem_post_icon_0" class="dashicons dashicons-unlock" ' . ( ( 0 != $post_meta_value ) ? 'style="display:none;"' : '' ) . '></span>' ),
+		'1' => array( 'text' => __( 'Blocked',   'wp-members' ), 'icon' => '<span id="wpmem_post_icon_1" class="dashicons dashicons-lock" '   . ( ( 1 != $post_meta_value ) ? 'style="display:none;"' : '' ) . '></span>' ),
+		'2' => array( 'text' => __( 'Hidden',    'wp-members' ), 'icon' => '<span id="wpmem_post_icon_2" class="dashicons dashicons-hidden" ' . ( ( 2 != $post_meta_value ) ? 'style="display:none;"' : '' ) . '></span>' ),
 	); ?>
-	<p>
-		<?php echo $notice_icon . ' ' . $notice_text . '&nbsp;&nbsp;<a href="' . add_query_arg( 'page', 'wpmem-settings', get_admin_url() . 'options-general.php' ) . '">' . __( 'Edit', 'wp-members' ) . '</a>'; ?>
+	<p><?php
+		foreach ( $post_meta_settings as $key => $value ) {
+			echo $value['icon'];
+		} ?> <?php
+		_e( 'Status:', 'wp-members' ); ?> <span id="wpmem_post_block_status"><?php echo $post_meta_settings[ $post_meta_value ]['text']; ?></span> <a href="#" class="hide-if-no-js" id="wpmem_edit_block_status"><?php _e( 'Edit' ); ?></a>
 	</p>
 	<p>
-		<select id="wpmem_block" name="wpmem_block">
-		<?php foreach ( $post_meta_settings as $key => $value ) {
-			echo '<option value="' . $key . '" ' . selected( $post_meta_value, $key, false ) . '>' . $value . '</option>';
-		} ?>
-		</select>
-		<label for="wpmem_block"><?php echo 'this ' . strtolower( $post_type->labels->singular_name ); ?><?php //echo $text; ?></label>
+		<div id="wpmem_block">
+		<?php
+		$original_value = ''; $original_label = '';
+		foreach ( $post_meta_settings as $key => $value ) {
+			$original_value = ( $post_meta_value == $key ) ? $key                  : $original_value;
+			$original_label = ( $post_meta_value == $key ) ? $value['text'] : $original_label;
+			echo '<input type="radio" id="wpmem_block_status_' . $key . '" name="wpmem_block" value="' . $key . '" ' . checked( $post_meta_value, $key, false ) . ' /><label>' . $value['text'] . '</label><br />';
+		}
+		echo '<input type="hidden" id="wpmem_block_original_value" name="wpmem_block_original_value" value="' . $original_value . '" />';
+		echo '<input type="hidden" id="wpmem_block_original_label" name="wpmem_block_original_label" value="' . $original_label . '" />';
+		?>
+		<p><a href="#" class="hide-if-no-js button" id="wpmem_ok_block_status"><?php echo _e( 'OK' ); ?></a> <!--<a href="#" class="hide-if-no-js" id="wpmem_cancel_block_status"><?php _e( 'Cancel' ); ?></a>--></p>
+		</div>
 	</p>
 	<?php
 	/**
@@ -306,7 +306,7 @@ function wpmem_post_columns( $columns ) {
 	$post_type = ( isset( $_REQUEST['post_type'] ) ) ? sanitize_text_field( $_REQUEST['post_type'] ) : 'post';
 	
 	if ( $post_type == 'page' || $post_type == 'post' || array_key_exists( $post_type, $wpmem->post_types ) ) {
-		$columns['wpmem_block'] = ( $wpmem->block[ $post_type ] == 1 ) ? __( 'Unblocked?', 'wp-members' ) : __( 'Blocked?', 'wp-members' );
+		$columns['wpmem_block'] = __( 'Status', 'wp-members' );
 	}
 	return $columns;
 }
@@ -338,9 +338,20 @@ function wpmem_post_columns_content( $column_name, $post_ID ) {
 			$block_meta = ( $old_block ) ? 1 : ( ( $old_unblock ) ? 0 : $block_meta );
 		}
 
-		echo ( $wpmem->block[ $post_type ] == 1 && $block_meta == '0' ) ? '<span class="dashicons dashicons-unlock" style="color:red"></span>' : '';
-		echo ( $wpmem->block[ $post_type ] == 0 && $block_meta == '1' ) ? '<span class="dashicons dashicons-lock" style="color:green"></span>' : '';
-		echo ( 2 == $block_meta ) ? '<span class="dashicons dashicons-hidden"></span>' : '';
+		if ( $wpmem->block[ $post_type ] == 1 ) {
+			$block_span = array( 'lock', 'green', 'Blocked' );
+		}
+		if ( $wpmem->block[ $post_type ] == 0 ) {
+			$block_span =  array( 'unlock', 'red', 'Unblocked' );
+		}
+		if ( $wpmem->block[ $post_type ] == 1 && $block_meta == '0' ) {
+			$block_span = array( 'unlock', 'red', 'Unblocked' );
+		} elseif ( $wpmem->block[ $post_type ] == 0 && $block_meta == '1' ) {
+			$block_span = array( 'lock', 'green', 'Blocked' );
+		} elseif ( 2 == $block_meta ) {
+			$block_span = array( 'hidden', '', 'Hidden' );
+		}
+		echo '<span class="dashicons dashicons-' . $block_span[0] . '" style="color:' . $block_span[1] . '" title="' . $block_span[2] . '"></span>';
 	}
 }
 
@@ -378,7 +389,7 @@ function wpmem_set_block_status( $status, $post_id, $post_type ) {
 	$prev_value = get_post_meta( $post_id, '_wpmem_block', true );
 
 	// Update accordingly.
-	if ( $prev_value && $status != $prev_value ) {
+	if ( false !== $prev_value && $status != $prev_value ) {
 		if ( $status == $wpmem->block[ $post_type ] ) {
 			delete_post_meta( $post_id, '_wpmem_block' );
 		} else {
@@ -386,7 +397,7 @@ function wpmem_set_block_status( $status, $post_id, $post_type ) {
 		}
 	} elseif ( ! $prev_value && $status != $wpmem->block[ $post_type ] ) {
 		update_post_meta( $post_id, '_wpmem_block', $status );
-	} else { 
+	} elseif ( $status != $prev_value ) {
 		delete_post_meta( $post_id, '_wpmem_block' );
 	}
 	

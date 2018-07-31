@@ -181,3 +181,50 @@
 		});
 	});
 })(jQuery);
+
+/**
+ * JS for post block status meta box
+ *
+ * @since 3.2.1
+ */
+(function($) {
+	$(document).ready(function() {
+		$("#wpmem_block").hide();
+	});
+	$(document).ready(function() {
+		$("#wpmem_edit_block_status").click(function() {
+			$("#wpmem_block").show('normal');
+			$("#wpmem_edit_block_status").hide();
+		});
+		$("#wpmem_cancel_block_status").click(function() {
+			$("#wpmem_block").hide('normal');
+			$("#wpmem_edit_block_status").show();
+			$("#wpmem_post_block_status").text($("input[name=wpmem_block_original_label]").val());
+			$('#wpmem_post_block_status_' + $('input[name=wpmem_block_original_value]')).val().prop("checked", true);
+		});
+		$("#wpmem_ok_block_status").click(function() {
+			$("#wpmem_block").hide('normal');
+			$("#wpmem_edit_block_status").show();
+			$("#wpmem_post_block_status").text($("input[name=wpmem_block]:checked + label").text());
+			if($('#wpmem_block_status_0').is(':checked')) { 
+				$("#wpmem_post_icon_0").show();
+				$("#wpmem_post_icon_1").hide();
+				$("#wpmem_post_icon_2").hide();
+			}
+			if($('#wpmem_block_status_1').is(':checked')) { 
+				$("#wpmem_post_icon_0").hide();
+				$("#wpmem_post_icon_1").show();
+				$("#wpmem_post_icon_2").hide();
+			}
+			if($('#wpmem_block_status_2').is(':checked')) { 
+				$("#wpmem_post_icon_0").hide();
+				$("#wpmem_post_icon_1").hide();
+				$("#wpmem_post_icon_2").show();
+			}
+		});
+	});
+})(jQuery);
+
+$(document).ready(function() {
+    $('.wpmem-product-select2').select2();
+});

@@ -3,7 +3,7 @@ Contributors: cbutlerjr
 Tags: access, authentication, content, login, member, membership, password, protect, register, registration, restriction, subscriber
 Requires at least: 4.0
 Tested up to: 4.9
-Stable tag: 3.2.0
+Stable tag: 3.2.2
 License: GPLv2
 
 The WP-Members membership plugin turns your WordPress site into a membership site. Restrict premium content, create custom registration fields, and more.
@@ -104,6 +104,7 @@ Premium priority support is available at the plugin's site [RocketGeek.com](http
 == Upgrade Notice ==
 
 WP-Members 3.2.0 is a major update. See changelog for important details. Minimum WP version is 4.0.
+WP-Members 3.2.2 is a fix update for 3.2.0. See changelog.
 
 == Screenshots ==
 
@@ -125,6 +126,26 @@ WP-Members 3.2.0 is a major update. See changelog for important details. Minimum
 
 
 == Changelog ==
+
+= 3.2.2 =
+
+* Fixed a 3.2 upgrade issue, verifies username field is properly added to field settings array.
+* Fixed issue with user product verification where only expiration products were validated.
+* Fixed logic in form field builder so multiselect will accept a custom class. 
+* Added select2 support for setting product access in the post editor.
+* Removed duplicate API function wpmem_current_postid() (use wpmem_current_post_id()).
+* Replaced sanitize_html_class() with WP_Members_Forms::sanitize_class() so variables may contain multiple classes.
+
+= 3.2.1 =
+
+* Fixed duplicate ID in login form.
+* Fixed user profile update for excluded fields.
+* Fixed native WP registration, excluded WP-Members username field in form validation.
+* Fixed update post when block status is not changed.
+* Rebuilt user interface for post restriction metabox to make it more intuitive.
+* Changed status column in All Posts to show all block statuses, not just those opposite the default.
+* Changed "clickable" attribute for field shortcode default to false.
+* Added wpmem_user_export_header and wpmem_user_export_row filter for export.
 
 = 3.2.0 =
 

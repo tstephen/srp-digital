@@ -133,13 +133,16 @@ function wpmem_upgrade_settings() {
 		
 		// If email is set in the settings array, change it back to the pre-3.1 option.
 		if ( isset( $wpmem_settings['email'] ) ) {
-			update_option( 'wpmembers_email_wpfrom', $wpmem_settings['email']['from'] );
-			update_option( 'wpmembers_email_wpname', $wpmem_settings['email']['from_name'] );
+			$from = ( is_array( $wpmem_settings['email'] ) ) ? $wpmem_settings['email']['from']      : '';
+			$name = ( is_array( $wpmem_settings['email'] ) ) ? $wpmem_settings['email']['from_name'] : '';
+			update_option( 'wpmembers_email_wpfrom', $from );
+			update_option( 'wpmembers_email_wpname', $name );
 			unset( $wpmem_settings['email'] );
 		}
 		
 		// Version number should be updated no matter what.
-		$wpmem_settings['version'] = WPMEM_VERSION;
+		$wpmem_settings['version']    = WPMEM_VERSION;
+		$wpmem_settings['db_version'] = WPMEM_DB_VERSION;
 		
 		update_option( 'wpmembers_settings', $wpmem_settings );
 		return $wpmem_settings;
@@ -149,7 +152,8 @@ function wpmem_upgrade_settings() {
 		$show_reg = ( $wpmem_settings[7] == 0 ) ? 1 : 0;
 		// Create new settings array.
 		$wpmem_newsettings = array(
-			'version' => WPMEM_VERSION,
+			'version'    => WPMEM_VERSION,
+			'db_version' => WPMEM_DB_VERSION,
 			'block'   => array(
 				'post' => $wpmem_settings[1],
 				'page' => $wpmem_settings[2],
@@ -465,8 +469,9 @@ function wpmem_upgrade_captcha() {
 function wpmem_install_settings() {
 		
 	$wpmem_settings = array(
-		'version' => WPMEM_VERSION,
-		'block'   => array(
+		'version'    => WPMEM_VERSION,
+		'db_version' => WPMEM_DB_VERSION,
+		'block'      => array(
 			'post' => ( is_multisite() ) ? 0 : 1,
 			'page' => 0,
 		),
