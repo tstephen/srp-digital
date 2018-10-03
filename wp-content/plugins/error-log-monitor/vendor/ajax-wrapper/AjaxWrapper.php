@@ -89,6 +89,9 @@ if (!class_exists('Ajaw_v1_ActionBuilder', false)):
 			return $instance;
 		}
 
+		/**
+		 * @return Ajaw_v1_Action
+		 */
 		public function register() {
 			$instance = $this->build();
 			$instance->register();

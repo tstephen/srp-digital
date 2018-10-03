@@ -77,7 +77,7 @@ function wpmem_posts_page_load() {
 			// Validate nonce.
 			check_admin_referer( 'bulk-posts' );
 			// Get the posts.
-			$posts = ( isset( $_REQUEST['post'] ) ) ? $_REQUEST['post'] : '';
+			$posts = wpmem_get( 'post', '', 'request' );
 			// Convert action.
 			$status = ( 'hide' == $action ) ? 2 : ( ( 'block' == $action ) ? 1 : 0 );
 			// Update posts.
@@ -176,7 +176,9 @@ function wpmem_block_meta_add() {
 			 */
 			$post_title = apply_filters( 'wpmem_admin_' . $key . '_meta_title', sprintf( __( '%s Restriction', 'wp-members' ), $post_type->labels->singular_name ) );
 	
-			add_meta_box( 'wpmem-block-meta-id', $post_title, 'wpmem_block_meta', $key, 'side', 'high' );
+			add_meta_box( 'wpmem-block-meta-id', $post_title, 'wpmem_block_meta', $key, 'side', 'high'
+				// ,array( '__back_compat_meta_box' => true, ) // @todo Convert to Block and declare this for backwards compat ONLY!
+			);
 		}
 	}
 }
@@ -324,7 +326,7 @@ function wpmem_post_columns( $columns ) {
 function wpmem_post_columns_content( $column_name, $post_ID ) {
 
 	global $wpmem;
-	$post_type = ( isset( $_REQUEST['post_type'] ) ) ? sanitize_text_field( $_REQUEST['post_type'] ) : 'post';
+	$post_type = sanitize_text_field( wpmem_get( 'post_type', 'post', 'request' ) );
 
 	if ( $column_name == 'wpmem_block' ) { 
 

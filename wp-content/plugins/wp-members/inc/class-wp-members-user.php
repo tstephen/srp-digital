@@ -60,27 +60,29 @@ class WP_Members_User {
 	 * wrapper and is the direct function called for login.
 	 *
 	 * @since 3.1.7
+	 * @since 3.2.3 Removed wpmem_login_fields filter.
+	 * @since 3.2.3 Replaced form collection with WP script to facilitate login with username OR email.
+	 * @since 3.2.3 Changed to wp_safe_redirect().
 	 *
 	 * @return string Returns "loginfailed" if failed login.
 	 */
 	function login() {
 		
-		$creds = array( 'user_login' => 'log', 'user_password' => 'pwd', 'remember' => 'rememberme', 'redirect_to' => 'redirect_to' );
-		/**
-		 * Filter the $fields the function handles.
-		 *
-		 * @since 3.1.7
-		 *
-		 * @param array $creds
-		 */
-		$creds = apply_filters( 'wpmem_login_fields', $creds );
-		foreach ( $creds as $key => $val ) {
-			$creds[ $key ] = ( 'user_login' == $key ) ? sanitize_user( wpmem_get( $val ) ) : wpmem_get( $val );
+		global $wpmem;
+		
+		if ( ! empty( $_POST['log'] ) && ! force_ssl_admin() ) {
+			$user_name = sanitize_user( $_POST['log'] );
+			$user = get_user_by( 'login', $user_name );
+
+			if ( ! $user && strpos( $user_name, '@' ) ) {
+				$user = get_user_by( 'email', $user_name );
+			}
 		}
 
-		$user = wp_signon( $creds, is_ssl() );
+		$user = wp_signon( array(), is_ssl() );
 
 		if ( is_wp_error( $user ) ) {
+			$wpmem->error = $user->get_error_message();
 			return "loginfailed";
 		} else {
 			$redirect_to = wpmem_get( 'redirect_to', false );
@@ -103,7 +105,7 @@ class WP_Members_User {
 			 * @param int    $user->ID    The user's primary key ID.
 			 */
 			$redirect_to = apply_filters( 'wpmem_login_redirect', $redirect_to, $user->ID );
-			wp_redirect( $redirect_to );
+			wp_safe_redirect( $redirect_to );
 			exit();
 		}
 	}
@@ -457,21 +459,28 @@ class WP_Members_User {
 	}
 	
 	/**
+	 * Sets a user's password.
+	 *
+	 * @since 3.2.3
+	 *
+	 * @param	int		$user_id
+	 * @param	string	$password
+	 */
+	function set_password( $user_id, $password ) {
+		wp_set_password( $password, $user_id );
+	}
+	
+	/**
 	 * Sets user as logged on password change.
 	 *
 	 * (Hooked to wpmem_pwd_change)
 	 *
 	 * @since 3.2.0
 	 *
-	 * @global	object	$user
 	 * @param	int		$user_id
 	 * @param	string	$password
 	 */
-	function set_as_logged_in( $user_id, $password ) {
-		global $user;
-		// Update user password.
-		wp_set_password( $password, $user_id );
-		// Maintain login state.
+	function set_as_logged_in( $user_id ) {
 		$user = get_user_by( 'id', $user_id );
 		wp_set_current_user( $user_id, $user->user_login );
 		wp_set_auth_cookie( $user_id );
@@ -485,30 +494,50 @@ class WP_Members_User {
 	 * @global object $wpmem
 	 * @param  mixed  $product
 	 * @param  int    $user_id (optional)
-	 * @return bool  
+	 * @return bool   $access
 	 */
 	function has_access( $product, $user_id = false ) {
 		global $wpmem;
-		$user_id = ( ! $user_id ) ? get_current_user_id() : $user_id;
+		if ( ! is_user_logged_in() ) {
+			return false;
+		}
+		$user_id = ( ! $user_id ) ? get_current_user_id() : $user_id; //echo '<pre>'; global $wpmem; print_r( $wpmem ); 
+		$access  = false;
 		foreach ( $product as $prod ) {
 			if ( isset( $this->access[ $prod ] ) ) {
 				// Is this an expiration product?
-				if ( isset( $wpmem->membership->product_detail[ $prod ]['expires'][0] ) && ! is_bool( $this->access[ $prod ] ) ) {
+				if ( isset( $wpmem->membership->products[ $prod ]['expires'][0] ) && ! is_bool( $this->access[ $prod ] ) ) {
 					if ( $this->is_current( $this->access[ $prod ] ) ) {
-						return true;
+						$access = true;
+						break;
 					}
-				} elseif ( '' != $wpmem->membership->product_detail[ $prod ]['role'] ) {
-					if ( $this->access[ $prod ] && wpmem_user_has_role( $wpmem->membership->product_detail[ $prod ]['role'] ) ) {
-						return true;
+				} elseif ( '' != $wpmem->membership->products[ $prod ]['role'] ) {
+					if ( $this->access[ $prod ] && wpmem_user_has_role( $wpmem->membership->products[ $prod ]['role'] ) ) {
+						$access = true;
+						break;
 					}
 				} else {
 					if ( $this->access[ $prod ] ) {
-						return true;
+						$access = true;
+						break;
 					}
 				}
 			}
 		}
-		return false;
+		
+		/**
+		 * Filter the access result.
+		 *
+		 * @since 3.2.0
+		 * @since 3.2.3 Added $product argument.
+		 *
+		 * @param  boolean $access
+		 * @param  mixed   $product
+		 * @param  integer $user_id
+		 * @param  array   $args
+		 */
+		return apply_filters( 'wpmem_user_has_access', $access, $product, $user_id );
+
 	}
 	
 	/**
@@ -547,10 +576,10 @@ class WP_Members_User {
 		}
 
 		// Convert date to add.
-		$expires = $wpmem->membership->product_detail[ $product ]['expires'];
+		$expires = ( isset( $wpmem->membership->products[ $product ]['expires'] ) ) ? $wpmem->membership->products[ $product ]['expires'] : false;
 		
 		if ( is_array( $expires ) ) {
-			$add_date = explode( "|", $wpmem->membership->product_detail[ $product ]['expires'][0] );
+			$add_date = explode( "|", $wpmem->membership->products[ $product ]['expires'][0] );
 			$add = ( 1 < $add_date[0] ) ? $add_date[0] . " " . $add_date[1] . "s" : $add_date[0] . " " . $add_date[1];
 			$user_products[ $product ] = ( isset( $user_products[ $product ] ) ) ? date( 'Y-m-d H:i:s', strtotime( $add, strtotime( $user_products[ $product ] ) ) ) : date( 'Y-m-d H:i:s', strtotime( $add ) );
 		} else {
@@ -584,14 +613,30 @@ class WP_Members_User {
 	/**
 	 * Utility for expiration validation.
 	 *
-	 * @3.2.0
+	 * @since 3.2.0
+	 *
+	 * @param date $date
 	 */
 	function is_current( $date ) {
 		return ( time() < strtotime( $date ) ) ? true : false;
 	}
+	
+	/**
+	 * Check if a user is activated.
+	 *
+	 * @since 3.2.2
+	 *
+	 * @param  int   $user_id
+	 * @return bool  $active
+	 */
+	function is_user_activated( $user_id = false ) {
+		$user_id = ( ! $user_id ) ? get_current_user_id() : $user_id;
+		$active  = get_user_meta( $user_id, 'active', true );
+		return ( $active != 1 ) ? false : true;
+	}
 
 	/**
-	 * Checks if a user is activated.
+	 * Checks if a user is activated during user authentication.
 	 *
 	 * @since 2.7.1
 	 * @since 3.2.0 Moved from core to user object.
@@ -610,7 +655,7 @@ class WP_Members_User {
 		}
 
 		// Activation flag must be validated.
-		if ( ! wpmem_is_user_activated( $user->ID ) ) {
+		if ( ! $this->is_user_activated( $user->ID ) ) {
 			return new WP_Error( 'authentication_failed', __( '<strong>ERROR</strong>: User has not been activated.', 'wp-members' ) );
 		}
 

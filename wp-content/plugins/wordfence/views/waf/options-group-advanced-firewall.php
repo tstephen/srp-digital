@@ -36,7 +36,7 @@ if (!isset($collapseable)) {
 							'optionName' => 'disableWAFIPBlocking',
 							'enabledValue' => 1,
 							'disabledValue' => 0,
-							'value' => $config->getConfig('disableWAFIPBlocking') ? 1 : 0,
+							'value' => wfConfig::get('disableWAFIPBlocking') ? 1 : 0,
 							'title' => __('Delay IP and Country blocking until after WordPress and plugins have loaded (only process firewall rules early)', 'wordfence'),
 							'subtitle' => ($firewall->isSubDirectoryInstallation() ? __('You are currently running the WAF from another WordPress installation. This option can be changed once you configure the firewall to run correctly on this site.', 'wordfence') : ''),
 							'helpLink' => wfSupportController::supportURL(wfSupportController::ITEM_FIREWALL_WAF_OPTION_DELAY_BLOCKING),
@@ -51,7 +51,7 @@ if (!isset($collapseable)) {
 							'textValue' => wfUtils::cleanupOneEntryPerLine(wfConfig::get('whitelisted')),
 							'title' => __('Whitelisted IP addresses that bypass all rules', 'wordfence'),
 							'alignTitle' => 'top',
-							'subtitleHTML' => __('Whitelisted IPs must be separated by commas or placed on separate lines. You can specify ranges using the following formats: 127.0.0.1/24, 127.0.0.[1-100], or 127.0.0.1 - 127.0.1.100<br/>Wordfence automatically whitelists <a href="http://en.wikipedia.org/wiki/Private_network" target="_blank" rel="noopener noreferrer">private networks</a> because these are not routable on the public Internet.', 'wordfence'),
+							'subtitleHTML' => __('Whitelisted IPs must be separated by commas or placed on separate lines. You can specify ranges using the following formats: 127.0.0.1/24, 127.0.0.[1-100], or 127.0.0.1-127.0.1.100<br/>Wordfence automatically whitelists <a href="http://en.wikipedia.org/wiki/Private_network" target="_blank" rel="noopener noreferrer">private networks</a> because these are not routable on the public Internet.', 'wordfence'),
 							'subtitlePosition' => 'value',
 							'helpLink' => wfSupportController::supportURL(wfSupportController::ITEM_FIREWALL_WAF_OPTION_WHITELISTED_IPS),
 						))->render();

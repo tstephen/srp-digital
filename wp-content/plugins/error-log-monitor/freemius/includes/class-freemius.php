@@ -2630,26 +2630,28 @@
             self::$_accounts = FS_Options::instance( WP_FS__ACCOUNTS_OPTION_NAME, true );
 
             if ( is_multisite() ) {
+                $has_skipped_migration = (
+                    // 'id_slug_type_path_map' - was never stored on older versions, therefore, not exists on the site level.
+                    null === self::$_accounts->get_option( 'id_slug_type_path_map', null, false ) &&
+                    // 'file_slug_map' stored on the site level, so it was running an SDK version before it was integrated with MS-network.
+                    null !== self::$_accounts->get_option( 'file_slug_map', null, false )
+                );
+
                 /**
-                 * If the id_slug_type_path_map exists on the site level but doesn't exist on the
+                 * If the file_slug_map exists on the site level but doesn't exist on the
                  * network level storage, it means that we need to process the storage with migration.
                  *
-                 * The code in this `if` scope will only be executed once and only for the first site that will execute it because once we migrate the storage data, id_slug_type_path_map will be already set in the network level storage.
+                 * The code in this `if` scope will only be executed once and only for the first site that will execute it because once we migrate the storage data, file_slug_map will be already set in the network level storage.
                  *
                  * @author Vova Feldman (@svovaf)
                  * @since  2.0.0
                  */
-                if ( null === self::$_accounts->get_option( 'id_slug_type_path_map', null, true ) &&
-                     null !== self::$_accounts->get_option( 'id_slug_type_path_map', null, false )
+                if (
+                    ( $has_skipped_migration && true !== self::$_accounts->get_option( 'ms_migration_complete', false, true ) ) ||
+                    ( null === self::$_accounts->get_option( 'file_slug_map', null, true ) &&
+                        null !== self::$_accounts->get_option( 'file_slug_map', null, false ) )
                 ) {
-                    self::migrate_accounts_to_network();
-
-                    // Migrate API options from site level to network level.
-                    $api_network_options = FS_Option_Manager::get_manager( WP_FS__OPTIONS_OPTION_NAME, true, true );
-                    $api_network_options->migrate_to_network();
-
-                    // Migrate API cache to network level storage.
-                    FS_Cache_Manager::get_manager( WP_FS__API_CACHE_OPTION_NAME )->migrate_to_network();
+                    self::migrate_options_to_network();
                 }
             }
 
@@ -2677,6 +2679,24 @@
             add_action( 'admin_footer', array( 'Freemius', '_enrich_ajax_url' ) );
 
             self::$_statics_loaded = true;
+        }
+
+        /**
+         * @author Leo Fajardo (@leorw)
+         *
+         * @since 2.1.3
+         */
+        private static function migrate_options_to_network() {
+            self::migrate_accounts_to_network();
+
+            // Migrate API options from site level to network level.
+            $api_network_options = FS_Option_Manager::get_manager( WP_FS__OPTIONS_OPTION_NAME, true, true );
+            $api_network_options->migrate_to_network();
+
+            // Migrate API cache to network level storage.
+            FS_Cache_Manager::get_manager( WP_FS__API_CACHE_OPTION_NAME )->migrate_to_network();
+
+            self::$_accounts->set_option( 'ms_migration_complete', true, true );
         }
 
         #----------------------------------------------------------------------------------
@@ -2905,6 +2925,10 @@
                 }
 
                 fs_redirect( $download_url );
+            } else if ( fs_request_is_action( 'migrate_options_to_network' ) ) {
+                check_admin_referer( 'migrate_options_to_network' );
+
+                self::migrate_options_to_network();
             }
         }
 
@@ -5987,7 +6011,7 @@
          * @param int $except_blog_id Since 2.0.0 when running in a multisite network environment, the cron execution is consolidated. This param allows excluding excluded specified blog ID from being the cron executor.
          */
         private function schedule_install_sync( $except_blog_id = 0 ) {
-            $this->schedule_cron( 'install_sync', 'install_sync', 'single', 0, false, $except_blog_id );
+            $this->schedule_cron( 'install_sync', 'install_sync', 'single', WP_FS__SCRIPT_START_TIME, false, $except_blog_id );
         }
 
         /**
@@ -10574,7 +10598,7 @@
                 return;
             }
 
-            if ( ! $this->is_premium() || $this->has_active_valid_license() ) {
+            if ( ! $this->is_premium() || $this->has_any_active_valid_license() ) {
                 // This is relevant only to the free versions and premium versions without an active license.
                 return;
             }
@@ -13026,6 +13050,7 @@
                 }
             }
 
+            $should_load_plans = false;
             if ( is_object( $site ) &&
                  is_numeric( $site->id ) &&
                  is_numeric( $site->user_id ) &&
@@ -13034,19 +13059,7 @@
                 // Load site.
                 $this->_site = $site;
 
-                // Load plans.
-                $this->_plans = $plans[ $this->_slug ];
-                if ( ! is_array( $this->_plans ) || empty( $this->_plans ) ) {
-                    $this->_sync_plans();
-                } else {
-                    for ( $i = 0, $len = count( $this->_plans ); $i < $len; $i ++ ) {
-                        if ( $this->_plans[ $i ] instanceof FS_Plugin_Plan ) {
-                            $this->_plans[ $i ] = self::decrypt_entity( $this->_plans[ $i ] );
-                        } else {
-                            unset( $this->_plans[ $i ] );
-                        }
-                    }
-                }
+                $should_load_plans = true;
             }
 
             $user = null;
@@ -13082,6 +13095,33 @@
                     clone $user :
                     null;
             }
+
+            /*
+             * [WSH] Crash workaround: Move the code that loads plans so that it runs *after* the user object
+             * is initialized. _sync_plans() indirectly calls get_current_or_network_user_api_scope(), which
+             * assumes that one of the following must be true:
+             *  a) The plugin is active for the entire network.
+             *  b) The user has already been loaded.
+             *
+             * In a situation where the plugin is activated only on certain sites and plans haven't been cached,
+             * this will lead to a fatal error because get_current_or_network_user_api_scope() will try to use
+             * the uninitialized user object.
+	         */
+	        if ( $should_load_plans && ($this->_is_network_active || isset($this->_user)) ) {
+		        // Load plans.
+		        $this->_plans = $plans[ $this->_slug ];
+		        if ( ! is_array( $this->_plans ) || empty( $this->_plans ) ) {
+			        $this->_sync_plans();
+		        } else {
+			        for ( $i = 0, $len = count( $this->_plans ); $i < $len; $i ++ ) {
+				        if ( $this->_plans[ $i ] instanceof FS_Plugin_Plan ) {
+					        $this->_plans[ $i ] = self::decrypt_entity( $this->_plans[ $i ] );
+				        } else {
+					        unset( $this->_plans[ $i ] );
+				        }
+			        }
+		        }
+	        }
 
             if ( is_object( $this->_user ) ) {
                 // Load licenses.
@@ -15590,7 +15630,8 @@
                 return;
             }
 
-            $encrypted_site = clone ( is_object( $site ) ? $site : $this->_site );
+            $site_clone     = is_object( $site ) ? $site : $this->_site;
+            $encrypted_site = clone $site_clone;
 
             $sites = self::get_all_sites( $this->_module_type, $network_level_or_blog_id );
 
@@ -16288,12 +16329,60 @@
          * @since  1.2.1
          */
         function has_active_valid_license() {
+            return self::is_active_valid_license( $this->_license );
+        }
+
+        /**
+         * Check if a given license is active & valid (not expired).
+         *
+         * @author Vova Feldman (@svovaf)
+         * @since  2.1.3
+         *
+         * @param FS_Plugin_License $license
+         *
+         * @return bool
+         */
+        private static function is_active_valid_license( $license ) {
             return (
-                is_object( $this->_license ) &&
-                is_numeric( $this->_license->id ) &&
-                $this->_license->is_active() &&
-                $this->_license->is_valid()
+                is_object( $license ) &&
+                FS_Plugin_License::is_valid_id( $license->id ) &&
+                $license->is_active() &&
+                $license->is_valid()
             );
+        }
+
+        /**
+         * Checks if there's any site that is associated with an active & valid license.
+         * This logic is used to determine if the admin can download the premium code base from a network level admin.
+         *
+         * @author Vova Feldman (@svovaf)
+         * @since  2.1.3
+         *
+         * @return bool
+         */
+        function has_any_active_valid_license() {
+            if ( ! fs_is_network_admin() ) {
+                return $this->has_active_valid_license();
+            }
+
+            $installs            = $this->get_blog_install_map();
+            $all_plugin_licenses = self::get_all_licenses( $this->_module_id );
+
+            foreach ( $installs as $blog_id => $install ) {
+                if ( ! FS_Plugin_License::is_valid_id( $install->license_id ) ) {
+                    continue;
+                }
+
+                foreach ( $all_plugin_licenses as $license ) {
+                    if ( $license->id == $install->license_id ) {
+                        if ( self::is_active_valid_license( $license ) ) {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
         }
 
         /**
@@ -18442,7 +18531,15 @@
             $this->_logger->entrance();
 
             $vars = array( 'id' => $this->_module_id );
-            fs_require_once_template( 'contact.php', $vars );
+
+            /**
+             * Added filter to the template to allow developers wrapping the template
+             * in custom HTML (e.g. within a wizard/tabs).
+             *
+             * @author Vova Feldman (@svovaf)
+             * @since  2.1.3
+             */
+            echo $this->apply_filters( 'templates/contact.php', fs_get_template( 'contact.php', $vars ) );
         }
 
         #endregion ------------------------------------------------------------------------
@@ -18748,14 +18845,14 @@
 
             // Show promotion if never shown before and 24 hours after initial activation with FS.
             if ( ! $was_promotion_shown_before &&
-                 $this->_storage->install_timestamp > ( time() - WP_FS__TIME_24_HOURS_IN_SEC )
+                 $this->_storage->install_timestamp > ( time() - $this->apply_filters( 'show_first_trial_after_n_sec', WP_FS__TIME_24_HOURS_IN_SEC ) )
             ) {
                 return false;
             }
 
             // OR if promotion was shown before, try showing it every 30 days.
             if ( $was_promotion_shown_before &&
-                 30 * WP_FS__TIME_24_HOURS_IN_SEC > time() - $last_time_trial_promotion_shown
+                 $this->apply_filters( 'reshow_trial_after_every_n_sec', 30 * WP_FS__TIME_24_HOURS_IN_SEC ) > time() - $last_time_trial_promotion_shown
             ) {
                 return false;
             }

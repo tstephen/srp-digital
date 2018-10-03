@@ -31,7 +31,8 @@ class WP_Members_User_Profile {
 	
 		global $current_screen, $user_ID, $wpmem;
 		$user_id = ( 'profile' == $current_screen->id ) ? $user_ID : filter_var( $_REQUEST['user_id'], FILTER_SANITIZE_NUMBER_INT ); 
-		$display = ( 'profile' == $current_screen->base ) ? 'user' : 'admin'; ?>
+		$display = ( 'profile' == $current_screen->base ) ? 'user' : 'admin'; 
+		$display = ( current_user_can( 'edit_users' ) ) ? 'admin' : $display; ?>
 
 		<h3><?php
 		$heading = ( 'admin' == $display ) ? __( 'WP-Members Additional Fields', 'wp-members' ) : __( 'Additional Information', 'wp-members' );
@@ -322,9 +323,9 @@ class WP_Members_User_Profile {
 				$wpmem_activate_user = ( isset( $_POST['activate_user'] ) == '' ) ? -1 : filter_var( $_POST['activate_user'], FILTER_SANITIZE_NUMBER_INT );
 
 				if ( $wpmem_activate_user == 1 ) {
-					wpmem_a_activate_user( $user_id, $chk_pass );
+					wpmem_activate_user( $user_id, $chk_pass );
 				} elseif ( $wpmem_activate_user == 0 ) {
-					wpmem_a_deactivate_user( $user_id );
+					wpmem_deactivate_user( $user_id );
 				}
 			}
 
@@ -341,8 +342,8 @@ class WP_Members_User_Profile {
 						// Enable or Disable?
 						if ( 'enable' == $product_value ) {
 							// Does product require a role?
-							if ( false !== $wpmem->membership->product_detail[ $product_key ]['role'] ) {
-								wpmem_update_user_role( $user_id, $wpmem->membership->product_detail[ $product_key ]['role'], 'add' );
+							if ( false !== $wpmem->membership->products[ $product_key ]['role'] ) {
+								wpmem_update_user_role( $user_id, $wpmem->membership->products[ $product_key ]['role'], 'add' );
 							}
 							$wpmem->user->set_user_product( $product_key, $user_id );
 						}
@@ -483,7 +484,7 @@ class WP_Members_User_Profile {
 		<tr>
 			<th><label><?php _e( 'Product Access', 'wp-members' ); ?></label></th>
 			<td><table><?php
-			foreach ( $wpmem->membership->products as $key => $label ) {
+			foreach ( $wpmem->membership->products as $key => $value ) {
 				$checked = ( $user_products && array_key_exists( $key, $user_products ) ) ? "checked" : "";
 				echo "<tr>";
 				echo '<td style="padding:5px 5px;">
@@ -491,7 +492,7 @@ class WP_Members_User_Profile {
 					<option value="">----</option>
 					<option value="enable">'  . __( 'Enable', 'wp-members'  ) . '</option>
 					<option value="disable">' . __( 'Disable', 'wp-members' ) . '</option>
-				</select></td><td style="padding:0px 0px;">' . $label . '</td>
+				</select></td><td style="padding:0px 0px;">' . $value['title'] . '</td>
 				<td style="padding:0px 0px;">';
 				if ( isset( $user_products[ $key ] ) ) {
 					echo '<span id="wpmem_product_enabled" class="dashicons dashicons-yes"></span>';

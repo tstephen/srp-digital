@@ -18,11 +18,58 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class WP_Members_Products {
 
-	public $post_meta = '_wpmem_products';
-	public $post_stem = '_wpmem_products_';
-	public $products = array();
-	public $product_detail = array();
+	/**
+	 * Product post type.
+	 *
+	 * @since  3.4.0
+	 * @access public
+	 * @var    string
+	 */
+	public $post_type = 'wpmem_product';
 	
+	/**
+	 * Product meta key.
+	 *
+	 * @since  3.2.0
+	 * @access public
+	 * @var    string
+	 */
+	public $post_meta = '_wpmem_products';
+
+	/**
+	 * Product meta key stem.
+	 *
+	 * @since  3.2.0
+	 * @access public
+	 * @var    string
+	 */
+	public $post_stem = '_wpmem_products_';
+
+	/**
+	 * Product details.
+	 *
+	 * @since  3.2.0
+	 * @access public
+	 * @var    array
+	 */
+	public $products = array();
+
+	/**
+	 * Product meta keyed by ID.
+	 *
+	 * @since  3.2.4
+	 * @access public
+	 * @var    array
+	 */
+	public $product_by_id = array();
+	
+	/**
+	 * Class constructor.
+	 *
+	 * @since 3.2.0
+	 *
+	 * @global object $wpmem
+	 */
 	function __construct() {
 		
 		$this->load_products();
@@ -30,43 +77,86 @@ class WP_Members_Products {
 		add_filter( 'wpmem_securify', array( $this, 'product_access' ) );
 	}
 	
+	/**
+	 * Loads product settings.
+	 *
+	 * @since 3.2.0
+	 */
 	function load_products() {
 		global $wpdb;
 		$sql    = "SELECT ID, post_title, post_name FROM " . $wpdb->prefix . "posts WHERE post_type = 'wpmem_product' AND post_status = 'publish';";
 		$result = $wpdb->get_results( $sql );
 		foreach ( $result as $plan ) {
-			$this->products[ $plan->post_name ] = $plan->post_title;
-			
-			$this->product_detail[ $plan->post_name ]['title'] = $plan->post_title;
+			$this->product_by_id[ $plan->ID ] = $plan->post_name;
+			$this->products[ $plan->post_name ]['title'] = $plan->post_title;			
 			$post_meta = get_post_meta( $plan->ID );
 			foreach ( $post_meta as $key => $meta ) {
 				if ( false !== strpos( $key, 'wpmem_product' ) ) {
 					if ( $key == 'wpmem_product_expires' ) {
 						$meta[0] = unserialize( $meta[0] );
 					}
-					$this->product_detail[ $plan->post_name ][ str_replace( 'wpmem_product_', '', $key ) ] = $meta[0];
+					$this->products[ $plan->post_name ][ str_replace( 'wpmem_product_', '', $key ) ] = $meta[0];
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Gets products assigned to a post.
+	 *
+	 * @since 3.2.4
+	 *
+	 * @param  integer $post_id
+	 * @return array   $products
+	 */
+	function get_post_products( $post_id ) {
+		$products = get_post_meta( $post_id, $this->post_meta, true );
+		return $products;
 	}
 
 	/**
 	 * Sets up custom access restriction by product.
 	 *
 	 * @since 3.2.0
+	 * @since 3.2.2 Merged check_product_access() logic for better messaging.
 	 *
+	 * @global object $post
 	 * @global object $wpmem
 	 * @param  string $content
 	 * @return string $content
 	 */
 	function product_access( $content ) {
 		
-		global $wpmem;
+		global $post, $wpmem;
 		// Is the user logged in and is this blocked content?
 		if ( is_user_logged_in() && wpmem_is_blocked() ) {
-			$access = $this->check_product_access();
+
+			// Get the post access products.
+			$post_products = $this->get_post_products( $post->ID );
+			// If the post is restricted to a product.
+			if ( $post_products ) {
+				if ( wpmem_user_has_access( $post_products ) ) {
+					$access = true;
+				} else {
+					// The error message for invalid users.
+					$access = false;
+				}
+			} else {
+				// Content that has no product restriction.
+				$access = true;
+			}
+			
 			// Handle content.
-			$content = ( $access ) ? $content : $wpmem->get_text( 'product_restricted' );
+			/**
+			 * Filter the product restricted message.
+			 *
+			 * @since 3.2.3
+			 *
+			 * @param string                The message.
+			 * @param array  $post_products Post products array.
+			 */
+			$content = ( $access ) ? $content : apply_filters( 'wpmem_product_restricted_msg', $wpmem->get_text( 'product_restricted' ), $post_products );
+			
 			// Handle comments.
 			if ( ! $access ) {
 				add_filter( 'wpmem_securify_comments', '__return_false' );
@@ -74,48 +164,6 @@ class WP_Members_Products {
 		}
 		// Return unfiltered content for all other cases.
 		return $content;
-	}
-
-	/**
-	 * Checks access restriction by product.
-	 *
-	 * @since 3.2.0
-	 *
-	 * @global object  $post
-	 * @global object  $wpmem
-	 * @return boolean        true if user has access, otherwise false.
-	 */
-	function check_product_access() {
-		
-		global $post, $wpmem;
-		// Is the user logged in and is this blocked content?
-		if ( is_user_logged_in() && wpmem_is_blocked() ) {
-			// Get the post access products.
-			$post_products = get_post_meta( $post->ID, $wpmem->membership->post_meta, true );
-			// If the post is restricted to a product.
-			if ( $post_products ) {
-				// @todo This is the nuts and bolts - work around whether a user has access
-				// to this product or not. 
-				/**
-				 * Filter whether the user has access or not.
-				 *
-				 * @since 3.2.0
-				 *
-				 * @param boolean $user_has_access
-				 */
-				$user_has_access = apply_filters( 'wpmem_user_has_access', $wpmem->user->has_access( $post_products ) );
-				if ( $user_has_access ) {
-					return true;
-				}
-				// The error message for invalid users.
-				return false;
-			} else {
-				// Content that has no product restriction.
-				return true;
-			}
-		}
-		// Return unfiltered content for all other cases.
-		return true;
 	}
 	
 	/**
@@ -171,7 +219,7 @@ class WP_Members_Products {
 			'show_in_rest'          => false,
 			//'register_meta_box_cb'  => '', // callback for meta box
 		);
-		register_post_type( 'wpmem_product', $args );
+		register_post_type( $this->post_type, $args );
 	}
 	
 }

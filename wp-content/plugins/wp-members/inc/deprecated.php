@@ -767,30 +767,6 @@ function wpmem_profile_update() {
 	}	
 }
 
-/**
- * Sets user profile update to multipart form data.
- *
- * If the fields array has a file or image field, this will echo the 
- * necessary "multipart/form-data" enctype for the form tag.
- *
- * @since 3.1.8
- * @deprecated 3.1.9
- */
-function wpmem_user_profile_multipart() {
-	
-	wpmem_write_log( "wpmem_user_profile_multipart() is deprecated. No alternative function exists." );
-	
-	global $wpmem;
-	$has_file = false;
-	foreach ( wpmem_fields() as $field ) {
-		if ( $field['type'] == 'file' || $field['type'] == 'image' ) {
-			$has_file = true;
-			break;
-		}
-	}
-	echo ( $has_file ) ? " enctype=\"multipart/form-data\"" : '';
-}
-
 if ( ! function_exists( 'wpmem_inc_status' ) ):
 /**
  * Generate users login status if logged in and gives logout link.
@@ -1092,7 +1068,7 @@ function wpmem_sc_fields( $atts, $content = null, $tag ) {
  * Logout link shortcode [wpmem_logout].
  *
  * @since 3.1.2
- * @since 3.2.0 Now a wrapper for WP_Members_Shortcodes::logout()
+ * @deprecated 3.2.0 Use WP_Members_Shortcodes::logout() instead.
  *
  * @global object $wpmem The WP_Members object.
  * @param  array  $atts {
@@ -1113,7 +1089,7 @@ function wpmem_sc_logout( $atts, $content, $tag ) {
  * TOS shortcode [wpmem_tos].
  *
  * @since 3.1.2
- * @since 3.2.0 Now a wrapper for WP_Members_Shortcodes::tos()
+ * @deprecated 3.2.0 Use WP_Members_Shortcodes::tos() instead.
  *
  * @global object $wpmem The WP_Members object.
  * @param  array  $atts {
@@ -1134,7 +1110,7 @@ function wpmem_sc_tos( $atts, $content, $tag ) {
  * Display user avatar.
  *
  * @since 3.1.7
- * @since 3.2.0 Now a wrapper for WP_Members_Shortcodes::avatar()
+ * @deprecated 3.2.0 Use WP_Members_Shortcodes::avatar() instead.
  *
  * @global object $wpmem The WP_Members object.
  * @param  array  $atts {
@@ -1156,7 +1132,7 @@ function wpmem_sc_avatar( $atts, $content, $tag ) {
  * Generates a login link with a return url.
  *
  * @since 3.1.7
- * @since 3.2.0 Now a wrapper for WP_Members_Shortcodes::login_link()
+ * @deprecated 3.2.0 Use WP_Members_Shortcodes::login_link() instead.
  *
  * @global object $wpmem The WP_Members object.
  * @param  array  $atts {
@@ -1180,7 +1156,7 @@ if ( ! function_exists( 'wpmem_inc_regemail' ) ):
  * @since 2.9.7 Major overhaul, added wpmem_email_filter filter.
  * @since 3.1.0 Can filter in custom shortcodes with wpmem_email_shortcodes.
  * @since 3.1.1 Added $custom argument for custom emails.
- * @since 3.2.0 Now a wrapper for WP_Members_Email::to_user().
+ * @deprecated 3.2.0 Use WP_Members_Email::to_user() instead.
  *
  * @global object $wpmem                The WP_Members object.
  * @global string $wpmem_mail_from      The email from address.
@@ -1199,55 +1175,59 @@ function wpmem_inc_regemail( $user_id, $password, $toggle, $wpmem_fields = null,
 }
 endif;
 
-
-if ( ! function_exists( 'wpmem_notify_admin' ) ):
+if ( ! function_exists( 'wpmem_check_activated' ) ):
 /**
- * Builds the email for admin notification of new user registration.
+ * Checks if a user is activated.
  *
- * @since 2.3
- * @since 3.2.0 Now a wrapper for WP_Members_Email::notify_admin().
+ * @since 2.7.1
+ * @deprecated 3.2.2 Use wpmem_is_user_activated() instead.
  *
- * @global object $wpmem                The WP_Members object.
- * @param  int    $user_id              The User's ID.
- * @param  array  $wpmem_fields         Array of the WP-Members fields (defaults to null).
- * @param  array  $field_data           Array of the registration data (defaults to null).
- */
-function wpmem_notify_admin( $user_id, $wpmem_fields = null, $field_data = null ) {
+ * @param  object $user     The WordPress User object.
+ * @param  string $username The user's username (user_login).
+ * @param  string $password The user's password.
+ * @return object $user     The WordPress User object.
+ */ 
+function wpmem_check_activated( $user, $username, $password ) {
+	wpmem_write_log( "wpmem_check_activated() is deprecated since WP-Members 3.2.2. Use wpmem_is_user_activated() instead" );
 	global $wpmem;
-	$wpmem->email->notify_admin( $user_id, $wpmem_fields, $field_data );
+	$user = $wpmem->user->check_activated( $user, $username, $password );
+	return $user;
 }
 endif;
 
-
 /**
- * Filters the wp_mail from address (if set).
+ * Activates a user.
  *
- * @since 2.7.0
- * @since 3.1.0 Converted to use email var in object.
- * @since 3.2.0 Now a wrapper for WP_Members_Email::from().
+ * If registration is moderated, sets the activated flag 
+ * in the usermeta. Flag prevents login when $wpmem->mod_reg
+ * is true (1). Function is fired from bulk user edit or
+ * user profile update.
  *
- * @global object $wpmem
- * @param  string $email
- * @return string $wpmem_mail_from|$email
+ * @since 2.4
+ * @since 3.1.6 Dependencies now loaded by object.
+ * @deprecated 3.2.4 Use wpmem_activate_user().
+ *
+ * @param int   $user_id
+ * @param bool  $chk_pass
+ * @uses  $wpdb WordPress Database object.
  */
-function wpmem_mail_from( $email ) {
-	global $wpmem;
-	return $wpmem->email->from( $email );
+function wpmem_a_activate_user( $user_id, $chk_pass = false ) {
+	wpmem_write_log( "wpmem_a_activate_user() is deprecated as of WP-Members 3.2.4. Use wpmem_activate_user instead" );
+	wpmem_activate_user( $user_id, $chk_pass );
 }
 
-
 /**
- * Filters the wp_mail from name (if set).
+ * Deactivates a user.
  *
- * @since 2.7.0
- * @since 3.1.0 Converted to use email var in object.
- * @since 3.2.0 Now a wrapper for WP_Members_Email::from_name().
+ * Reverses the active flag from the activation process
+ * preventing login when registration is moderated.
  *
- * @global object $wpmem
- * @param  string $name
- * @return string $wpmem_mail_from_name|$name
+ * @since 2.7.1
+ * @depreacted 3.2.4 Use wpmem_deactivate_user().
+ *
+ * @param int $user_id
  */
-function wpmem_mail_from_name( $name ) {
-	global $wpmem;
-	return $wpmem->email->from_name( $name );
+function wpmem_a_deactivate_user( $user_id ) {
+	wpmem_write_log( "wpmem_a_deactivate_user() is deprecated as of WP-Members 3.2.4. Use wpmem_deactivate_user instead" );
+	wpmem_deactivate_user( $user_id );
 }

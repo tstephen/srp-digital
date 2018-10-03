@@ -222,7 +222,7 @@ function wpmem_do_wp_newuser_form() {
 	echo '<table class="form-table"><tbody>';
 
 	$wpmem_fields = wpmem_fields( 'add_new' );
-	$exclude = wpmem_get_excluded_meta( 'register' );
+	$exclude = wpmem_get_excluded_meta( 'wp-register' );
 
 	foreach ( $wpmem_fields as $meta_key => $field ) {
 
@@ -377,7 +377,7 @@ function wpmem_wp_reg_finalize( $user_id ) {
 		$exclude = wpmem_get_excluded_meta( 'wp-register' );
 		foreach ( wpmem_fields( 'wp_finalize' ) as $meta_key => $field ) {
 			$value = wpmem_get( $meta_key, false );
-			if ( $value && ! in_array( $meta_key, $exclude ) && 'file' != $field['type'] && 'image' != $field['type'] ) {
+			if ( false !== $value && ! in_array( $meta_key, $exclude ) && 'file' != $field['type'] && 'image' != $field['type'] ) {
 				if ( 'multiselect' == $field['type'] || 'multicheckbox' == $field['type'] ) {
 					$value = implode( $field['delimiter'], $value );
 				}

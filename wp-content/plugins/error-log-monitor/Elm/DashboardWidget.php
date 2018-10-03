@@ -132,6 +132,12 @@ class Elm_DashboardWidget {
 
 			echo '<div class="elm-upgrade-notice-links">';
 			printf(
+				'<a href="%s" target="_blank" rel="noopener" title="Opens in a new tab">%s</a>',
+				esc_attr('https://errorlogmonitor.com/'),
+				_x('Details', 'a link to Pro version information', 'error-log-monitor')
+			);
+			echo ' | ';
+			printf(
 				'<a href="%s">%s</a>',
 				esc_attr(wsh_elm_fs()->get_upgrade_url()),
 				__('View Pricing', 'error-log-monitor')
@@ -486,7 +492,10 @@ class Elm_DashboardWidget {
 				$isMundane[$index] = 1;
 			} else if ( $this->endsWithAny(
 				$fileName,
-				array('/wp-load.php', '/wp-config.php', '/wp-settings.php', '/wp-admin/admin.php', '/wp-admin/menu.php',)
+				array(
+					'/wp-load.php', '/wp-config.php', '/wp-settings.php', '/wp-admin/admin.php', '/wp-admin/menu.php',
+					'/wp-includes/template-loader.php', '/wp-blog-header.php', '/wp-includes/template.php',
+				)
 			) ) {
 				//Hide core files that are included on almost every page load.
 				$isMundane[$index] = 1;
@@ -1020,8 +1029,21 @@ class Elm_DashboardWidget {
 	}
 
 	public function displayProSection() {
+		if ( !current_user_can('manage_options') ) {
+			return;
+		}
+
+		$accountLink = null;
+		if ( wsh_elm_fs()->is_registered() ) {
+			$accountLink = sprintf(
+				'<a href="%s">%s</a>',
+				esc_attr(wsh_elm_fs()->get_account_url()),
+				_x('Account', 'Freemius account link', 'error-log-monitor')
+			);
+		}
+
 		//Pro version call-to-action.
-		if ( wsh_elm_fs()->is_not_paying() && current_user_can('manage_options') ) {
+		if ( wsh_elm_fs()->is_not_paying() ) {
 			echo 'Upgrade to Pro to get these additional features: ';
 			echo '<ul class="elm-pro-features">';
 			echo '<li>"Summary" tab that groups together identical errors.</li>';
@@ -1030,6 +1052,13 @@ class Elm_DashboardWidget {
 			echo '</ul>';
 
 			echo '<p>';
+			printf(
+				'<a href="%s" target="_blank" rel="noopener" title="Opens in a new tab">%s</a>',
+				esc_attr('https://errorlogmonitor.com/'),
+				_x('Details', 'a link to Pro version information', 'error-log-monitor')
+			);
+			echo ' | ';
+
 			if ( wsh_elm_fs()->is_pricing_page_visible() ) {
 				printf(
 					'<a href="%s">%s</a>',
@@ -1038,15 +1067,12 @@ class Elm_DashboardWidget {
 				);
 			}
 
-			if ( wsh_elm_fs()->is_registered() ) {
-				echo ' | ';
-				printf(
-					'<a href="%s">%s</a>',
-					esc_attr(wsh_elm_fs()->get_account_url()),
-					_x('Account', 'Freemius account link', 'error-log-monitor')
-				);
+			if ( !empty($accountLink) ) {
+				echo ' | ' . $accountLink;
 			}
 			echo '</p>';
+		} else if ( !empty($accountLink) ) {
+			echo '<p>' . $accountLink . '</p>';
 		}
 	}
 

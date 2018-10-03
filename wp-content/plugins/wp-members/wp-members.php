@@ -3,7 +3,7 @@
 Plugin Name: WP-Members
 Plugin URI:  https://rocketgeek.com
 Description: WP access restriction and user registration.  For more information on plugin features, refer to <a href="https://rocketgeek.com/plugins/wp-members/users-guide/">the online Users Guide</a>. A <a href="https://rocketgeek.com/plugins/wp-members/quick-start-guide/">Quick Start Guide</a> is also available. WP-Members(tm) is a trademark of butlerblog.com.
-Version:     3.2.2.1
+Version:     3.2.4.1
 Author:      Chad Butler
 Author URI:  http://butlerblog.com/
 Text Domain: wp-members
@@ -66,7 +66,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Initialize constants.
-define( 'WPMEM_VERSION',    '3.2.2.1' );
+define( 'WPMEM_VERSION',    '3.2.4.1' );
 define( 'WPMEM_DB_VERSION', '2.1.4' );
 define( 'WPMEM_DEBUG', false );
 define( 'WPMEM_DIR',  plugin_dir_url ( __FILE__ ) );
@@ -153,7 +153,7 @@ function wpmem_install() {
 	/**
 	 * Load the install file.
 	 */
-	require_once( WPMEM_PATH . 'wp-members-install.php' );
+	require_once( WPMEM_PATH . 'inc/install.php' );
 
 	// Multisite requires different install process.
 	if ( is_multisite() ) {
@@ -211,7 +211,7 @@ function wpmem_mu_new_site( $blog_id, $user_id, $domain, $path, $site_id, $meta 
 	/**
 	 * Load the install file.
 	 */
-	require_once( WPMEM_PATH . 'wp-members-install.php' );
+	require_once( WPMEM_PATH . 'inc/install.php' );
 
 	// Switch to the new blog.
 	switch_to_blog( $blog_id );

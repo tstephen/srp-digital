@@ -125,7 +125,7 @@ class WP_Members_Admin_API {
 		add_action( 'show_user_profile',          array( 'WP_Members_User_Profile', 'profile' ) );
 		add_action( 'edit_user_profile',          array( 'WP_Members_User_Profile', 'profile' ) );
 		add_action( 'profile_update',             array( 'WP_Members_User_Profile', 'update' ) );
-		if ( current_user_can( 'edit_users' ) ) {
+		if ( current_user_can( 'list_users' ) ) {
 			add_action( 'admin_footer-users.php',     'wpmem_bulk_user_action' );
 			add_action( 'load-users.php',             'wpmem_users_page_load' );
 			add_action( 'admin_notices',              'wpmem_users_admin_notices' );
@@ -461,8 +461,7 @@ class WP_Members_Admin_API {
 		$this->current_form = $current_form;
 		$this->current_form_fields = $fields;
 		*/
-		$current_form = wpmem_get( 'form', $form, 'get' ); //( isset( $_GET['form'] ) ) ? $_GET['form'] : $form;
-		$this->current_form = $current_form;
+		$this->current_form = sanitize_text_field( wpmem_get( 'form', $form, 'get' ) ); //( isset( $_GET['form'] ) ) ? $_GET['form'] : $form;
 		global $wpmem;
 		// Add numeric array form fields as associative
 		//foreach( $wpmem->fields as $field ) {
@@ -508,18 +507,20 @@ class WP_Members_Admin_API {
 	 * @since 3.2.0 Moved into admin object, renamed dashboard_enqueue_scripts().
 	 * @since 3.2.1 Load js for post.php hook.
 	 *
-	 * @param str $hook The admin screen hook being loaded.
+	 * @global object $wpmem
+	 * @param  string $hook The admin screen hook being loaded.
 	 */
 	function dashboard_enqueue_scripts( $hook ) {
-		if ( 'edit.php' == $hook || 'settings_page_wpmem-settings' == $hook || 'post.php' == $hook || 'user-edit.php' == $hook ) {
+		global $wpmem;
+		if ( 'edit.php' == $hook || 'settings_page_wpmem-settings' == $hook || 'post.php' == $hook || 'post-new.php' == $hook || 'user-edit.php' == $hook || 'profile.php' == $hook ) {
 			wp_enqueue_style( 'wpmem-admin', WPMEM_DIR . 'admin/css/admin.css', '', WPMEM_VERSION );
 		} 
-		if ( 'settings_page_wpmem-settings' == $hook || 'post.php' == $hook ) {
+		if ( 'settings_page_wpmem-settings' == $hook || 'post.php' == $hook || 'post-new.php' == $hook  ) {
 			wp_enqueue_script( 'wpmem-admin', WPMEM_DIR . 'admin/js/admin.js', '', WPMEM_VERSION );
 		}
-		if ( 'post.php' == $hook ) {
-			wp_register_style( 'select2css', '//cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.css', false, '1.0', 'all' );
-			wp_register_script( 'select2', '//cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.js', array( 'jquery' ), '1.0', true );
+		if ( ( 'post.php' == $hook || 'post-new.php' == $hook ) && 1 == $wpmem->enable_products ) {
+			wp_register_style( 'select2css', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/css/select2.min.css', false, '4.0.5', 'all' );
+			wp_register_script( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/js/select2.min.js', array( 'jquery' ), '4.0.5', true );
 			wp_enqueue_style( 'select2css' );
 			wp_enqueue_script( 'select2' );
 		}
@@ -545,6 +546,29 @@ class WP_Members_Admin_API {
 			$links = array_merge( array( $settings_link ), $links );
 		}
 		return $links;
+	}
+
+	/**
+	 * Returns an array of WordPress reserved terms.
+	 *
+	 * @since 3.0.2
+	 * @since 3.2.3 Moved to WP_Members_Admin_API class.
+	 *
+	 * @return array An array of WordPress reserved terms.
+	 */
+	function wp_reserved_terms() {
+		$reserved_terms = array( 'attachment', 'attachment_id', 'author', 'author_name', 'calendar', 'cat', 'category', 'category__and', 'category__in', 'category__not_in', 'category_name', 'comments_per_page', 'comments_popup', 'customize_messenger_channel', 'customized', 'cpage', 'day', 'debug', 'error', 'exact', 'feed', 'fields', 'hour', 'link_category', 'm', 'minute', 'monthnum', 'more', 'name', 'nav_menu', 'nonce', 'nopaging', 'offset', 'order', 'orderby', 'p', 'page', 'page_id', 'paged', 'pagename', 'pb', 'perm', 'post', 'post__in', 'post__not_in', 'post_format', 'post_mime_type', 'post_status', 'post_tag', 'post_type', 'posts', 'posts_per_archive_page', 'posts_per_page', 'preview', 'robots', 'role', 's', 'search', 'second', 'sentence', 'showposts', 'static', 'subpost', 'subpost_id', 'tag', 'tag__and', 'tag__in', 'tag__not_in', 'tag_id', 'tag_slug__and', 'tag_slug__in', 'taxonomy', 'tb', 'term', 'theme', 'type', 'w', 'withcomments', 'withoutcomments', 'year' );
+
+		/**
+		 * Filter the array of reserved terms.
+		 *
+		 * @since 3.0.2
+		 *
+		 * @param array $reserved_terms
+		 */
+		$reserved_terms = apply_filters( 'wpmem_wp_reserved_terms', $reserved_terms );
+
+		return $reserved_terms;
 	}
 } // End of WP_Members_Admin_API class.
 

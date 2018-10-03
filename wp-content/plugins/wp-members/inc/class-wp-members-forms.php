@@ -34,6 +34,7 @@ class WP_Members_Forms {
 	 * @since 3.1.6 Added $placeholder.
 	 * @since 3.1.7 Added number type & $min, $max, $title and $pattern attributes.
 	 * @since 3.2.0 Added $id argument.
+	 * @since 3.2.4 Added radio group and multiple checkbox individual item labels.
 	 *
 	 * @param array  $args {
 	 *     @type string  $id
@@ -162,18 +163,21 @@ class WP_Members_Forms {
 		case "multicheckbox":
 			$class = ( 'textbox' == $class ) ? "checkbox" : $class;
 			$str = '';
+			$num = 1;
 			foreach ( $value as $option ) {
 				$pieces = explode( '|', $option );
 				$values = ( empty( $compare ) ) ? array() : ( is_array( $compare ) ? $compare : explode( $delimiter, $compare ) );
 				$chk = ( isset( $pieces[2] ) && '' == $compare ) ? $pieces[1] : '';
 				if ( isset( $pieces[1] ) && '' != $pieces[1] ) {
+					$id_value = esc_attr( $id . '[' . $pieces[1] . ']' );
+					$label = wpmem_form_label( array( 'meta_key'=>$id_value, 'label'=>esc_html( __( $pieces[0], 'wp-members' ) ), 'type'=>'radio', 'id'=>$id_value ) );
 					$str = $str . $this->create_form_field( array(
-						'id'      => $id . '[' . $pieces[1] . ']',
+						'id'      => $id_value,
 						'name'    => $name . '[]',
 						'type'    => 'checkbox',
 						'value'   => $pieces[1],
 						'compare' => ( in_array( $pieces[1], $values ) ) ? $pieces[1] : $chk,
-					) ) . "&nbsp;" . esc_html( $pieces[0] ) . "<br />\n";
+					) ) . "&nbsp;" . $label . "<br />\n";
 				} else {
 					$str = $str . '<span class="div_multicheckbox_separator">' . esc_html( $pieces[0] ) . "</span><br />\n";
 				}
@@ -186,13 +190,14 @@ class WP_Members_Forms {
 			$num = 1;
 			foreach ( $value as $option ) {
 				$pieces = explode( '|', $option );
-				$id = $this->sanitize_class( $id . '_' . $num );
+				$id_num = $id . '_' . $num;
 				if ( isset( $pieces[1] ) && '' != $pieces[1] ) {
-					$str = $str . "<input type=\"radio\" name=\"$name\" id=\"$id\" value=\"" . esc_attr( $pieces[1] ) . '"' . checked( $pieces[1], $compare, false ) . ( ( $required ) ? " required " : " " ) . "> " . esc_html( __( $pieces[0], 'wp-members' ) ) . "<br />\n";
+					$label = wpmem_form_label( array( 'meta_key'=>esc_attr( $id_num ), 'label'=>esc_html( __( $pieces[0], 'wp-members' ) ), 'type'=>'radio', 'id'=>esc_attr( "label_" . $id_num ) ) );
+					$str = $str . "<input type=\"radio\" name=\"$name\" id=\"" . esc_attr( $id_num ) . "\" value=\"" . esc_attr( $pieces[1] ) . '"' . checked( $pieces[1], $compare, false ) . ( ( $required ) ? " required " : " " ) . "> $label<br />\n";
+					$num++;
 				} else {
 					$str = $str . '<span class="div_radio_separator">' . esc_html( __( $pieces[0], 'wp-members' ) ) . "</span><br />\n";
 				}
-				$num++;
 			}
 			break;		
 	
@@ -205,11 +210,13 @@ class WP_Members_Forms {
 	 * Create form label.
 	 *
 	 * @since 3.1.7
+	 * @since 3.2.4 Added $id
 	 *
 	 * @param array  $args {
 	 *     @type string $meta_key
-	 *     @type string $label_text
+	 *     @type string $label
 	 *     @type string $type
+	 *     @type string $id       (optional)
 	 *     @type string $class    (optional)
 	 *     @type string $required (optional)
 	 *     @type string $req_mark (optional)
@@ -223,6 +230,7 @@ class WP_Members_Forms {
 		$label      = $args['label'];
 		$type       = $args['type'];
 		$class      = ( isset( $args['class']    ) ) ? $args['class']    : false;
+		$id         = ( isset( $args['id']       ) ) ? $args['id']       : false;
 		$required   = ( isset( $args['required'] ) ) ? $args['required'] : false;
 		$req_mark   = ( isset( $args['req_mark'] ) ) ? $args['req_mark'] : false;
 		
@@ -231,8 +239,10 @@ class WP_Members_Forms {
 		if ( ! $class ) {
 			$class = ( $type == 'password' || $type == 'email' || $type == 'url' ) ? 'text' : $type;
 		}
+		
+		$id = ( $id ) ? ' id="' . esc_attr( $id ) . '"' : '';
 
-		$label = '<label for="' . esc_attr( $meta_key ) . '" class="' . $this->sanitize_class( $class ) . '">' . __( $label, 'wp-members' );
+		$label = '<label for="' . esc_attr( $meta_key ) . '"' . $id . ' class="' . $this->sanitize_class( $class ) . '">' . __( $label, 'wp-members' );
 		$label = ( $required ) ? $label . $req_mark : $label;
 		$label = $label . '</label>';
 		
@@ -834,7 +844,7 @@ class WP_Members_Forms {
 				} 
 
 				// Gets the field value for edit profile.
-				if ( ( 'edit' == $tag ) && ( '' == $wpmem->regchk ) ) { 
+				if ( ( 'edit' == $tag ) && ( '' == $wpmem->regchk ) ) {
 					switch ( $meta_key ) {
 						case( 'description' ):
 						case( 'textarea' == $field['type'] ):
@@ -1062,7 +1072,8 @@ class WP_Members_Forms {
 		 */
 		$rows = apply_filters( 'wpmem_register_form_rows', $rows, $tag );
 		
-		// Make sure all keys are set.
+		// Make sure all keys are set just in case someone didn't return a proper array through the filter.
+		// @todo Merge this with the next foreach loop so we only have to foreach one time.
 		$row_keys = array( 'meta', 'type', 'value', 'values', 'label_text', 'row_before', 'label', 'field_before', 'field', 'field_after', 'row_after' );
 		foreach ( $rows as $meta_key => $row ) {
 			foreach ( $row_keys as $check_key ) {

@@ -2,9 +2,9 @@
 Contributors: mmaunder 
 Tags: security, firewall, malware scanner, web application firewall, antivirus, block hackers, country blocking, clean hacked site, blacklist, waf, login security
 Requires at least: 3.9
-Requires PHP: 5.2
+Requires PHP: 5.3
 Tested up to: 4.9.8
-Stable tag: 7.1.10
+Stable tag: 7.1.15
 
 Secure your website with the most comprehensive WordPress security plugin. Firewall, malware scan, blocking, live traffic, login security & more.
 
@@ -34,7 +34,6 @@ Wordfence includes an endpoint firewall and malware scanner that were built from
 #### SECURITY TOOLS
 * With Live Traffic, monitor visits and hack attempts not shown in other analytics packages in real time; including origin, their IP address, the time of day and time spent on your site.
 * [Premium] Stop brute force attacks permanently by using two factor authentication, one of the most secure forms of remote system authentication available.
-* The free version of Wordfence includes an excellent comment spam filter. [Premium] An advanced comment spam filter is automatically enabled for premium customers.
 * Block attackers by IP or build advanced rules based on IP Range, Hostname, User Agent and Referrer. [Premium] Country blocking available with Wordfence Premium.
 
 == Installation ==
@@ -171,6 +170,43 @@ Secure your website with Wordfence.
 
 
 == Changelog ==
+
+= 7.1.15 =
+* Fix: Addressed a plugin conflict with the composer autoloader.
+
+= 7.1.14 =
+* Improvement: Reduced queries and potential table size for rate limiting-related data.
+* Improvement: Updated the internal browscap database.
+* Improvement: Better error reporting for scan failures due to connectivity issues.
+* Improvement: WAF-related file permissions will now lock down further when possible.
+* Improvement: Hardening for sites on servers with insecure configuration, which should not be enabled on publicly accessible servers. Thanks Janek Vind.
+* Change: Switched the minimum PHP version to 5.3.
+* Fix: Prevent bypass of author enumeration prevention by using invalid parameters. Thanks Janek Vind.
+* Fix: Wordfence crons will now automatically reschedule if missing for any reason.
+* Fix: Fixed an issue where the block counts and total IPs blocked values on the dashboard might not agree.
+* Fix: Corrected the message shown on Live Traffic when a country blocking bypass URL is used.
+* Fix: Removed extra spacing in the example ranges for "Whitelisted IP addresses that bypass all rules"
+
+= 7.1.12 =
+* Improvement: Updated bundled GeoIP database.
+* Improvement: Restructured the WAF configuration storage to be more resilient on hosts with no file locking support.
+* Change: Moved the settings import/export to the Tools page.
+* Change: New installations will now use lowercase table names to avoid issues with some backup plugins and Windows-based sites.
+* Fix: The notice and repair link for an unreadable WAF configuration now work correctly.
+* Fix: Improved appearance of some stat components on smaller screens.
+* Fix: Fixed duplicate entries with different status codes appearing in detailed live traffic.
+* Fix: Added better caching for the breached password check to compensate for sites that prevent the cache from expiring correctly.
+* Fix: Changing the frequency of the activity summary email now reschedules it.
+
+= 7.1.11 =
+* Improvement: Added a custom message field that will show on all block pages.
+* Improvement: Improved the standard appearance for block pages.
+* Improvement: Live Traffic now better displays failed logins.
+* Improvement: Added a constant to prevent direct MySQLi use for hosts with unsupported DB configurations.
+* Improvement: Malware scan results have been modified to include both a public identifier and description.
+* Change: Description updated on the Live Traffic page.
+* Fix: Removed an empty file hash from the old Wordpress core file detection.
+* Fix: Update locking now works on multisites that have removed the original site.
 
 = 7.1.10 =
 * Improvement: Better labeling in Live Traffic for 301 and 302 redirects.

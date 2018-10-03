@@ -10,6 +10,8 @@ class Elm_Plugin {
 	private $emailCronJob = null;
 	private $pluginFile = '';
 
+	private $wizard;
+
 	/**
 	 * @var scbCron
 	 */
@@ -25,6 +27,8 @@ class Elm_Plugin {
 		} else {
 			add_action('plugins_loaded', array($this, 'loadTextDomain'));
 		}
+
+		add_action('init', array($this, 'initSetupWizard'));
 
 		$this->createDashboardWidget();
 		add_action('elm_settings_changed', array($this, 'updateEmailSchedule'));
@@ -454,5 +458,11 @@ class Elm_Plugin {
 
 		$remainingBytes = $currentLimitBytes - memory_get_usage();
 		return max(0, $remainingBytes);
+	}
+
+	public function initSetupWizard() {
+		if ( is_admin() && current_user_can('update_core') ) {
+			$this->wizard = new Elm_SetupWizard($this);
+		}
 	}
 }

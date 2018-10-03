@@ -15,7 +15,8 @@ class Elm_PhpErrorLog {
 	 * @return Elm_PhpErrorLog|WP_Error An instance of this log reader, or WP_Error if error logging is not configured properly.
 	 */
 	public static function autodetect() {
-		$errorLoggingEnabled = ini_get('log_errors') && (ini_get('log_errors') != 'Off');
+		$logErrors = strtolower(strval(ini_get('log_errors')));
+		$errorLoggingEnabled = !empty($logErrors) && !in_array($logErrors, array('off', '0', 'false', 'no'));
 		$logFile = ini_get('error_log');
 
 		//Check for common problems that could prevent us from displaying the error log.
