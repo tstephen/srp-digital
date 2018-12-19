@@ -3,7 +3,7 @@
 Plugin Name: Error Log Monitor
 Plugin URI: http://w-shadow.com/blog/2012/07/25/error-log-monitor-plugin/
 Description: Adds a Dashboard widget that displays the last X lines from your PHP error log, and can also send you email notifications about newly logged errors.
-Version: 1.6.2
+Version: 1.6.3
 Author: Janis Elsts
 Author URI: http://w-shadow.com/
 Text Domain: error-log-monitor
@@ -79,6 +79,14 @@ if ( !function_exists('wsh_elm_fs') ) {
 	spl_autoload_register('error_log_monitor_autoloader');
 
 	function error_log_monitor_init() {
+		//Compatibility workaround: Ensure initialisation code is only run once. Plugins that call
+		//scb_init() in or after plugins_loaded can cause this to be executed multiple times.
+		static $isInitDone = false;
+		if ( $isInitDone ) {
+			return;
+		}
+		$isInitDone = true;
+
 		new Elm_Plugin(__FILE__);
 	}
 
