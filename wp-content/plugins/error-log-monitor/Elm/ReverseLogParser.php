@@ -166,10 +166,12 @@ class Elm_ReverseLogParser implements OuterIterator {
 		//Note: Native PHP stack traces are deepest-call-first (i.e. most recent call first).
 		$stackTrace = array();
 
-		//The last line of the stack trace can be "#123 /path/to/x.php..." or "  thrown in /path/to/x.php..."
+		//The last line of the stack trace can be "#123 /path/to/x.php..." or "  [thrown] in /path/to/x.php..."
+		//However, the last line can be truncated at any point if the message + stack trace exceeds
+		//the log_errors_max_len setting. log_errors_max_len defaults to 1024 bytes.
 		$line = $this->readNextLine();
 		if ( isset($line) && preg_match('/^(\s\sthrown in |#\d{1,3}\s\S)/', $line) ) {
-			$item = $this->parsePhpStackTraceItem($line);
+			$item = $this->parsePhpStackTraceItem($line, true);
 			if ( $item !== null ) {
 				$stackTrace[] = $item;
 			} else {
@@ -211,8 +213,9 @@ class Elm_ReverseLogParser implements OuterIterator {
 		return null;
 	}
 
-	private function parsePhpStackTraceItem($message) {
-		//It's usually "#123 C:\path\to\plugin.php(456): functionCallHere()"
+	private function parsePhpStackTraceItem($message, $isLastLine = false) {
+		//It's usually "#123 C:\path\to\plugin.php(456): functionCallHere()".
+		//The last line of a very long entry can be truncated.
 		if ( preg_match(
 			'@^\#(?P<index>\d++)\s  # Stack frame index.
 			(?:
@@ -248,6 +251,14 @@ class Elm_ReverseLogParser implements OuterIterator {
 				$item['line'] = $matches['line'];
 			}
 
+			return $item;
+		} else if (
+			//Simplified parsing for truncated stack trace entries.
+			$isLastLine
+			&& preg_match('@^\#(?P<index>\d++)\s@', $message, $matches)
+			&& preg_match('@\son\sline\s\d++$@', $message)
+		) {
+			$item = array('call' => trim(substr($message, strlen($matches[0]))));
 			return $item;
 		} else {
 			return null;

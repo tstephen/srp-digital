@@ -132,11 +132,11 @@ class Elm_SeverityFilter extends Elm_LogFilter {
 	 */
 	public function accept() {
 		$entry = $this->getInnerIterator()->current();
-		if ( !isset($entry, $entry['level']) ) {
+		if ( !isset($entry) ) {
 			return true;
 		}
 
-		if ( $this->isSeverityLevelIncluded($entry['level']) ) {
+		if ( $this->isSeverityLevelIncluded(isset($entry['level']) ? $entry['level'] : self::UNKNOWN_LEVEL_GROUP) ) {
 			return true;
 		} else {
 			$this->skippedEntryCount++;

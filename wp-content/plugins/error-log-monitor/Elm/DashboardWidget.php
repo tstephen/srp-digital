@@ -59,11 +59,11 @@ class Elm_DashboardWidget {
 	}
 
 	private function userCanClearLog() {
-		return $this->userCanSeeWidget() && current_user_can('update_core');
+		return $this->userCanSeeWidget() && current_user_can('install_plugins');
 	}
 
 	private function userCanChangeSettings() {
-		return $this->userCanSeeWidget() && current_user_can('update_core');
+		return $this->userCanSeeWidget() && current_user_can('install_plugins');
 	}
 
 	public function enqueueWidgetDependencies($hook) {
@@ -79,7 +79,7 @@ class Elm_DashboardWidget {
 				'elm-dashboard-widget-styles',
 				plugins_url($this->widgetCssPath, $this->plugin->getPluginFile()),
 				array(),
-				'20180801'
+				'20190125'
 			);
 		}
 	}
@@ -218,6 +218,14 @@ class Elm_DashboardWidget {
 		}
 	}
 
+	/**
+	 * @return array
+	 */
+	protected function getItemActionLinks() {
+		$links = array($this->getIgnoreLink());
+		return $links;
+	}
+
 	private function getIgnoreLink() {
 		static $html = null;
 		if ( $html === null ) {
@@ -251,7 +259,7 @@ class Elm_DashboardWidget {
 					</td>',
 				esc_attr($line['message']),
 				!empty($line['timestamp']) ? $this->plugin->formatTimestamp($line['timestamp']) : '',
-				$this->getIgnoreLink()
+				implode(' | ', $this->getItemActionLinks())
 			);
 
 			echo '<td>';
@@ -282,7 +290,7 @@ class Elm_DashboardWidget {
 			$listClasses[] = 'elm-list-with-stack-traces';
 		}
 
-		$actions = sprintf('<div class="elm-line-actions">%s</div>', $this->getIgnoreLink());
+		$actions = sprintf('<div class="elm-line-actions">%s</div>', implode(' | ', $this->getItemActionLinks()));
 
 		echo '<ul class="', esc_attr(implode(' ', $listClasses)), '">';
 		foreach ($lines as $line) {
@@ -389,7 +397,7 @@ class Elm_DashboardWidget {
 				//Remove the "PHP " prefix from trace items.
 				$item = preg_replace('@^PHP @', '', $item, 1);
 				printf(
-					'<li class="%s"><span class="elm-stack-frame-content">%s</span></li>' . "\n",
+					'<tr class="%s"><td colspan="2"><span class="elm-stack-frame-content">%s</span></td></tr>' . "\n",
 					implode(' ', $classes),
 					$this->insertPathBreaks(esc_html($this->plugin->formatLogMessage($item)))
 				);
@@ -595,6 +603,10 @@ class Elm_DashboardWidget {
 	public function handleSettingsForm() {
 		if ( !$this->userCanChangeSettings() ) {
 			_e("Sorry, you are not allowed to change these settings.", 'error-log-monitor');
+
+			//Hide the "Submit" button. WordPress doesn't provide any way to remove it completely.
+			echo '<style type="text/css">#ws_php_error_log .submit { display: none; }</style>';
+
 			return;
 		}
 

@@ -149,6 +149,24 @@ body.has-fs-modal {
 #the-list .deactivate > .fs-slug {
   display: none; }
 
+.fs-modal.fs-modal-subscription-cancellation .fs-price-increase-warning {
+  color: red;
+  font-weight: bold;
+  padding: 0 25px;
+  margin-bottom: 0; }
+.fs-modal.fs-modal-subscription-cancellation ul.subscription-actions label input {
+  float: left;
+  top: 5px;
+  position: relative; }
+  .rtl .fs-modal.fs-modal-subscription-cancellation ul.subscription-actions label input {
+    float: right; }
+.fs-modal.fs-modal-subscription-cancellation ul.subscription-actions label span {
+  display: block;
+  margin-left: 24px; }
+  .rtl .fs-modal.fs-modal-subscription-cancellation ul.subscription-actions label span {
+    margin-left: 0;
+    margin-right: 24px; }
+
 .fs-modal.fs-modal-license-activation .fs-modal-body input.license_key {
   width: 100%; }
 
@@ -412,5 +430,25 @@ a.show-license-resend-modal {
   max-width: 100%;
   margin: 0 auto;
   display: block; }
+
+.button-primary.warn {
+  box-shadow: 0 1px 0 #d2593c;
+  text-shadow: 0 -1px 1px #d2593c, 1px 0 1px #d2593c, 0 1px 1px #d2593c, -1px 0 1px #d2593c;
+  background: #f56a48;
+  border-color: #ec6544 #d2593c #d2593c; }
+  .button-primary.warn:hover {
+    background: #fd6d4a;
+    border-color: #d2593c; }
+  .button-primary.warn:focus {
+    box-shadow: 0 1px 0 #dd6041, 0 0 2px 1px #e4a796; }
+  .button-primary.warn:active {
+    background: #dd6041;
+    border-color: #d2593c;
+    box-shadow: inset 0 2px 0 #d2593c; }
+  .button-primary.warn.disabled {
+    color: #f5b3a1 !important;
+    background: #e76444 !important;
+    border-color: #d85e40 !important;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.1) !important; }
 
 /*# sourceMappingURL=dialog-boxes.css.map */
