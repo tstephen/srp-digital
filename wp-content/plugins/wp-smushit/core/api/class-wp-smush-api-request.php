@@ -8,6 +8,10 @@
  * @package WP_Smush
  */
 
+if ( ! defined( 'WPINC' ) ) {
+	die;
+}
+
 /**
  * Class WP_Smush_API_Request.
  */
@@ -85,23 +89,11 @@ class WP_Smush_API_Request {
 	 * @return string
 	 */
 	public function get_this_site() {
-		if ( ! is_multisite() || is_main_site() ) {
-			if ( defined( 'WP_SMUSH_API_DOMAIN' ) && WP_SMUSH_API_DOMAIN ) {
-				return WP_SMUSH_API_DOMAIN;
-			}
-
-			if ( ! empty( $this->service->api_key ) ) {
-				return network_site_url();
-			}
-
-			return network_home_url();
+		if ( defined( 'WP_SMUSH_API_DOMAIN' ) && WP_SMUSH_API_DOMAIN ) {
+			return WP_SMUSH_API_DOMAIN;
 		}
 
-		if ( defined( 'WP_SMUSH_API_SUBDOMAIN' ) && WP_SMUSH_API_SUBDOMAIN ) {
-			return WP_SMUSH_API_SUBDOMAIN;
-		}
-
-		return get_site_url();
+		return network_site_url();
 	}
 
 	/**
@@ -175,14 +167,15 @@ class WP_Smush_API_Request {
 	 *
 	 * @since 3.0
 	 *
-	 * @param string $path  Endpoint route.
-	 * @param array  $data  Data array.
+	 * @param string $path    Endpoint route.
+	 * @param array  $data    Data array.
+	 * @param bool   $manual  If it's a manual check. Only manual on button click.
 	 *
 	 * @return mixed|WP_Error
 	 */
-	public function get( $path, $data = array() ) {
+	public function get( $path, $data = array(), $manual = false ) {
 		try {
-			$result = $this->request( $path, $data, 'get' );
+			$result = $this->request( $path, $data, 'get', $manual );
 			return $result;
 		} catch ( Exception $e ) {
 			return new WP_Error( $e->getCode(), $e->getMessage() );
@@ -281,10 +274,25 @@ class WP_Smush_API_Request {
 	 * @param string $path    API endpoint route.
 	 * @param array  $data    Data array.
 	 * @param string $method  API method.
+	 * @param bool   $manual  If it's a manual check. Only manual on button click.
 	 *
 	 * @return array|WP_Error
 	 */
-	private function request( $path, $data = array(), $method = 'post' ) {
+	private function request( $path, $data = array(), $method = 'post', $manual = false ) {
+		$defaults = array(
+			'time'  => time(),
+			'fails' => 0,
+		);
+
+		$last_run = WP_Smush_Settings::get_instance()->get_setting( WP_SMUSH_PREFIX . 'last_run_sync', $defaults );
+
+		$backoff = min( pow( 5, $last_run['fails'] ), HOUR_IN_SECONDS ); // Exponential 5, 25, 125, 625, 3125, 3600 max.
+		if ( $last_run['time'] > ( time() - $backoff ) && ! $manual ) {
+			$last_run['time'] = time();
+			WP_Smush_Settings::get_instance()->set_setting( WP_SMUSH_PREFIX . 'last_run_sync', $last_run );
+			return new WP_Error( 'api-backoff', __( '[WPMUDEV API] Skipped sync due to API error exponential backoff.', 'wp-smushit' ) );
+		}
+
 		$url = $this->get_api_url( $path );
 
 		$this->sign_request();
@@ -327,6 +335,18 @@ class WP_Smush_API_Request {
 			default:
 				$response = wp_remote_request( $url, $args );
 				break;
+		}
+
+		$last_run['time'] = time();
+
+		// Clear the API backoff if it's a manual scan or the API call was a success.
+		if ( $manual || ( ! is_wp_error( $response ) && 200 === wp_remote_retrieve_response_code( $response ) ) ) {
+			$last_run['fails'] = 0;
+			WP_Smush_Settings::get_instance()->set_setting( WP_SMUSH_PREFIX . 'last_run_sync', $last_run );
+		} else {
+			// For network errors, perform exponential backoff.
+			$last_run['fails'] = $last_run['fails'] + 1;
+			WP_Smush_Settings::get_instance()->set_setting( WP_SMUSH_PREFIX . 'last_run_sync', $last_run );
 		}
 
 		return $response;

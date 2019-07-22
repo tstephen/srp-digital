@@ -6,12 +6,12 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at https://rocketgeek.com
- * Copyright (c) 2006-2018  Chad Butler
+ * Copyright (c) 2006-2019  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @author Chad Butler
- * @copyright 2006-2018
+ * @copyright 2006-2019
  *
  * Functions Included:
  * - wpmem_inc_loginfailed
@@ -61,8 +61,6 @@ function wpmem_inc_loginfailed() {
 	 *
 	 * @since 2.9.0
 	 *
-	 * @todo Needs probably to pass user ID or some identifier so we can get user info without going to the post object and then get_user_by().
-	 *
 	 * @param array An array of arguments to merge with defaults.
 	 */
 	$args = apply_filters( 'wpmem_login_failed_args', '' );
@@ -80,8 +78,6 @@ function wpmem_inc_loginfailed() {
 	 * Filter the login failed dialog.
 	 *
 	 * @since 2.7.3
-	 *
-	 * @todo Needs probably to pass user ID or some identifier so we can get user info without going to the post object and then get_user_by().
 	 *
 	 * @param string $str The login failed dialog.
 	 */
@@ -406,6 +402,7 @@ if ( ! function_exists( 'wpmem_page_pwd_reset' ) ):
  * password forms for page=password shortcode.
  *
  * @since 2.7.6
+ * @since 3.2.6 Added nonce validation.
  *
  * @global object $wpmem
  * @param  string $wpmem_regchk
@@ -420,23 +417,16 @@ function wpmem_page_pwd_reset( $wpmem_regchk, $content ) {
 	
 		switch ( $wpmem_regchk ) {
 
-		case "pwdchangempty":
-			$content = wpmem_inc_regmessage( $wpmem_regchk, $wpmem->get_text( 'pwdchangempty' ) );
-			$content = $content . wpmem_inc_changepassword();
-			break;
+			case "pwdchangesuccess":
+				$content = $content . wpmem_inc_regmessage( $wpmem_regchk );
+				break;
 
-		case "pwdchangerr":
-			$content = wpmem_inc_regmessage( $wpmem_regchk );
-			$content = $content . wpmem_inc_changepassword();
-			break;
-
-		case "pwdchangesuccess":
-			$content = $content . wpmem_inc_regmessage( $wpmem_regchk );
-			break;
-
-		default:
-			$content = $content . wpmem_inc_changepassword();
-			break;
+			default:
+				if ( isset( $wpmem_regchk ) && '' != $wpmem_regchk ) {
+					$content .= wpmem_inc_regmessage( $wpmem_regchk, $wpmem->get_text( $wpmem_regchk ) );
+				}
+				$content = $content . wpmem_inc_changepassword();
+				break;
 		}
 
 	} else {
@@ -449,22 +439,18 @@ function wpmem_page_pwd_reset( $wpmem_regchk, $content ) {
 		} else {
 
 			switch( $wpmem_regchk ) {
-	
-			case "pwdreseterr":
-				$content = $content 
-					. wpmem_inc_regmessage( $wpmem_regchk )
-					. wpmem_inc_resetpassword();
-				$wpmem_regchk = ''; // Clear regchk.
-				break;
-	
-			case "pwdresetsuccess":
-				$content = $content . wpmem_inc_regmessage( $wpmem_regchk );
-				$wpmem_regchk = ''; // Clear regchk.
-				break;
-	
-			default:
-				$content = $content . wpmem_inc_resetpassword();
-				break;
+
+				case "pwdresetsuccess":
+					$content = $content . wpmem_inc_regmessage( $wpmem_regchk );
+					$wpmem_regchk = ''; // Clear regchk.
+					break;
+
+				default:
+					if ( isset( $wpmem_regchk ) && '' != $wpmem_regchk ) {
+						$content = wpmem_inc_regmessage( $wpmem_regchk, $wpmem->get_text( $wpmem_regchk ) );
+					}
+					$content = $content . wpmem_inc_resetpassword();
+					break;
 			}
 		
 		}
@@ -539,7 +525,7 @@ function wpmem_page_forgot_username( $wpmem_regchk, $content ) {
 			break;
 
 		case "usernamesuccess":
-			$email = ( isset( $_POST['user_email'] ) ) ? $_POST['user_email'] : '';
+			$email = ( isset( $_POST['user_email'] ) ) ? sanitize_email( $_POST['user_email'] ) : '';
 			$msg = sprintf( $wpmem->get_text( 'usernamesuccess' ), $email );
 			$content = $content . wpmem_inc_regmessage( 'usernamesuccess', $msg );
 			$wpmem->regchk = ''; // Clear regchk.

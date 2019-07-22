@@ -6,13 +6,13 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at https://rocketgeek.com
- * Copyright (c) 2006-2018 Chad Butler
+ * Copyright (c) 2006-2019 Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @subpackage WP-Members Registration Functions
  * @author Chad Butler
- * @copyright 2006-2018
+ * @copyright 2006-2019
  *
  * Functions Included:
  * - wpmem_registration
@@ -48,11 +48,9 @@ function wpmem_registration( $tag ) {
 	global $user_ID, $wpmem, $wpmem_themsg, $userdata; 
 	
 	// Check the nonce.
-	if ( defined( 'WPMEM_USE_NONCE' ) ) {
-		if ( empty( $_POST ) || ! wp_verify_nonce( $_POST['wpmem-form-submit'], 'wpmem-validate-submit' ) ) {
-			$wpmem_themsg = __( 'There was an error processing the form.', 'wp-members' );
-			return;
-		}
+	if ( empty( $_POST ) || ! wp_verify_nonce( $_REQUEST[ '_wpmem_' . $tag . '_nonce' ], 'wpmem_longform_nonce' ) ) {
+		$wpmem_themsg = __( 'There was an error processing the form.', 'wp-members' );
+		return;
 	}
 
 	// Is this a registration or a user profile update?
@@ -86,10 +84,10 @@ function wpmem_registration( $tag ) {
 					case 'multiselect':
 					case 'multicheckbox':
 						$delimiter = ( isset( $field['delimiter'] ) ) ? $field['delimiter'] : '|';
-						$wpmem->user->post_data[ $meta_key ] = ( isset( $_POST[ $meta_key ] ) ) ? implode( $delimiter, $_POST[ $meta_key ] ) : '';
+						$wpmem->user->post_data[ $meta_key ] = ( isset( $_POST[ $meta_key ] ) ) ? implode( $delimiter, wpmem_sanitize_array( $_POST[ $meta_key ] ) ) : '';
 						break;
 					case 'textarea':
-						$wpmem->user->post_data[ $meta_key ] = $_POST[ $meta_key ];
+						$wpmem->user->post_data[ $meta_key ] = sanitize_textarea_field( $_POST[ $meta_key ] );
 						break;
 					default:
 						$wpmem->user->post_data[ $meta_key ] = sanitize_text_field( $_POST[ $meta_key ] );
@@ -131,7 +129,7 @@ function wpmem_registration( $tag ) {
 	// Check for required fields, reverse the array for logical error message order.
 	foreach ( array_reverse( $wpmem->fields ) as $meta_key => $field ) {
 		// Validation if the field is required.
-		if ( $field['required'] ) { // @todo - verify $field['required']
+		if ( $field['required'] ) {
 			if ( 'file' == $field['type'] || 'image' == $field['type'] ) {
 				// If this is a new registration.
 				if ( 'register' == $tag ) {
@@ -142,8 +140,20 @@ function wpmem_registration( $tag ) {
 				}
 			} else {
 				// If the required field is any other field type.
-				if ( ! $wpmem->user->post_data[ $meta_key ] ) {
+				if ( null == $wpmem->user->post_data[ $meta_key ] ) {
 					$wpmem_themsg = sprintf( $wpmem->get_text( 'reg_empty_field' ), __( $field['label'], 'wp-members' ) );
+				}
+			}
+		}
+		
+		// Validate file field type.
+		if ( 'file' == $field['type'] || 'image' == $field['type'] ) {
+			$allowed_file_types = explode( '|', $field['file_types'] );
+			$msg_types  = implode( ', ', $allowed_file_types );
+			if ( ! empty( $_FILES[ $meta_key ]['name'] ) ) {
+				$extension = pathinfo( $_FILES[ $meta_key ]['name'], PATHINFO_EXTENSION );
+				if ( ! in_array( $extension, $allowed_file_types ) ) {
+					$wpmem_themsg = sprintf( $wpmem->get_text( 'reg_file_type' ), __( $field['label'], 'wp-members' ), str_replace( '|', ',', $msg_types ) );
 				}
 			}
 		}

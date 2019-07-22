@@ -6,12 +6,12 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at https://rocketgeek.com
- * Copyright (c) 2006-2018  Chad Butler
+ * Copyright (c) 2006-2019  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @author Chad Butler
- * @copyright 2006-2018
+ * @copyright 2006-2019
  *
  * Functions included:
  * - wpmem_a_build_options
@@ -57,8 +57,8 @@ function wpmem_a_build_options() {
 
 	/** This filter is documented in wp-members/inc/email.php */
 	$admin_email = apply_filters( 'wpmem_notify_addr', get_option( 'admin_email' ) );
-	$chg_email   = __( sprintf( '%sChange%s or %sFilter%s this address', '<a href="' . site_url( 'wp-admin/options-general.php', 'admin' ) . '">', '</a>', '<a href="https://rocketgeek.com/plugins/wp-members/users-guide/filter-hooks/wpmem_notify_addr/">', '</a>' ), 'wp-members' );
-	$help_link   = __( sprintf( 'See the %sUsers Guide on plugin options%s.', '<a href="https://rocketgeek.com/plugins/wp-members/users-guide/plugin-settings/options/" target="_blank">', '</a>' ), 'wp-members' );	
+	$chg_email   = sprintf( __( '%sChange%s or %sFilter%s this address', 'wp-members' ), '<a href="' . site_url( 'wp-admin/options-general.php', 'admin' ) . '">', '</a>', '<a href="https://rocketgeek.com/plugins/wp-members/users-guide/filter-hooks/wpmem_notify_addr/">', '</a>' );
+	$help_link   = sprintf( __( 'See the %sUsers Guide on plugin options%s.', 'wp-members' ), '<a href="https://rocketgeek.com/plugins/wp-members/users-guide/plugin-settings/options/" target="_blank">', '</a>' );	
 
 	// Build an array of post types
 	$post_types = get_post_types( array( 'public' => true, '_builtin' => false ), 'names', 'and' );
@@ -81,7 +81,8 @@ function wpmem_a_build_options() {
 			<div class="postbox">
 				<h3><span><?php _e( 'Need help?', 'wp-members' ); ?></span></h3>
 				<div class="inside">
-					<strong><i><?php echo $help_link; ?></i></strong>
+					<p><strong><i><?php echo $help_link; ?></i></strong></p>
+					<p><button id="opener">Get Settings Information</button></p>
 				</div>
 			</div>
 			<?php wpmem_a_rss_box(); ?>
@@ -182,7 +183,7 @@ function wpmem_a_build_options() {
 							/** This filter is defined in class-wp-members.php */
 							$dropin_folder = apply_filters( 'wpmem_dropin_folder', WPMEM_DROPIN_DIR );
 							$arr = array(
-								array(__('Enable Products', 'wp-members'),'wpmem_settings_products',__('Enables creation of different membership products'),'enable_products'),
+								array(__('Enable Products', 'wp-members'),'wpmem_settings_products',__('Enables creation of different membership products','wp-members'),'enable_products'),
 								array(__('Clone menus','wp-members'),'wpmem_settings_menus',__('Enables logged in menus','wp-members'),'clone_menus'),
 								array(__('Notify admin','wp-members'),'wpmem_settings_notify',sprintf(__('Notify %s for each new registration? %s','wp-members'),$admin_email,$chg_email),'notify'),
 								array(__('Moderate registration','wp-members'),'wpmem_settings_moderate',__('Holds new registrations for admin approval','wp-members'),'mod_reg'),
@@ -301,6 +302,62 @@ function wpmem_a_build_options() {
 			</div><!-- #post-body-content -->
 		</div><!-- #post-body -->
 	</div><!-- .metabox-holder -->
+<script>
+jQuery(document).ready(function($){
+	$( function() {
+		$( "#dialog-message" ).dialog({
+			autoOpen: false,
+			modal: true,
+			buttons: {
+				<?php _e( 'Close', 'wp-members' ); ?>: function() {
+					$( this ).dialog( "close" );
+				}
+			}
+		});
+		$( "#opener" ).on( "click", function() {
+			$( "#dialog-message" ).dialog( "open" );
+		});
+	} );
+	$("#select_all").click(function(){
+		$("textarea").select();
+		document.execCommand('copy');
+	});
+	$(window).resize(function() {
+		$("#dialog-message").dialog("option", "position", {my: "center", at: "center", of: window});
+	});
+});
+</script>
+<div id="dialog-message" title="<?php _e( 'WP-Members Settings', 'wp-members' ); ?>">
+<h3><span><?php _e( 'WP-Members Settings', 'wp-members' ); ?></span></h3>
+<p><?php _e( 'The following is your WP-Members settings information if needed for support.', 'wp-members' ); ?></p>
+<pre>
+<textarea cols=80 rows=10 align=left wrap=soft style="width:100%;" id="supportinfo" wrap="soft"><?php
+global $wp_version, $wpdb, $wpmem;
+echo "WP Version: " . $wp_version . "\r\n";
+echo "PHP Version: " . phpversion() . "\r\n";
+echo "MySQL Version: " . $wpdb->db_version() . "\r\n";
+wpmem_fields();
+print_r( $wpmem );
+
+echo '***************** Plugin Info *******************' . "\r\n";
+$all_plugins    = get_plugins();
+$active_plugins = get_option( 'active_plugins' );
+$active_display = ''; $inactive_display = '';
+foreach ( $all_plugins as $key => $value ) {
+if ( in_array( $key, $active_plugins ) ) {
+	$active_display.= $key . " | " . $value['Name'] . " | Version: " . $value['Version'] . "\r\n";
+} else {
+	$inactive_display.= $key . " | " . $value['Name'] . " | Version: " . $value['Version'] . "\r\n";
+}
+}
+echo "*************** Active Plugins **************** \r\n";
+echo $active_display;
+echo "*************** Inactive Plugins **************** \r\n";
+echo $inactive_display;
+?></textarea>
+</pre>
+<button id="select_all" class="ui-button-text"><?php _e( 'Click to Copy', 'wp-members' ); ?></button>
+	</div>
 	<?php
 }
 

@@ -7,13 +7,13 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at https://rocketgeek.com
- * Copyright (c) 2006-2018  Chad Butler
+ * Copyright (c) 2006-2019  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @subpackage WP-Members Utility Functions
  * @author Chad Butler 
- * @copyright 2006-2018
+ * @copyright 2006-2019
  */
 
 if ( ! function_exists( 'wpmem_securify' ) ):
@@ -146,14 +146,13 @@ if ( ! function_exists( 'wpmem_do_excerpt' ) ):
  * @since 2.6
  * @since 3.2.3 Now a wrapper for WP_Members::do_excerpt().
  *
- * @global object $post  The post object.
  * @global object $wpmem The WP_Members object.
  *
  * @param  string $content
  * @return string $content
  */
 function wpmem_do_excerpt( $content ) {
-	global $post, $more, $wpmem;
+	global $wpmem;
 	$content = $wpmem->do_excerpt( $content );
 	return $content;
 }
@@ -221,15 +220,17 @@ function wpmem_load_dropins() {
  *
  * @since 3.2.4
  *
- * @param mixed $date
+ * @param mixed $args
  * @return date $date
  */
-function wpmem_format_date( $date ) {
-	$args = array(
-		'date_format' => get_option( 'date_format' ),
-		'localize'    => true,
-		'date'        => $date,
-	);
+function wpmem_format_date( $args ) {
+	if ( ! is_array( $args ) ) {
+		$args = array(
+			'date_format' => get_option( 'date_format' ),
+			'localize'    => true,
+			'date'        => $args,
+		);
+	}
 	/**
 	 * Filter the date display and format settings.
 	 *
@@ -240,4 +241,38 @@ function wpmem_format_date( $date ) {
 	$args = apply_filters( 'wpmem_format_date_args', $args );
 	$date = ( true === $args['localize'] ) ? date_i18n( $args['date_format'], strtotime( $args['date'] ) ) : date( $args['date_format'], strtotime( $args['date'] ) );
 	return $date;
+}
+
+/**
+ * Call a shortcode function by tag name.
+ *
+ * Use this function for directly calling a shortcode without using do_shortcode.
+ * do_shortcode() runs an extensive regex that goes through every shortcode in
+ * the WP global $shortcode_tags. That's a lot of processing wasted if all you
+ * want to do is run a specific shortcode/function. Yes, you could run the callback
+ * directly, but what if that callback is in a class instance method? This utlitiy
+ * allows you to run a shortcode function directly, regardless of whether it is
+ * a direct function or in a class. It comes from an article by J.D. Grimes on this
+ * subject and I've provided a link to that article.
+ *
+ * @author J.D. Grimes
+ * @link https://codesymphony.co/dont-do_shortcode/
+ *
+ * @since 3.2.5
+ *
+ * @param string $tag     The shortcode whose function to call.
+ * @param array  $atts    The attributes to pass to the shortcode function. Optional.
+ * @param array  $content The shortcode's content. Default is null (none).
+ *
+ * @return string|bool False on failure, the result of the shortcode on success.
+ */
+function wpmem_do_shortcode( $tag, array $atts = array(), $content = null ) {
+ 
+	global $shortcode_tags;
+
+	if ( ! isset( $shortcode_tags[ $tag ] ) ) {
+		return false;
+	}
+
+	return call_user_func( $shortcode_tags[ $tag ], $atts, $content, $tag );
 }

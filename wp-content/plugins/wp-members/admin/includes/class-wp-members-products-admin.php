@@ -77,15 +77,15 @@ class WP_Members_Products_Admin {
 				break;
 			case 'role':
 				$role = $this->get_meta( 'wpmem_product_role' );
-				echo ( $role ) ? $role : __( 'No role required', 'wp-members' );
+				echo ( $role ) ? esc_html( $role ) : __( 'No role required', 'wp-members' );
 				break;
 			case 'expires':
 				$expires = $this->get_meta( 'wpmem_product_expires' );
 				$period = ( false !== $expires ) ? explode( "|", $expires[0] ) : __( 'Does not expire', 'wp-members' );
-				echo ( is_array( $period ) ) ? $period[0] . ' ' . $period[1] : $period;
+				echo ( is_array( $period ) ) ? esc_html( $period[0] . ' ' . $period[1] ) : esc_html( $period );
 				break;
 			case 'last_updated':
-				echo date_i18n( get_option( 'date_format' ), strtotime( $post->post_modified ) );
+				echo date_i18n( get_option( 'date_format' ), strtotime( esc_attr( $post->post_modified ) ) );
 				break;
 		}
 	}
@@ -163,7 +163,7 @@ class WP_Members_Products_Admin {
 				<span id="wpmem_product_expires_wrap">
 					<label for="wpmem_product_number_of_periods" style="display:none;"><?php _e( 'Number', 'wp-members' ); ?></label>
 					<?php $period = explode( '|', $product_expires ); ?>
-					<input type="text" name="wpmem_product_number_of_periods" id="wpmem_product_number_of_periods" value="<?php echo $period[0]; ?>" class="small-text" placeholder="<?php _e( 'Number', 'membership_product' ); ?>" style="width:66px;height:28px;vertical-align:middle;">
+					<input type="text" name="wpmem_product_number_of_periods" id="wpmem_product_number_of_periods" value="<?php echo esc_attr( $period[0] ); ?>" class="small-text" placeholder="<?php _e( 'Number', 'membership_product' ); ?>" style="width:66px;height:28px;vertical-align:middle;">
 					<label for="wpmem_product_time_period" style="display:none;"><?php _e( 'Period', 'wp-members' ); ?></label>
 					<?php echo wpmem_form_field( array( 'name'=>'wpmem_product_time_period', 'type'=>'select', 'value'=>$periods, 'compare'=>( ( isset( $period[1] ) ) ? $period[1] : '' ) ) ); ?>
 				</span>
@@ -205,26 +205,26 @@ class WP_Members_Products_Admin {
 		
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) return;
 		if ( ! isset( $_POST['wpmem_product_nonce'] ) || ! wp_verify_nonce( $_POST['wpmem_product_nonce'], '_wpmem_product_nonce' ) ) return;
-		if ( ! current_user_can( 'edit_post', $post_id ) ) return;
+		if ( ! current_user_can( 'edit_posts', $post_id ) ) return;
 		
 		$post = get_post( $post_id );
 
 		$product_name = wpmem_get( 'wpmem_product_name', false );
 		$product_name = ( $product_name ) ? $product_name : $post->post_name;
-		update_post_meta( $post_id, 'wpmem_product_name', esc_attr( $product_name ) );
+		update_post_meta( $post_id, 'wpmem_product_name', sanitize_text_field( $product_name ) );
 		
 		$role_required = wpmem_get( 'wpmem_product_role_required', false );
 		if ( ! $role_required ) {
 			update_post_meta( $post_id, 'wpmem_product_role', false );
 		} else {
-			update_post_meta( $post_id, 'wpmem_product_role', wpmem_get( 'wpmem_product_role' ) );
+			update_post_meta( $post_id, 'wpmem_product_role', sanitize_text_field( wpmem_get( 'wpmem_product_role' ) ) );
 		}
 		
 		$expires = wpmem_get( 'wpmem_product_expires', false );
 		if ( ! $expires ) {
 			update_post_meta( $post_id, 'wpmem_product_expires', false );
 		} else {
-			$expires_array = array( wpmem_get( 'wpmem_product_number_of_periods' ) . "|" . wpmem_get( 'wpmem_product_time_period' ) );
+			$expires_array = array( sanitize_text_field( wpmem_get( 'wpmem_product_number_of_periods' ) ) . "|" . sanitize_text_field( wpmem_get( 'wpmem_product_time_period' ) ) );
 			update_post_meta( $post_id, 'wpmem_product_expires', $expires_array );
 		}
 	}

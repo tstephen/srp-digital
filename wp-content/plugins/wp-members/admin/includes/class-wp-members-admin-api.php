@@ -73,6 +73,7 @@ class WP_Members_Admin_API {
 	 * @since 3.1.0
 	 * @since 3.1.1 Added tab-about.php.
 	 * @since 3.1.7 Loads all admin dependent files.
+	 * @since 3.2.9 Removed tab-about.php until we can re-do it.
 	 */
 	function load_dependencies() {
 		
@@ -83,13 +84,12 @@ class WP_Members_Admin_API {
 		include_once( WPMEM_PATH . 'admin/dialogs.php' );
 		include_once( WPMEM_PATH . 'admin/post.php' );
 		include_once( WPMEM_PATH . 'admin/includes/api.php' );
-		require_once( WPMEM_PATH . 'inc/class-wp-members-user-profile.php' );
 		include_once( WPMEM_PATH . 'admin/tab-fields.php' ); // Fields tab is used for field reorder (which is ! wpmem-settings).
 		if ( 'wpmem-settings' == wpmem_get( 'page', false, 'get' ) ) {
 			include_once( WPMEM_PATH . 'admin/tab-options.php' );
 			include_once( WPMEM_PATH . 'admin/tab-emails.php' );
 			include_once( WPMEM_PATH . 'admin/tab-captcha.php' );
-			include_once( WPMEM_PATH . 'admin/tab-about.php' );
+			// include_once( WPMEM_PATH . 'admin/tab-about.php' );
 			include_once( WPMEM_PATH . 'admin/tab-dialogs.php' );
 			include_once( WPMEM_PATH . 'admin/tab-dropins.php' );
 		}
@@ -111,12 +111,12 @@ class WP_Members_Admin_API {
 		add_action( 'wp_ajax_wpmem_a_field_reorder', 'wpmem_a_do_field_reorder' );
 		add_action( 'user_new_form',                 'wpmem_admin_add_new_user' );
 		add_filter( 'plugin_action_links',           array( $this, 'plugin_links' ), 10, 2 );
-		add_filter( 'wpmem_admin_tabs',              'wpmem_add_about_tab'       );
+		// add_filter( 'wpmem_admin_tabs',              'wpmem_add_about_tab'       );
 		
 		add_action( 'wpmem_admin_do_tab',            'wpmem_a_options_tab', 1 );
 		add_action( 'wpmem_admin_do_tab',            'wpmem_a_dialogs_tab', 10 );
 		add_action( 'wpmem_admin_do_tab',            'wpmem_a_emails_tab', 15 );
-		add_action( 'wpmem_admin_do_tab',            'wpmem_a_about_tab', 999, 1 );
+		// add_action( 'wpmem_admin_do_tab',            'wpmem_a_about_tab', 999, 1 );
 		
 		// If user has a role that cannot edit users, set profile actions for non-admins.
 		
@@ -125,6 +125,8 @@ class WP_Members_Admin_API {
 		add_action( 'show_user_profile',          array( 'WP_Members_User_Profile', 'profile' ) );
 		add_action( 'edit_user_profile',          array( 'WP_Members_User_Profile', 'profile' ) );
 		add_action( 'profile_update',             array( 'WP_Members_User_Profile', 'update' ) );
+		add_action( 'edit_user_profile',          array( 'WP_Members_User_Profile', '_profile_tabs' ), 99 );
+
 		if ( current_user_can( 'list_users' ) ) {
 			add_action( 'admin_footer-users.php',     'wpmem_bulk_user_action' );
 			add_action( 'load-users.php',             'wpmem_users_page_load' );
@@ -451,7 +453,7 @@ class WP_Members_Admin_API {
 	 *
 	 * @since 3.1.2
 	 *
-	 * @todo Work on multi-form project for 3.1.2
+	 * @todo Work on multi-form project, no current milestone.
 	 */
 	function get_form( $form = 'default' ) {
 		/*
@@ -507,11 +509,12 @@ class WP_Members_Admin_API {
 	 * @since 3.2.0 Moved into admin object, renamed dashboard_enqueue_scripts().
 	 * @since 3.2.1 Load js for post.php hook.
 	 *
+	 * @global object $current_screen
 	 * @global object $wpmem
 	 * @param  string $hook The admin screen hook being loaded.
 	 */
 	function dashboard_enqueue_scripts( $hook ) {
-		global $wpmem;
+		global $current_screen, $wpmem;
 		if ( 'edit.php' == $hook || 'settings_page_wpmem-settings' == $hook || 'post.php' == $hook || 'post-new.php' == $hook || 'user-edit.php' == $hook || 'profile.php' == $hook ) {
 			wp_enqueue_style( 'wpmem-admin', WPMEM_DIR . 'admin/css/admin.css', '', WPMEM_VERSION );
 		} 
@@ -519,10 +522,34 @@ class WP_Members_Admin_API {
 			wp_enqueue_script( 'wpmem-admin', WPMEM_DIR . 'admin/js/admin.js', '', WPMEM_VERSION );
 		}
 		if ( ( 'post.php' == $hook || 'post-new.php' == $hook ) && 1 == $wpmem->enable_products ) {
-			wp_register_style( 'select2css', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/css/select2.min.css', false, '4.0.5', 'all' );
-			wp_register_script( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/js/select2.min.js', array( 'jquery' ), '4.0.5', true );
-			wp_enqueue_style( 'select2css' );
-			wp_enqueue_script( 'select2' );
+			if ( ! wp_script_is( 'select2', 'enqueued' ) ) {
+				wp_register_style( 'select2-style', WPMEM_DIR . 'admin/css/select2.min.css', false, '4.0.5', 'all' );
+				wp_register_script( 'select2',   WPMEM_DIR . 'admin/js/select2.min.js', array( 'jquery' ), '4.0.5', true );
+				wp_enqueue_style( 'select2-style' );
+				wp_enqueue_script( 'select2' );
+			}
+		}
+		if ( 'user-edit' == $current_screen->id ) {
+			wp_enqueue_script( 'jquery' );
+			wp_enqueue_script( 'jquery-ui-core' ); // enqueue jQuery UI Core
+			wp_enqueue_script( 'jquery-ui-tabs' ); // enqueue jQuery UI Tabs
+			wp_enqueue_script( 'jquery-ui-datepicker' ); // enqueue jQuery UI Datepicker
+
+			if ( ! wp_style_is( 'jquery-ui-style', 'enqueued' ) ) {
+				wp_register_style( 'jquery-ui-style', WPMEM_DIR . 'admin/css/jquery-ui.min.css' );
+			}
+			wp_enqueue_style( 'jquery-ui-style' ); 
+		}
+		if ( 'settings_page_wpmem-settings' == $hook ) {
+			wp_enqueue_script( 'jquery' );
+			wp_enqueue_script( 'jquery-ui-core' );// enqueue jQuery UI Core
+			wp_enqueue_script( 'jquery-ui-dialog' );
+			
+			if ( ! wp_style_is( 'jquery-ui-style', 'enqueued' ) ) {
+				wp_register_style( 'jquery-ui-style', WPMEM_DIR . 'admin/css/jquery-ui.min.css' );
+			}
+			wp_enqueue_style( 'jquery-ui-style' ); 
+			 
 		}
 	}
 

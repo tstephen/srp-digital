@@ -4,14 +4,27 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at https://rocketgeek.com
- * Copyright (c) 2006-2018  Chad Butler
+ * Copyright (c) 2006-2019  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @subpackage WP-Members API Functions
  * @author Chad Butler 
- * @copyright 2006-2018
+ * @copyright 2006-2019
  */
+
+/**
+ * Checks if a user exists.
+ *
+ * @since 3.2.5
+ *
+ * @param $user_id
+ * @return boolean
+ */
+function wpmem_is_user( $user_id ) {
+	$user = get_userdata( $user_id );
+	return ( $user ) ? true : false;
+}
 
 /**
  * Checks if user has a particular role.
@@ -105,11 +118,12 @@ function wpmem_is_user_activated( $user_id = false ) {
  *
  * @global object  $wpmem
  * @param  integer $user_id
+ * @param  bool    $all
  * @return array   $user_fields
  */
-function wpmem_user_data( $user_id = false ) {
+function wpmem_user_data( $user_id = false, $all = false ) {
 	global $wpmem;
-	return $wpmem->user_fields( $user_id );
+	return $wpmem->user->user_data( $user_id, $all );
 }
 
 /**
@@ -150,15 +164,17 @@ function wpmem_user_has_access( $product, $user_id = false ) {
  * Sets product access for a user.
  *
  * @since 3.2.3
+ * @since 3.2.6 Added $date to set a specific expiration date.
  *
  * @global object $wpmem
  * @param  string $product The meta key of the product.
  * @param  int    $user_id
+ * @param  string $date    Expiration date (optional) format: MySQL timestamp
  * @return bool   $result
  */
-function wpmem_set_user_product( $product, $user_id = false ) {
+function wpmem_set_user_product( $product, $user_id = false, $date = false ) {
 	global $wpmem;
-	return $wpmem->user->set_user_product( $product, $user_id );
+	return $wpmem->user->set_user_product( $product, $user_id, $date );
 }
 
 /**
@@ -282,5 +298,26 @@ endif;
 function wpmem_retrieve_username() {
 	global $wpmem;
 	return $wpmem->user->retrieve_username();
+}
+
+/**
+ * Creates a membership number.
+ *
+ * @since 3.1.1
+ * @since 3.2.0 Changed "lead" to "pad".
+ *
+ * @param  array  $args {
+ *     @type string $option    The wp_options name for the counter setting (required).
+ *     @type string $meta_key  The field's meta key (required).
+ *     @type int    $start     Number to start with (optional, default 0).
+ *     @type int    $increment Number to increment by (optional, default 1).
+ *     @type int    $digits    Number of digits for the number (optional).
+ *     @type boolen $pad       Pad leading zeros (optional, default true).
+ * }
+ * @return string $membersip_number
+ */
+function wpmem_create_membership_number( $args ) {
+	global $wpmem;
+	return $wpmem->api->generate_membership_number( $args );
 }
 // End of file.

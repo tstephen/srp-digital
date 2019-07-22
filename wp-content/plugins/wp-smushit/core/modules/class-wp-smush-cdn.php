@@ -6,10 +6,14 @@
  * @version 3.0
  */
 
+if ( ! defined( 'WPINC' ) ) {
+	die;
+}
+
 /**
  * Class WP_Smush_CDN
  */
-class WP_Smush_CDN extends WP_Smush_Module {
+class WP_Smush_CDN extends WP_Smush_Content {
 
 	/**
 	 * Smush CDN base url.
@@ -60,6 +64,9 @@ class WP_Smush_CDN extends WP_Smush_Module {
 		// Add setting names to appropriate group.
 		add_action( 'wp_smush_cdn_settings', array( $this, 'add_settings' ) );
 
+		// Cron task to update CDN stats.
+		add_action( 'smush_update_cdn_stats', array( $this, 'cron_update_stats' ) );
+
 		// Set auto resize flag.
 		$this->init_flags();
 
@@ -78,6 +85,8 @@ class WP_Smush_CDN extends WP_Smush_Module {
 
 		// Only do stuff on the frontend.
 		if ( is_admin() ) {
+			// Verify the cron task to update stats is configured.
+			$this->schedule_cron();
 			return;
 		}
 
@@ -107,6 +116,38 @@ class WP_Smush_CDN extends WP_Smush_Module {
 	 */
 	public function get_status() {
 		return $this->cdn_active;
+	}
+
+	/**
+	 * Get the CDN status.
+	 *
+	 * @return string  Possible return values: disabled/enabled, activating, overcap/upgrade.
+	 *
+	 * @since 3.2.1
+	 */
+	public function status() {
+		if ( ! $this->cdn_active || ! $this->settings->get( 'cdn' ) ) {
+			return 'disabled';
+		}
+
+		$cdn = $this->settings->get_setting( WP_SMUSH_PREFIX . 'cdn_status' );
+
+		if ( isset( $cdn->cdn_enabling ) && $cdn->cdn_enabling ) {
+			return 'activating';
+		}
+
+		$plan      = isset( $cdn->bandwidth_plan ) ? $cdn->bandwidth_plan : 10;
+		$bandwidth = isset( $cdn->bandwidth ) ? $cdn->bandwidth : 0;
+
+		$percentage = round( 100 * $bandwidth / 1024 / 1024 / 1024 / $plan );
+
+		if ( $percentage > 100 || 100 === (int) $percentage ) {
+			return 'overcap';
+		} elseif ( 90 <= (int) $percentage ) {
+			return 'upgrade';
+		}
+
+		return 'enabled';
 	}
 
 	/**
@@ -158,7 +199,7 @@ class WP_Smush_CDN extends WP_Smush_Module {
 	 * @param string $setting_key Setting key.
 	 */
 	public function settings_desc( $setting_key = '' ) {
-		if ( empty( $setting_key ) || ! in_array( $setting_key, array( 'webp', 'auto_resize' ) ) ) {
+		if ( empty( $setting_key ) || ! in_array( $setting_key, array( 'webp', 'auto_resize' ), true ) ) {
 			return;
 		}
 		?>
@@ -180,7 +221,7 @@ class WP_Smush_CDN extends WP_Smush_Module {
 						'wp-smushit'
 					);
 					break;
-				case 'default':
+				default:
 					break;
 			}
 			?>
@@ -194,26 +235,35 @@ class WP_Smush_CDN extends WP_Smush_Module {
 	 * @since 3.0
 	 */
 	public function cdn_stats_ui() {
-		// Only show the UI box if CDN module is enabled and has some data.
-		if ( ! $this->settings->get( 'cdn' ) || ! $this->status ) {
+		$status = $this->status();
+
+		if ( 'disabled' === $status ) {
 			return;
 		}
-
-		$plan      = isset( $this->status->bandwidth_plan ) ? $this->status->bandwidth_plan : 10;
-		$bandwidth = isset( $this->status->bandwidth ) ? $this->status->bandwidth : 0;
-
-		$percentage = round( $plan * $bandwidth / 1024 / 1024 / 1024 );
 		?>
 		<li class="smush-cdn-stats">
 			<span class="sui-list-label"><?php esc_html_e( 'CDN', 'wp-smushit' ); ?></span>
 			<span class="wp-smush-stats sui-list-detail">
 				<i class="sui-icon-loader sui-loading sui-hidden" aria-hidden="true" title="<?php esc_attr_e( 'Updating Stats', 'wp-smushit' ); ?>"></i>
-				<span class="wp-smush-cdn-stats"><?php echo esc_html( WP_Smush_Helper::format_bytes( $bandwidth, 2 ) ); ?></span>
-				<span class="wp-smush-stats-sep">/</span>
-				<span class="wp-smush-cdn-usage">
-					<?php echo absint( $plan ); ?> GB
-				</span>
-				<div class="sui-circle-score" data-score="<?php echo absint( $percentage ); ?>"></div>
+				<?php if ( 'overcap' === $status ) : ?>
+					<span class="sui-tooltip sui-tooltip-top-right sui-tooltip-constrained" data-tooltip="<?php esc_attr_e( "You've gone through your CDN bandwidth limit, so we’ve stopped serving your images via the CDN. Contact your administrator to upgrade your Smush CDN plan to reactivate this service", 'wp-smushit' ); ?>">
+						<i class="sui-icon-warning-alert sui-error sui-md" aria-hidden="true"></i>
+					</span>
+					<span><?php esc_html_e( 'Overcap', 'wp-smushit' ); ?></span>
+				<?php elseif ( 'upgrade' === $status ) : ?>
+					<span class="sui-tooltip sui-tooltip-top-right sui-tooltip-constrained" data-tooltip="<?php esc_attr_e( "You're almost through your CDN bandwidth limit. Please contact your administrator to upgrade your Smush CDN plan to ensure you don't lose this service", 'wp-smushit' ); ?>">
+						<i class="sui-icon-warning-alert sui-warning sui-md" aria-hidden="true"></i>
+					</span>
+					<span><?php esc_html_e( 'Needs upgrade', 'wp-smushit' ); ?></span>
+				<?php elseif ( 'activating' === $status ) : ?>
+					<i class="sui-icon-check-tick sui-info sui-md" aria-hidden="true"></i>
+					<span><?php esc_html_e( 'Activating', 'wp-smushit' ); ?></span>
+				<?php else : ?>
+					<span class="sui-tooltip sui-tooltip-top-right sui-tooltip-constrained" data-tooltip="<?php esc_attr_e( 'Your media is currently being served from the WPMU DEV CDN. Bulk and Directory smush features are treated separately and will continue to run independently.', 'wp-smushit' ); ?>">
+						<i class="sui-icon-check-tick sui-info sui-md" aria-hidden="true"></i>
+					</span>
+					<span><?php esc_html_e( 'Active', 'wp-smushit' ); ?></span>
+				<?php endif; ?>
 			</span>
 		</li>
 		<?php
@@ -325,6 +375,10 @@ class WP_Smush_CDN extends WP_Smush_Module {
 	 * @see update_image_srcset()
 	 * @see update_image_sizes()
 	 * @see update_cdn_image_src_args()
+	 * @see process_cdn_status()
+	 * @see cron_update_stats()
+	 * @see unschedule_cron()
+	 * @see schedule_cron()
 	 */
 
 	/**
@@ -354,33 +408,124 @@ class WP_Smush_CDN extends WP_Smush_Module {
 	 * @return string
 	 */
 	public function process_img_tags( $content ) {
-		if ( empty( $content ) ) {
+		if ( empty( $content ) || ! $this->cdn_active ) {
 			return $content;
 		}
 
-		$content = mb_convert_encoding( $content, 'HTML-ENTITIES', 'UTF-8' );
+		$images = $this->get_images_from_content( $content );
 
-		$document = new DOMDocument();
-		libxml_use_internal_errors( true );
-		$document->loadHTML( utf8_decode( $content ) );
-
-		// Get images from current DOM elements.
-		$images = $document->getElementsByTagName( 'img' );
-
-		// If images found, set attachment ids.
-		if ( ! empty( $images ) ) {
-			/**
-			 * Action hook to modify DOM images.
-			 *
-			 * Images are saved at the end of this function. So no need
-			 * to return anything in this hook.
-			 */
-			do_action( 'smush_images_from_content', $images );
-
-			$this->process_images( $images );
+		if ( empty( $images ) ) {
+			return $content;
 		}
 
-		return $document->saveHTML();
+		foreach ( $images[0] as $key => $image ) {
+			$src = $images['img_url'][ $key ];
+
+			/**
+			 * Filter to skip a single image from cdn.
+			 *
+			 * @param bool       $skip     Should skip? Default: false.
+			 * @param string     $img_url  Image url.
+			 * @param array|bool $image    Image tag or false.
+			 */
+			if ( apply_filters( 'smush_skip_image_from_cdn', false, $src, $image ) ) {
+				continue;
+			}
+
+			$new_image = $image;
+
+			// Make sure this image is inside a supported directory. Try to convert to valid path.
+			if ( $src = $this->is_supported_path( $src ) ) {
+				// Store the original $src to be used later on.
+				$original_src = $src;
+
+				$src = $this->process_src( $image, $src );
+
+				// Replace the src of the image with CDN link.
+				if ( ! empty( $images['img_url'][ $key ] ) ) {
+					$new_image = preg_replace( '#(src=["|\'])' . $images['img_url'][ $key ] . '(["|\'])#i', '\1' . $src . '\2', $new_image, 1 );
+				}
+
+				// See if srcset is already set.
+				if ( ! preg_match( '/srcset=["|\']([^"|\']+)["|\']/i', $images[0][ $key ] ) && $this->settings->get( 'auto_resize' ) ) {
+					list( $srcset, $sizes ) = $this->generate_srcset( $original_src );
+
+					$this->add_attribute( $new_image, 'srcset', $srcset );
+
+					if ( false !== $sizes ) {
+						$this->add_attribute( $new_image, 'sizes', $sizes );
+					}
+				}
+			}
+
+			// Support for 3rd party lazy loading plugins.
+			$data_src = $this->get_attribute( $new_image, 'data-src' );
+			if ( $data_src = $this->is_supported_path( $data_src ) ) {
+				$cdn_image = $this->process_src( $image, $data_src );
+				$this->remove_attribute( $new_image, 'data-src' );
+				$this->add_attribute( $new_image, 'data-src', $cdn_image );
+			}
+
+			$data_lazy_src = $this->get_attribute( $new_image, 'data-lazy-src' );
+			if ( $data_lazy_src = $this->is_supported_path( $data_lazy_src ) ) {
+				$cdn_image = $this->process_src( $image, $data_lazy_src );
+				$this->remove_attribute( $new_image, 'data-lazy-src' );
+				$this->add_attribute( $new_image, 'data-lazy-src', $cdn_image );
+			}
+
+			/**
+			 * Filter hook to alter image tag before replacing the image in content.
+			 *
+			 * @param string $image  Image tag.
+			 */
+			$new_image = apply_filters( 'smush_cdn_image_tag', $new_image );
+
+			$content = str_replace( $image, $new_image, $content );
+		}
+
+		return $content;
+	}
+
+	/**
+	 * Process src link and convert to CDN link.
+	 *
+	 * @since 3.2.1
+	 *
+	 * @param string $image  Image tag.
+	 * @param string $src    Image src attribute.
+	 *
+	 * @return string
+	 */
+	private function process_src( $image, $src ) {
+		/**
+		 * Filter hook to alter image src arguments before going through cdn.
+		 *
+		 * @param array  $args   Arguments.
+		 * @param string $src    Image src.
+		 * @param string $image  Image tag.
+		 */
+		$args = apply_filters( 'smush_image_cdn_args', array(), $image );
+
+		/**
+		 * Filter hook to alter image src before going through cdn.
+		 *
+		 * @param string $src    Image src.
+		 * @param string $image  Image tag.
+		 */
+		$src = apply_filters( 'smush_image_src_before_cdn', $src, $image );
+
+		// Generate cdn url from local url.
+		$src = $this->generate_cdn_url( $src, $args );
+
+		/**
+		 * Filter hook to alter image src after replacing with CDN base.
+		 *
+		 * @param string $src    Image src.
+		 * @param string $image  Image tag.
+		 */
+		$src = apply_filters( 'smush_image_src_after_cdn', $src, $image );
+
+		return $src;
 	}
 
 	/**
@@ -471,7 +616,7 @@ class WP_Smush_CDN extends WP_Smush_Module {
 		// Get maximum content width.
 		$content_width = $this->max_content_width();
 
-		if ( ( is_array( $size ) && $size[0] <= $content_width ) ) {
+		if ( is_array( $size ) && $size[0] < $content_width ) {
 			return $sizes;
 		}
 
@@ -489,25 +634,128 @@ class WP_Smush_CDN extends WP_Smush_Module {
 	 * @return array $args
 	 */
 	public function update_cdn_image_src_args( $args, $image ) {
+		// Don't need to auto resize - return default args.
+		if ( ! $this->settings->get( 'auto_resize' ) ) {
+			return $args;
+		}
+
 		// Get registered image sizes.
 		$image_sizes = $this->get_image_sizes();
 
-		// Image class.
-		$class = $image->getAttribute( 'class' );
+		// Find the width and height attributes.
+		$width  = false;
+		$height = false;
+		wp_is_mobile();
+		// Try to get the width and height from img tag.
+		if ( preg_match( '/width=["|\']?(\b[[:digit:]]+(?!\%)\b)["|\']?/i', $image, $width_string ) ) {
+			$width = $width_string[1];
+		}
+
+		if ( preg_match( '/height=["|\']?(\b[[:digit:]]+(?!\%)\b)["|\']?/i', $image, $height_string ) ) {
+			$height = $height_string[1];
+		}
 
 		$size = array();
 
 		// Detect WP registered image size from HTML class.
-		if ( preg_match( '#size-([^"\'\s]+)[^"\']*["|\']?#i', $class, $size ) ) {
+		if ( preg_match( '/size-([^"\'\s]+)[^"\']*["|\']?/i', $image, $size ) ) {
 			$size = array_pop( $size );
 
+			if ( ! array_key_exists( $size, $image_sizes ) ) {
+				return $args;
+			}
+
+			// This is probably a correctly sized thumbnail - no need to resize.
+			if ( (int) $width === $image_sizes[ $size ]['width'] || (int) $height === $image_sizes[ $size ]['height'] ) {
+				return $args;
+			}
+
 			// If this size exists in registered sizes, add argument.
-			if ( 'full' !== $size && array_key_exists( $size, $image_sizes ) ) {
+			if ( 'full' !== $size ) {
 				$args['size'] = (int) $image_sizes[ $size ]['width'] . 'x' . (int) $image_sizes[ $size ]['height'];
+			}
+		} else {
+			// It's not a registered thumbnail size.
+			if ( $width && $height ) {
+				$args['size'] = (int) $width . 'x' . (int) $height;
 			}
 		}
 
 		return $args;
+	}
+
+	/**
+	 * Process CDN status.
+	 *
+	 * @since 3.0
+	 * @since 3.1  Moved from Ajax class.
+	 *
+	 * @param string $status  Status in JSON format.
+	 *
+	 * @return mixed
+	 */
+	public function process_cdn_status( $status ) {
+		if ( is_wp_error( $status ) ) {
+			wp_send_json_error(
+				array(
+					'message' => $status->get_error_message(),
+				)
+			);
+		}
+
+
+		$status = json_decode( $status['body'] );
+
+		// Error from API.
+		if ( ! $status->success ) {
+			wp_send_json_error(
+				array(
+					'message' => $status->data->message,
+				),
+				$status->data->error_code
+			);
+		}
+
+		return $status->data;
+	}
+
+	/**
+	 * Update CDN stats (daily) cron task.
+	 *
+	 * @since 3.1.0
+	 */
+	public function cron_update_stats() {
+		$current_status = $this->settings->get_setting( WP_SMUSH_PREFIX . 'cdn_status' );
+
+		if ( isset( $current_status->cdn_enabling ) && $current_status->cdn_enabling ) {
+			$status = WP_Smush::get_instance()->api()->enable();
+		} else {
+			$status = WP_Smush::get_instance()->api()->check();
+		}
+
+		$data = $this->process_cdn_status( $status );
+		$this->settings->set_setting( WP_SMUSH_PREFIX . 'cdn_status', $data );
+	}
+
+	/**
+	 * Disable CDN stats update cron task.
+	 *
+	 * @since 3.1.0
+	 */
+	public function unschedule_cron() {
+		$timestamp = wp_next_scheduled( 'smush_update_cdn_stats' );
+		wp_unschedule_event( $timestamp, 'smush_update_cdn_stats' );
+	}
+
+	/**
+	 * Set cron task to update CDN stats daily.
+	 *
+	 * @since 3.1.0
+	 */
+	public function schedule_cron() {
+		if ( ! wp_next_scheduled( 'smush_update_cdn_stats' ) ) {
+			wp_schedule_event( time(), 'daily', 'smush_update_cdn_stats' );
+		}
 	}
 
 	/**************************************
@@ -516,7 +764,8 @@ class WP_Smush_CDN extends WP_Smush_Module {
 	 *
 	 * Functions that are used by the public methods of this CDN class.
 	 *
-	 * @see process_images()
+	 * @since 3.0.0:
+	 *
 	 * @see is_valid_url()
 	 * @see get_size_from_file_name()
 	 * @see get_url_without_dimensions()
@@ -524,83 +773,14 @@ class WP_Smush_CDN extends WP_Smush_Module {
 	 * @see set_additional_srcset()
 	 * @see get_image_sizes()
 	 * @see generate_srcset()
+	 * @see maybe_generate_srcset()
+	 * @see is_supported_path()
+	 *
+	 * @since 3.1.0:
+	 *
+	 * @see get_images_from_content()
+	 * @see add_attribute()
 	 */
-
-	/**
-	 * Set attachment IDs of image as data.
-	 *
-	 * Get attachment IDs from URLs and set new data property to img.
-	 * We can use WP_Query to find attachment ids of all images on current page content.
-	 *
-	 * @since 3.0
-	 *
-	 * @param DOMNodeList $images Current page images.
-	 */
-	private function process_images( $images ) {
-		// Loop through each image.
-		foreach ( $images as $key => $image ) {
-			// Get the src value.
-			$src = $image->getAttribute( 'src' );
-
-			/**
-			 * Filter to skip a single image from cdn.
-			 *
-			 * @param bool false Should skip?
-			 * @param string $img_url Image url.
-			 * @param array|bool $image Image object or false.
-			 */
-			if ( apply_filters( 'smush_skip_image_from_cdn', false, $src, $image ) ) {
-				continue;
-			}
-
-			// Make sure this image is inside a supported directory. Try to convert to valid path.
-			if ( ! $src = $this->is_supported_path( $src ) ) {
-				continue;
-			}
-
-			// See if srcset is already set.
-			$srcset = $image->getAttribute( 'srcset' );
-			if ( ! $srcset && $this->settings->get( 'auto_resize' ) ) {
-				list( $srcset, $sizes ) = $this->generate_srcset( $src );
-				$image->setAttribute( 'srcset', $srcset );
-				$image->setAttribute( 'sizes', $sizes );
-			}
-
-			/**
-			 * Filter hook to alter image src arguments before going through cdn.
-			 *
-			 * @param array $args Arguments.
-			 * @param string $src Image src.
-			 * @param object $image Image tag object.
-			 */
-			$args = apply_filters( 'smush_image_cdn_args', array(), $image );
-
-			/**
-			 * Filter hook to alter image src before going through cdn.
-			 *
-			 * @param string $src Image src.
-			 * @param object $image Image tag object.
-			 */
-			$src = apply_filters( 'smush_image_src_before_cdn', $src, $image );
-
-			// Do not continue if CDN is not active.
-			if ( $this->cdn_active ) {
-				// Generate cdn url from local url.
-				$src = $this->generate_cdn_url( $src, $args );
-
-				/**
-				 * Filter hook to alter image src after replacing with CDN base.
-				 *
-				 * @param string $src Image src.
-				 * @param object $image Image tag object.
-				 */
-				$src = apply_filters( 'smush_image_src_after_cdn', $src, $image );
-			}
-
-			// Update src with cdn url.
-			$image->setAttribute( 'src', $src );
-		}
-	}
 
 	/**
 	 * Check if we can use the image URL in CDN.
@@ -624,7 +804,7 @@ class WP_Smush_CDN extends WP_Smush_Module {
 		}
 
 		// If not supported extension - return false.
-		if ( ! in_array( strtolower( pathinfo( $parsed_url['path'], PATHINFO_EXTENSION ) ), $this->supported_extensions ) ) {
+		if ( ! in_array( strtolower( pathinfo( $parsed_url['path'], PATHINFO_EXTENSION ) ), $this->supported_extensions, true ) ) {
 			return false;
 		}
 
@@ -711,6 +891,11 @@ class WP_Smush_CDN extends WP_Smush_Module {
 
 		if ( isset( $resize_sizes['width'] ) && $resize_sizes['width'] < $content_width ) {
 			return $resize_sizes['width'];
+		}
+
+		// Just in case something goes wrong with the above checks.
+		if ( ! $content_width ) {
+			$content_width = 1900;
 		}
 
 		return $content_width;
@@ -884,6 +1069,12 @@ class WP_Smush_CDN extends WP_Smush_Module {
 		if ( $attachment_id ) {
 			list( $src, $width, $height ) = wp_get_attachment_image_src( $attachment_id, 'full' );
 
+			// Revolution slider fix: images will always return 0 height and 0 width.
+			if ( 0 === $width && 0 === $height ) {
+				// Try to get the dimensions directly from the file.
+				list( $width, $height ) = getimagesize( $src );
+			}
+
 			$image_meta = wp_get_attachment_metadata( $attachment_id );
 		} else {
 			// Try to get the dimensions directly from the file.
@@ -965,16 +1156,62 @@ class WP_Smush_CDN extends WP_Smush_Module {
 			return false;
 		}
 
+		if ( ! isset( $url_parts['scheme'] ) && 0 === strpos( $src, '//' ) ) {
+			$src = is_ssl() ? 'https:' : 'http:' . $src;
+		}
+
 		// This is a relative path, try to get the URL.
 		if ( ! isset( $url_parts['host'] ) && ! isset( $url_parts['scheme'] ) ) {
 			$src = site_url( $src );
 		}
 
-		if ( false === strpos( $src, content_url() ) ) {
+		$mapped_domain = $this->check_mapped_domain();
+
+		if ( false === strpos( $src, content_url() ) || ( is_multisite() && $mapped_domain && false === strpos( $src, $mapped_domain ) ) ) {
+			return false;
+		}
+
+		// Allow only these extensions in CDN.
+		$ext = strtolower( pathinfo( $src, PATHINFO_EXTENSION ) );
+		if ( ! in_array( $ext, array( 'gif', 'jpg', 'jpeg', 'png' ), true ) ) {
 			return false;
 		}
 
 		return $src;
+	}
+
+	/**
+	 * Support for domain mapping plugin.
+	 *
+	 * @since 3.1.1
+	 */
+	private function check_mapped_domain() {
+		if ( ! is_multisite() ) {
+			return false;
+		}
+
+		if ( ! defined( 'DOMAINMAP_BASEFILE' ) ) {
+			return false;
+		}
+
+		$domain = wp_cache_get( 'smush_mapped_site_domain', 'smush' );
+
+		if ( ! $domain ) {
+			global $wpdb;
+
+			$domain = $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT domain FROM {$wpdb->base_prefix}domain_mapping WHERE blog_id = %d ORDER BY id ASC LIMIT 1",
+					get_current_blog_id()
+				)
+			); // Db call ok.
+
+			if ( null !== $domain ) {
+				wp_cache_add( 'smush_mapped_site_domain', $domain, 'smush' );
+			}
+		}
+
+		return $domain;
 	}
 
 }

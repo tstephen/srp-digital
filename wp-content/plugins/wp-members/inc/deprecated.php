@@ -8,12 +8,12 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at https://rocketgeek.com
- * Copyright (c) 2006-2018  Chad Butler
+ * Copyright (c) 2006-2019  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package   WP-Members
  * @author    Chad Butler 
- * @copyright 2006-2018
+ * @copyright 2006-2019
  */
 
 // Exit if accessed directly.
@@ -71,7 +71,7 @@ if ( ! function_exists( 'wpmem_shortcode' ) ):
 function wpmem_shortcode( $attr, $content = null, $tag = 'wp-members' ) {
 	
 	$error = "wpmem_shortcode() is deprecated as of WP-Members 3.1.2. The [wp-members] shortcode tag should be replaced. ";
-	$error.= 'See replacement shortcodes: http://rkt.bz/logsc ';
+	$error.= 'See replacement shortcodes: https://rocketgeek.com/shortcodes/list-of-replacement-shortcodes/';
 	$error.= "post ID: " . get_the_ID() . " ";
 	$error.= "page url: " . wpmem_current_url();
 	wpmem_write_log( $error );
@@ -1170,6 +1170,7 @@ if ( ! function_exists( 'wpmem_inc_regemail' ) ):
  */
 function wpmem_inc_regemail( $user_id, $password, $toggle, $wpmem_fields = null, $field_data = null, $custom = null ) {
 	global $wpmem;
+	wpmem_write_log( "wpmem_inc_regemail() is deprecated since WP-Members 3.2.0. Use $ wpmem->email->to_user() instead" );
 	$wpmem->email->to_user( $user_id, $password, $toggle, $wpmem_fields, $field_data, $custom );
 	return;
 }

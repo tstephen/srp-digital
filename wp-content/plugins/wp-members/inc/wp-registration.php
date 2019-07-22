@@ -8,12 +8,12 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at https://rocketgeek.com
- * Copyright (c) 2006-2018 Chad Butler
+ * Copyright (c) 2006-2019 Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @author Chad Butler
- * @copyright 2006-2018
+ * @copyright 2006-2019
  *
  * Functions Included:
  * - wpmem_do_wp_register_form
@@ -123,7 +123,7 @@ function wpmem_do_wp_register_form( $process = 'wp' ) {
 					switch ( $field['type'] ) {
 
 					case( 'select' ):
-						$val = ( isset( $_POST[ $meta_key ] ) ) ? $_POST[ $meta_key ] : '';
+						$val = ( isset( $_POST[ $meta_key ] ) ) ? sanitize_text_field( $_POST[ $meta_key ] ) : '';
 						$input = wpmem_create_formfield( $meta_key, $field['type'], $field['values'], $val );
 						break;
 
@@ -137,7 +137,7 @@ function wpmem_do_wp_register_form( $process = 'wp' ) {
 					case( 'multicheckbox' ):
 					case( 'radio' ):	
 						$row_before = '<p class="' . $field['type'] . '">';
-						$valtochk = ( isset( $_POST[ $meta_key ] ) ) ? $_POST[ $meta_key ] : ''; // @todo Should this be escaped?
+						$valtochk = ( isset( $_POST[ $meta_key ] ) ) ? sanitize_text_field( $_POST[ $meta_key ] ) : '';
 						$formfield_args = array( 
 							'name'     => $meta_key,
 							'type'     => $field['type'],
@@ -160,10 +160,10 @@ function wpmem_do_wp_register_form( $process = 'wp' ) {
 						$class = ( $is_woo ) ? 'woocommerce-Input woocommerce-Input--text input-text' : 'input';
 						//$input = '<input type="' . $field['type'] . '" name="' . $meta_key . '" id="' . $meta_key . '" class="' . $class . '" value="';
 						$input = wpmem_form_field( array( 
-								'name' => $meta_key, 
-								'type' => $field['type'], 
-								'value' => ( isset( $_POST[ $meta_key ] ) ) ? esc_attr( $_POST[ $meta_key ] ) : '',
-								'compare' => ( isset( $field['compare'] ) ) ? $field['compare'] : '',
+								'name'        => $meta_key, 
+								'type'        => $field['type'], 
+								'value'       => $wpmem->forms->sanitize_field( wpmem_get( $meta_key, '' ), $field['type'] ),
+								'compare'     => ( isset( $field['compare'] ) ) ? $field['compare'] : '',
 								'placeholder' => ( isset( $field['placeholder'] ) ) ? $field['placeholder'] : '',
 							) );
 						//$input.= ( isset( $_POST[ $meta_key ] ) ) ? esc_attr( $_POST[ $meta_key ] ) : ''; 
@@ -241,7 +241,7 @@ function wpmem_do_wp_newuser_form() {
 			switch ( $field['type'] ) {
 
 			case( 'select' ):
-				$val = ( isset( $_POST[ $meta_key ] ) ) ? $_POST[ $meta_key ] : '';
+				$val = ( isset( $_POST[ $meta_key ] ) ) ? sanitize_text_field( $_POST[ $meta_key ] ) : '';
 				echo wpmem_create_formfield( $meta_key, $field['type'], $field['values'], $val );
 				break;
 
@@ -252,7 +252,7 @@ function wpmem_do_wp_newuser_form() {
 				break;
 
 			case( 'checkbox' ):
-				$val = ( isset( $_POST[ $meta_key ] ) ) ? $_POST[ $meta_key ] : '';
+				$val = ( isset( $_POST[ $meta_key ] ) ) ? sanitize_text_field( $_POST[ $meta_key ] ) : '';
 				$val = ( ! $_POST && $field['checked_default'] ) ? $field['checked_value'] : $val;
 				echo wpmem_create_formfield( $meta_key, $field['type'], $field['checked_value'], $val );
 				break;
@@ -260,7 +260,7 @@ function wpmem_do_wp_newuser_form() {
 			case( 'multiselect' ):
 			case( 'multicheckbox' ):
 			case( 'radio' ):
-				$valtochk = ( isset( $_POST[ $meta_key ] ) ) ? $_POST[ $meta_key ] : '';
+				$valtochk = ( isset( $_POST[ $meta_key ] ) ) ? sanitize_text_field( $_POST[ $meta_key ] ) : '';
 				$formfield_args = array( 
 					'name'     => $meta_key,
 					'type'     => $field['type'],
@@ -310,10 +310,6 @@ function wpmem_do_wp_newuser_form() {
  * @since 3.1.8 Added $process argument.
  */
 function wpmem_wp_register_form( $process = 'wp' ) {
-	/**
-	 * Load native WP registration functions.
-	 */
-	require_once( WPMEM_PATH . 'inc/wp-registration.php' );
 	wpmem_do_wp_register_form( $process );
 }
 

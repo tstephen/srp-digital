@@ -3,14 +3,13 @@
  * WP-Members Dropins Admin Functions
  *
  * This file is part of the WP-Members plugin by Chad Butler
- * You can find out more about this plugin at https://rocketgeek.com/plugins/wp-members/extensions/editor/
- * Copyright (c) 2006-2018  Chad Butler
+ * You can find out more about this plugin at https://rocketgeek.com/plugins/wp-members/
+ * Copyright (c) 2006-2019  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
- * @subpackage WP-Members Editor
  * @author Chad Butler
- * @copyright 2006-2018
+ * @copyright 2006-2019
  */
 
 // Exit if accessed directly.
@@ -361,7 +360,7 @@ class WP_Members_Dropins_Table extends WP_List_Table {
 			case 'delete':
 	
 				// Do whatever you want
-				//wp_redirect( esc_url( add_query_arg() ) );
+				//wp_safe_redirect( esc_url( add_query_arg() ) );
 				break;
 				
 			case 'save':

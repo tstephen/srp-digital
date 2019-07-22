@@ -4,13 +4,13 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at https://rocketgeek.com
- * Copyright (c) 2006-2018  Chad Butler
+ * Copyright (c) 2006-2019  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @subpackage WP-Members API Functions
  * @author Chad Butler 
- * @copyright 2006-2018
+ * @copyright 2006-2019
  *
  * Functions included:
  * - wpmem_redirect_to_login
@@ -53,7 +53,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 function wpmem_redirect_to_login( $redirect_to = false ) {
 	if ( ! is_user_logged_in() ) {
 		$redirect_to = ( $redirect_to ) ? $redirect_to : wpmem_current_url();
-		wp_redirect( wpmem_login_url( $redirect_to ) );
+		wp_safe_redirect( wpmem_login_url( $redirect_to ) );
 		exit();
 	}
 	return;
@@ -206,27 +206,6 @@ function wpmem_gettext( $str, $echo = false ) {
 function wpmem_use_custom_dialog( $defaults, $tag, $dialogs ) {
 	$defaults['msg'] = __( $dialogs[ $tag ], 'wp-members' );
 	return $defaults;
-}
-
-/**
- * Creates a membership number.
- *
- * @since 3.1.1
- * @since 3.2.0 Changed "lead" to "pad".
- *
- * @param  array  $args {
- *     @type string $option    The wp_options name for the counter setting (required).
- *     @type string $meta_key  The field's meta key (required).
- *     @type int    $start     Number to start with (optional, default 0).
- *     @type int    $increment Number to increment by (optional, default 1).
- *     @type int    $digits    Number of digits for the number (optional).
- *     @type boolen $pad       Pad leading zeros (optional, default true).
- * }
- * @return string $membersip_number
- */
-function wpmem_create_membership_number( $args ) {
-	global $wpmem;
-	return $wpmem->api->generate_membership_number( $args );
 }
 
 /**

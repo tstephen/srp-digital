@@ -7,13 +7,13 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at https://rocketgeek.com
- * Copyright (c) 2006-2018  Chad Butler
+ * Copyright (c) 2006-2019  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @subpackage WP_Members_Shortcodes
  * @author Chad Butler 
- * @copyright 2006-2018
+ * @copyright 2006-2019
  */
 
 // Exit if accessed directly.
@@ -365,19 +365,24 @@ class WP_Members_Email {
 		 * @param array $this->settings P
 		 *     An array containing email body, subject, user id, and additional settings.
 		 *
-		 *     @type integer user_id
-		 *     @type string  user_login
-		 *     @type string  user_email
-		 *     @type string  blogname
-		 *     @type string  user_ip
-		 *     @type string  reg_link
-		 *     @type string  act_link
-		 *     @type string  exp_type
-		 *     @type string  exp_date
-		 *     @type boolean do_shortcodes
-		 *     @type boolean add_footer
-		 *     @type boolean footer
-		 *     @type boolean disable
+		 *     @type string  $subj
+		 *     @type string  $body
+		 *     @type integer $user_id
+		 *     @type string  $user_login
+		 *     @type string  $user_email
+		 *     @type string  $blogname
+		 *     @type string  $user_ip
+		 *     @type string  $reg_link
+		 *     @type string  $act_link
+		 *     @type string  $exp_type
+		 *     @type string  $exp_date
+		 *     @type boolean $do_shortcodes
+		 *     @type boolean $add_footer
+		 *     @type boolean $footer
+		 *     @type boolean $disable
+		 *     @type array   $field_arr
+		 *     @type string  $headers
+		 *     @type string  $admin_email
 		 * }
 		 * @param array $wpmem_fields   An array of the WP-Members fields.
 		 * @param array $field_data     An array of the posted registration data.
@@ -512,11 +517,24 @@ class WP_Members_Email {
 	 * @since 3.2.0
 	 */
 	function send( $to ) {
-		$send_to = ( 'user' == $to ) ? $this->settings['user_email'] : $this->settings['admin_email'];
+		$args['to'] = ( 'user' == $to ) ? $this->settings['user_email'] : $this->settings['admin_email'];
+		$args['subject'] = $this->settings['subj'];
+		$args['message'] = $this->settings['body'];
+		$args['headers'] = $this->settings['headers'];
+		// @todo Add attachments to arguments and email send (and probably in the original function).
+		/**
+		 * Filter email send arguments.
+		 *
+		 * @since 3.2.5
+		 *
+		 * @param array  $send_args
+		 * @param string $to
+		 * @param array  $this->settings
+		 */
+		$args = apply_filters( 'wpmem_email_send_args', $args, $to, $this->settings );
 		// Apply WP's "from" and "from name" email filters.
 		add_filter( 'wp_mail_from',      array( $this, 'from'      ) );
 		add_filter( 'wp_mail_from_name', array( $this, 'from_name' ) );
-		// Send the message.
-		wp_mail( $send_to, stripslashes( $this->settings['subj'] ), stripslashes( $this->settings['body'] ), $this->settings['headers'] );
+		wp_mail( $args['to'], stripslashes( $args['subject'] ), stripslashes( $args['message'] ), $args['headers'] );
 	}
 }

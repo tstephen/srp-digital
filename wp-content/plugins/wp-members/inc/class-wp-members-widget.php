@@ -80,7 +80,7 @@ class widget_wpmemwidget extends WP_Widget {
 
 		$redirect_to = ( array_key_exists( 'redirect_to', $instance ) ) ? $instance['redirect_to'] : '';
 		$title       = ( array_key_exists( 'title',       $instance ) ) ? $instance['title']       : __( 'Login Status', 'wp-members' );
-		$customizer  = ( is_customize_preview() ) ? get_theme_mod( 'show_logged_out_state', false ) : false;
+		$customizer  = ( is_customize_preview() ) ? get_theme_mod( 'wpmem_show_logged_out_state', false ) : false;
 		
 		/** This filter is documented in wp-includes/widgets/class-wp-widget-pages.php */
 		$title = apply_filters( 'widget_title', $title, $instance, $this->id_base );
@@ -274,8 +274,10 @@ class widget_wpmemwidget extends WP_Widget {
 
 			$form = '<form name="form" method="post" action="' . $post_to . '">' . $args['n'] . $form . $args['n'] . '</form>';
 
-			// Add status message.
-			$form = $args['status_msg'] . $args['n'] . $form;
+			// Add status message, if one exists.
+			if ( '' == $args['status_msg'] ) {
+				$args['status_msg'] . $args['n'] . $form;
+			}
 
 			// Strip breaks.
 			$form = ( $args['strip_breaks'] ) ? str_replace( array( "\n", "\r", "\t" ), array( '','','' ), $form ) : $form;
@@ -290,9 +292,15 @@ class widget_wpmemwidget extends WP_Widget {
 			$form = apply_filters( 'wpmem_sidebar_form', $form );
 
 			$do_error_msg = '';
+			$error_msg = $args['error_before'] . $args['error_msg'] . $args['error_after'];
+			
 			if ( isset( $_POST['slog'] ) && $wpmem_regchk == 'loginfailed' ) {
 				$do_error_msg = true;
-				$error_msg = $args['error_before'] . $args['error_msg'] . $args['error_after'];
+			} elseif( is_customize_preview() && get_theme_mod( 'wpmem_show_form_message_dialog', false ) ) {
+				$do_error_msg = true;
+			}
+			
+			if ( $do_error_msg ) {
 				/**
 				 * Filter the sidebar login failed message.
 				 *
@@ -301,8 +309,8 @@ class widget_wpmemwidget extends WP_Widget {
 				 * @param string $error_msg The error message.
 				 */
 				$error_msg = apply_filters( 'wpmem_login_failed_sb', $error_msg );
+				$form = $error_msg . $form;
 			}
-			$form = ( $do_error_msg ) ? $error_msg . $form : $form;
 
 			echo $form;
 
