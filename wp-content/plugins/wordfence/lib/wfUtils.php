@@ -1,6 +1,5 @@
 <?php
 require_once('wfConfig.php');
-require_once('wfCountryMap.php');
 class wfUtils {
 	private static $isWindows = false;
 	public static $scanLockFH = false;
@@ -109,7 +108,7 @@ class wfUtils {
 		if ($minutes) {
 			$components[] = self::pluralize($minutes, 'minute');
 		}
-		if ($secs) {
+		if ($secs && $secs >= 1) {
 			$components[] = self::pluralize($secs, 'second');
 		}
 		
@@ -891,6 +890,24 @@ class wfUtils {
 		return false;
 	}
 
+	public static function getAllServerVariableIPs()
+	{
+		$variables = array('REMOTE_ADDR', 'HTTP_CF_CONNECTING_IP', 'HTTP_X_REAL_IP', 'HTTP_X_FORWARDED_FOR');
+		$ips = array();
+
+		foreach ($variables as $variable) {
+			$ip = isset($_SERVER[$variable]) ? $_SERVER[$variable] : false;
+
+			if ($ip && strpos($ip, ',') !== false) {
+				$ips[$variable] = preg_replace('/[\s,]/', '', explode(',', $ip));
+			} else {
+				$ips[$variable] = $ip;
+			}
+		}
+
+		return $ips;
+	}
+
 	public static function getIPAndServerVariable($howGet = null, $trustedProxies = null) {
 		$connectionIP = array_key_exists('REMOTE_ADDR', $_SERVER) ? array($_SERVER['REMOTE_ADDR'], 'REMOTE_ADDR') : array('127.0.0.1', 'REMOTE_ADDR');
 
@@ -1153,13 +1170,27 @@ class wfUtils {
 	}
 	public static function getScanFileError() {
 		$fileTime = wfConfig::get('scanFileProcessing');
-		if (! $fileTime) {
+		if (!$fileTime) {
 			return;
 		}
 		list($file, $time) =  unserialize($fileTime);
 		if ($time+10 < time()) {
-			$files = wfConfig::get('scan_exclude') . "\n" . $file;
-			wfConfig::set('scan_exclude', self::cleanupOneEntryPerLine($files));
+			$add = true;
+			$excludePatterns = wordfenceScanner::getExcludeFilePattern(wordfenceScanner::EXCLUSION_PATTERNS_USER);
+			if ($excludePatterns) {
+				foreach ($excludePatterns as $pattern) {
+					if (preg_match($pattern, $file)) {
+						$add = false;
+						break;
+					}
+				}
+			}
+			
+			if ($add) {
+				$files = wfConfig::get('scan_exclude') . "\n" . $file;
+				wfConfig::set('scan_exclude', self::cleanupOneEntryPerLine($files));
+			}
+			
 			self::endProcessingFile();
 		}
 	}
@@ -1191,6 +1222,9 @@ class wfUtils {
 
 		wfConfig::set('wf_scanRunning', '');
 		wfIssues::updateScanStillRunning(false);
+		if (wfCentral::isConnected()) {
+			wfCentral::updateScanStatus();
+		}
 	}
 	public static function getIPGeo($IP){ //Works with int or dotted
 
@@ -1369,8 +1403,9 @@ class wfUtils {
 		return $tooBig;
 	}
 	public static function countryCode2Name($code){
-		if(isset(wfCountryMap::$map[$code])){
-			return wfCountryMap::$map[$code];
+		require('wfBulkCountries.php'); /** @var array $wfBulkCountries */
+		if(isset($wfBulkCountries[$code])){
+			return $wfBulkCountries[$code];
 		} else {
 			return '';
 		}
