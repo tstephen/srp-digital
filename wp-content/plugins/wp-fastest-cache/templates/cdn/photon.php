@@ -6,7 +6,7 @@
 			<table width="100%" height="100%">
 				<tbody>
 					<tr>
-						<td valign="middle" style="vertical-align: middle; font-weight: bold; color: rgb(255, 255, 255); text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5); padding-left: 10px; font-size: 13px; cursor: move;">CDN Settings</td>
+						<td valign="middle" style="vertical-align: middle; font-weight: bold; color: rgb(255, 255, 255); text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5); padding-left: 10px; font-size: 13px; cursor: move;">Photon Settings</td>
 						<td width="20" align="center" style="vertical-align: middle;"></td>
 						<td width="20" align="center" style="vertical-align: middle; font-family: Arial,Helvetica,sans-serif; color: rgb(170, 170, 170); cursor: default;">
 							<div title="Close Window" class="close-wiz"></div>
@@ -57,11 +57,20 @@
 					<div wpfc-cdn-page="4" class="wiz-cont" style="display:none">
 						<?php include WPFC_MAIN_PATH."templates/cdn/specify_sources.php"; ?>
 					</div>
+
+					
+
 					<div wpfc-cdn-page="5" class="wiz-cont" style="display:none">
+						<?php include WPFC_MAIN_PATH."templates/cdn/exclude_sources.php"; ?>
+					</div>
+
+
+
+					<div wpfc-cdn-page="6" class="wiz-cont" style="display:none">
 						<h1>Ready to Go!</h1>
 						<p>You're all set! Click the finish button below and that's it.</p>
 					</div>
-					<div wpfc-cdn-page="6" class="wiz-cont" style="display:none">
+					<div wpfc-cdn-page="7" class="wiz-cont" style="display:none">
 						<h1>Integration Ready!</h1>
 						<p>Your static contents will be delivered via CDN.</p>
 					</div>

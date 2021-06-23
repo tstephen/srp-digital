@@ -38,7 +38,7 @@ div.questionCon.qsubmit{
 }
 
 .tabGroup div.question{
-	padding-right: 10px;
+	padding-right: 5px;
     float: left;
     text-align: right;
     width: 130px;
@@ -114,14 +114,17 @@ div.questionCon.qsubmit{
 }
 /* for lef panel */
 #toplevel_page_wpfastestcacheoptions img{
-    padding: 0 !important;
-    margin-left: 5px !important;
+    margin-top: -7px !important;
+    width: 30px !important;
+/*    padding: 0 !important;
+    margin-left: 5px !important;*/
 }
 #toplevel_page_wpfastestcacheoptions div.wp-menu-name{
     margin-left: 0 !important;
 }
 .question:after {
     content: ":";
+    padding-left: 5px;
 }
 .inputCon input[type="checkbox"]{
     margin-right: 5px;
@@ -244,7 +247,11 @@ form.delete-line .left .submit input{
     width: 165px;
     white-space: pre-line !important;
 }
-.revert{
+td div.revert:before{
+    font-family: "dashicons";
+    content: "\f531";
+}
+td div.revert{
     width:16px;
     height:16px;
     vertical-align: middle;
@@ -258,31 +265,15 @@ form.delete-line .left .submit input{
     border:1px solid #aaa;
     background:#ddd;
     padding:3px;
-    
-    background: rgb(255,255,255) url("../images/cancel.png") no-repeat center; /* Old browsers */
-    background: -moz-linear-gradient(top,  rgba(255,255,255,1) 0%, rgba(229,229,229,1) 100%) url("../images/cancel.png") no-repeat center; /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(100%,rgba(229,229,229,1))) url("../images/cancel.png") no-repeat center; /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%) url("../images/cancel.png") no-repeat center; /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%) url("../images/cancel.png") no-repeat center; /* Opera 11.10+ */
-    background: -ms-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%) url("../images/cancel.png") no-repeat center; /* IE10+ */
-    background: linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%) no-repeat center; /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#e5e5e5',GradientType=0 ) url("../images/cancel.png") no-repeat center; /* IE6-9 */
+    background-color: white;
 }
 
-.revert:hover{
+td div.revert:hover{
     border-color:#000;
-    
-    background: rgb(255,255,255) url("../images/cancel.png") no-repeat center; /* Old browsers */
-    background: -moz-linear-gradient(top,  rgba(255,255,255,1) 0%, rgba(229,229,229,1) 100%) url("../images/cancel.png") no-repeat center; /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(100%,rgba(229,229,229,1))) url("../images/cancel.png") no-repeat center; /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%) url("../images/cancel.png") no-repeat center; /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%) url("../images/cancel.png") no-repeat center; /* Opera 11.10+ */
-    background: -ms-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%) url("../images/cancel.png") no-repeat center; /* IE10+ */
-    background: linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%) url("../images/cancel.png") no-repeat center; /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#e5e5e5',GradientType=0 ) url("../images/cancel.png") no-repeat center; /* IE6-9 */
+    background-color: white;
 }
 
-.revert:active{
+td div.revert:active{
     background-color: #F5F5F5;
 }
 
