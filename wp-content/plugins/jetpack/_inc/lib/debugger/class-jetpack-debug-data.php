@@ -1,13 +1,15 @@
 <?php
 /**
- * Jetpack Debug Data for the legacy Jetpack debugger page and the WP 5.2-era Site Health sections.
+ * Jetpack Debug Data for the Site Health sections.
  *
- * @package jetpack
+ * @package automattic/jetpack
  */
 
+use Automattic\Jetpack\Connection\Tokens;
 use Automattic\Jetpack\Constants;
-use Automattic\Jetpack\Sync\Modules;
+use Automattic\Jetpack\Redirect;
 use Automattic\Jetpack\Sync\Functions;
+use Automattic\Jetpack\Sync\Modules;
 use Automattic\Jetpack\Sync\Sender;
 
 /**
@@ -42,7 +44,7 @@ class Jetpack_Debug_Data {
 	 * @return string Human readable time.
 	 */
 	public static function seconds_to_time( $seconds ) {
-		$seconds = intval( $seconds );
+		$seconds = (int) $seconds;
 		$units   = array(
 			'week'   => WEEK_IN_SECONDS,
 			'day'    => DAY_IN_SECONDS,
@@ -56,7 +58,7 @@ class Jetpack_Debug_Data {
 		}
 		$human_readable = '';
 		foreach ( $units as $name => $divisor ) {
-			$quot = intval( $seconds / $divisor );
+			$quot = (int) ( $seconds / $divisor );
 			if ( $quot ) {
 				$human_readable .= "$quot $name";
 				$human_readable .= ( abs( $quot ) > 1 ? 's' : '' ) . ', ';
@@ -94,6 +96,10 @@ class Jetpack_Debug_Data {
 	 * @return array $args Debug information in the same format as the initial argument.
 	 */
 	public static function core_debug_data( $debug ) {
+		$support_url = Jetpack::is_development_version()
+			? Redirect::get_url( 'jetpack-contact-support-beta-group' )
+			: Redirect::get_url( 'jetpack-contact-support' );
+
 		$jetpack = array(
 			'jetpack' => array(
 				'label'       => __( 'Jetpack', 'jetpack' ),
@@ -103,7 +109,7 @@ class Jetpack_Debug_Data {
 						'Diagnostic information helpful to <a href="%1$s" target="_blank" rel="noopener noreferrer">your Jetpack Happiness team<span class="screen-reader-text">%2$s</span></a>',
 						'jetpack'
 					),
-					esc_html( 'https://jetpack.com/contact-support/' ),
+					esc_url( $support_url ),
 					__( '(opens in a new tab)', 'jetpack' )
 				),
 				'fields'      => self::debug_data(),
@@ -161,7 +167,7 @@ class Jetpack_Debug_Data {
 		);
 		$debug_info['master_user']    = array(
 			'label'   => 'Jetpack Master User',
-			'value'   => self::human_readable_master_user(),
+			'value'   => self::human_readable_master_user(), // Only ID number and user name.
 			'private' => false,
 		);
 
@@ -175,8 +181,8 @@ class Jetpack_Debug_Data {
 		 * If a token does not contain a period, then it is malformed and we report it as such.
 		 */
 		$user_id    = get_current_user_id();
-		$blog_token = Jetpack_Data::get_access_token();
-		$user_token = Jetpack_Data::get_access_token( $user_id );
+		$blog_token = ( new Tokens() )->get_access_token();
+		$user_token = ( new Tokens() )->get_access_token( $user_id );
 
 		$tokenset = '';
 		if ( $blog_token ) {
@@ -259,7 +265,7 @@ class Jetpack_Debug_Data {
 				$debug_info[ $header ] = array(
 					'label'   => 'Server Variable ' . $header,
 					'value'   => ( $_SERVER[ $header ] ) ? $_SERVER[ $header ] : 'false',
-					'private' => false,
+					'private' => true, // This isn't really 'private' information, but we don't want folks to easily paste these into public forums.
 				);
 			}
 		}
@@ -278,7 +284,7 @@ class Jetpack_Debug_Data {
 			foreach ( $sync_statuses as $sync_status => $sync_status_value ) {
 				$human_readable_sync_status[ $sync_status ] =
 					in_array( $sync_status, array( 'started', 'queue_finished', 'send_started', 'finished' ), true )
-						? date( 'r', $sync_status_value ) : $sync_status_value;
+						? gmdate( 'r', $sync_status_value ) : $sync_status_value;
 			}
 			$debug_info['full_sync'] = array(
 				'label'   => 'Full Sync Status',
@@ -388,6 +394,6 @@ class Jetpack_Debug_Data {
 	private static function human_readable_user( $user ) {
 		$user = new WP_User( $user );
 
-		return sprintf( '#%1$d %2$s (%3$s)', $user->ID, $user->user_login, $user->user_email ); // Format: "#1 username (user@example.com)".
+		return sprintf( '#%1$d %2$s', $user->ID, $user->user_login ); // Format: "#1 username".
 	}
 }
