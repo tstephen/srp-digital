@@ -1,5 +1,8 @@
 <?php
+// phpcs:ignoreFile -- compatibility library for PHP 5-7.1
 namespace Sodium;
+
+require_once dirname(dirname(__FILE__)) . '/autoload.php';
 
 use ParagonIE_Sodium_Compat;
 

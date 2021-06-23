@@ -1,4 +1,5 @@
 <?php
+// phpcs:ignoreFile -- compatibility library for PHP 5-7.1
 
 if (class_exists('ParagonIE_Sodium_Core_Util', false)) {
     return;
@@ -911,6 +912,7 @@ abstract class ParagonIE_Sodium_Core_Util
 
         if ($mbstring === null) {
             $mbstring = extension_loaded('mbstring')
+                && defined('MB_OVERLOAD_STRING')
                 &&
             ((int) (ini_get('mbstring.func_overload')) & MB_OVERLOAD_STRING);
         }

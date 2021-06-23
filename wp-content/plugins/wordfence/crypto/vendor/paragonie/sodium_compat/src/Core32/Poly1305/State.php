@@ -1,4 +1,5 @@
 <?php
+// phpcs:ignoreFile -- compatibility library for PHP 5-7.1
 
 if (class_exists('ParagonIE_Sodium_Core32_Poly1305_State', false)) {
     return;
@@ -142,7 +143,7 @@ class ParagonIE_Sodium_Core32_Poly1305_State extends ParagonIE_Sodium_Core32_Uti
             }
 
             $this->blocks(
-                static::intArrayToString($this->buffer),
+                self::intArrayToString($this->buffer),
                 ParagonIE_Sodium_Core32_Poly1305::BLOCK_SIZE
             );
             $this->leftover = 0;
@@ -346,7 +347,7 @@ class ParagonIE_Sodium_Core32_Poly1305_State extends ParagonIE_Sodium_Core32_Uti
             $this->final = true;
             $this->blocks(
                 self::substr(
-                    static::intArrayToString($this->buffer),
+                    self::intArrayToString($this->buffer),
                     0,
                     ParagonIE_Sodium_Core32_Poly1305::BLOCK_SIZE
                 ),

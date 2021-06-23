@@ -1,5 +1,5 @@
 <?php
-require_once('wfConfig.php');
+require_once(dirname(__FILE__) . '/wfConfig.php');
 class wfUtils {
 	private static $isWindows = false;
 	public static $scanLockFH = false;
@@ -22,7 +22,7 @@ class wfUtils {
 	}
 	public static function makeTimeAgo($secs, $noSeconds = false) {
 		if($secs < 1){
-			return "a moment";
+			return __("a moment", 'wordfence');
 		}
 		
 		if (function_exists('date_diff')) {
@@ -57,25 +57,29 @@ class wfUtils {
 		}
 		
 		if ($years) {
-			return self::pluralize($years, 'year', $months, 'month');
+			return $years . ' ' . _n('year', 'years', $years, 'wordfence') .
+				(is_numeric($months) ? ' ' . $months . ' ' . _n('month', 'months', $months, 'wordfence') : '');
 		}
 		else if ($months) {
-			return self::pluralize($months, 'month', $days, 'day');
+			return $months . ' ' . _n('month', 'months', $months, 'wordfence') .
+				(is_numeric($days) ? ' ' . $days . ' ' . _n('day', 'days', $days, 'wordfence') : '');
 		}
 		else if ($days) {
-			return self::pluralize($days, 'day', $hours, 'hour');
+			return $days . ' ' . _n('day', 'days', $days, 'wordfence') .
+				(is_numeric($hours) ? ' ' . $hours . ' ' . _n('hour', 'hours', $hours, 'wordfence') : '');
 		}
 		else if ($hours) {
-			return self::pluralize($hours, 'hour', $minutes, 'min');
+			return $hours . ' ' . _n('hour', 'hours', $hours, 'wordfence') .
+				(is_numeric($minutes) ? ' ' . $minutes . ' ' . _n('minute', 'minutes', $minutes, 'wordfence') : '');
 		}
 		else if ($minutes) {
-			return self::pluralize($minutes, 'min');
+			return $minutes . ' ' . _n('minute', 'minutes', $minutes, 'wordfence');
 		}
 		else {
 			if($noSeconds){
-				return "less than a minute";
+				return __("less than a minute", 'wordfence');
 			} else {
-				return floor($secs) . " secs";
+				return sprintf(/* translators: Number of seconds. */ __("%d seconds", 'wordfence'), floor($secs));
 			}
 		}
 	}
@@ -88,47 +92,43 @@ class wfUtils {
 		$minutes = floor($secs / 60); $secs -= $minutes * 60;
 		
 		if ($months) {
-			$components[] = self::pluralize($months, 'month');
+			$components[] = $months . ' ' . _n('month', 'months', $months, 'wordfence');
 			if (!$createExact) {
 				$hours = $minutes = $secs = 0;
 			}
 		}
 		if ($days) {
-			$components[] = self::pluralize($days, 'day');
+			$components[] = $days . ' ' . _n('day', 'days', $days, 'wordfence');
 			if (!$createExact) {
 				$minutes = $secs = 0;
 			}
 		}
 		if ($hours) {
-			$components[] = self::pluralize($hours, 'hour');
+			$components[] = $hours . ' ' . _n('hour', 'hours', $hours, 'wordfence');
 			if (!$createExact) {
 				$secs = 0;
 			}
 		}
 		if ($minutes) {
-			$components[] = self::pluralize($minutes, 'minute');
+			$components[] = $minutes . ' ' . _n('minute', 'minutes', $minutes, 'wordfence');
 		}
 		if ($secs && $secs >= 1) {
-			$components[] = self::pluralize($secs, 'second');
+			$components[] = $secs . ' ' . _n('second', 'seconds', $secs, 'wordfence');
 		}
 		
 		if (empty($components)) {
-			$components[] = 'less than 1 second';
+			$components[] = __('less than 1 second', 'wordfence');
 		}
 		
 		return implode(' ', $components);
 	}
-	public static function pluralize($m1, $t1, $m2 = false, $t2 = false) {
-		if($m1 != 1) {
-			$t1 = $t1 . 's';
-		}
-		if($m2 != 1) {
-			$t2 = $t2 . 's';
-		}
-		if($m1 && $m2){
-			return "$m1 $t1 $m2 $t2";
+	public static function pluralize($m1, $m1Singular, $m1Plural, $m2 = false, $m2Singular = false, $m2Plural = false) {
+		$m1Text = _n($m1Singular, $m1Plural, $m1, 'wordfence');
+		if (is_numeric($m2)) {
+			$m2Text = _n($m2Singular, $m2Plural, $m2, 'wordfence');
+			return "$m1 $m1Text $m2 $m2Text";
 		} else {
-			return "$m1 $t1";
+			return "$m1 $m1Text";
 		}
 	}
 	public static function formatBytes($bytes, $precision = 2) {
@@ -157,7 +157,7 @@ class wfUtils {
 		}
 		return $version;
 	}
-
+	
 	/**
 	 * Check if an IP address is in a network block
 	 *
@@ -166,43 +166,216 @@ class wfUtils {
 	 * @return boolean
 	 */
 	public static function subnetContainsIP($subnet, $ip) {
-		list($network, $prefix) = array_pad(explode('/', $subnet, 2), 2, null);
-
-		if (filter_var($network, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-			// If no prefix was supplied, 32 is implied for IPv4
-			if ($prefix === null) {
-				$prefix = 32;
+		static $_network_cache = array();
+		static $_ip_cache = array();
+		static $_masks = array(
+			0 => "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			1 => "\x80\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			2 => "\xc0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			3 => "\xe0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			4 => "\xf0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			5 => "\xf8\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			6 => "\xfc\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			7 => "\xfe\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			8 => "\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			9 => "\xff\x80\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			10 => "\xff\xc0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			11 => "\xff\xe0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			12 => "\xff\xf0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			13 => "\xff\xf8\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			14 => "\xff\xfc\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			15 => "\xff\xfe\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			16 => "\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			17 => "\xff\xff\x80\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			18 => "\xff\xff\xc0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			19 => "\xff\xff\xe0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			20 => "\xff\xff\xf0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			21 => "\xff\xff\xf8\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			22 => "\xff\xff\xfc\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			23 => "\xff\xff\xfe\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			24 => "\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			25 => "\xff\xff\xff\x80\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			26 => "\xff\xff\xff\xc0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			27 => "\xff\xff\xff\xe0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			28 => "\xff\xff\xff\xf0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			29 => "\xff\xff\xff\xf8\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			30 => "\xff\xff\xff\xfc\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			31 => "\xff\xff\xff\xfe\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			32 => "\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			33 => "\xff\xff\xff\xff\x80\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			34 => "\xff\xff\xff\xff\xc0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			35 => "\xff\xff\xff\xff\xe0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			36 => "\xff\xff\xff\xff\xf0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			37 => "\xff\xff\xff\xff\xf8\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			38 => "\xff\xff\xff\xff\xfc\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			39 => "\xff\xff\xff\xff\xfe\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			40 => "\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			41 => "\xff\xff\xff\xff\xff\x80\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			42 => "\xff\xff\xff\xff\xff\xc0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			43 => "\xff\xff\xff\xff\xff\xe0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			44 => "\xff\xff\xff\xff\xff\xf0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			45 => "\xff\xff\xff\xff\xff\xf8\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			46 => "\xff\xff\xff\xff\xff\xfc\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			47 => "\xff\xff\xff\xff\xff\xfe\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			48 => "\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			49 => "\xff\xff\xff\xff\xff\xff\x80\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			50 => "\xff\xff\xff\xff\xff\xff\xc0\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			51 => "\xff\xff\xff\xff\xff\xff\xe0\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			52 => "\xff\xff\xff\xff\xff\xff\xf0\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			53 => "\xff\xff\xff\xff\xff\xff\xf8\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			54 => "\xff\xff\xff\xff\xff\xff\xfc\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			55 => "\xff\xff\xff\xff\xff\xff\xfe\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			56 => "\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+			57 => "\xff\xff\xff\xff\xff\xff\xff\x80\x00\x00\x00\x00\x00\x00\x00\x00",
+			58 => "\xff\xff\xff\xff\xff\xff\xff\xc0\x00\x00\x00\x00\x00\x00\x00\x00",
+			59 => "\xff\xff\xff\xff\xff\xff\xff\xe0\x00\x00\x00\x00\x00\x00\x00\x00",
+			60 => "\xff\xff\xff\xff\xff\xff\xff\xf0\x00\x00\x00\x00\x00\x00\x00\x00",
+			61 => "\xff\xff\xff\xff\xff\xff\xff\xf8\x00\x00\x00\x00\x00\x00\x00\x00",
+			62 => "\xff\xff\xff\xff\xff\xff\xff\xfc\x00\x00\x00\x00\x00\x00\x00\x00",
+			63 => "\xff\xff\xff\xff\xff\xff\xff\xfe\x00\x00\x00\x00\x00\x00\x00\x00",
+			64 => "\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00",
+			65 => "\xff\xff\xff\xff\xff\xff\xff\xff\x80\x00\x00\x00\x00\x00\x00\x00",
+			66 => "\xff\xff\xff\xff\xff\xff\xff\xff\xc0\x00\x00\x00\x00\x00\x00\x00",
+			67 => "\xff\xff\xff\xff\xff\xff\xff\xff\xe0\x00\x00\x00\x00\x00\x00\x00",
+			68 => "\xff\xff\xff\xff\xff\xff\xff\xff\xf0\x00\x00\x00\x00\x00\x00\x00",
+			69 => "\xff\xff\xff\xff\xff\xff\xff\xff\xf8\x00\x00\x00\x00\x00\x00\x00",
+			70 => "\xff\xff\xff\xff\xff\xff\xff\xff\xfc\x00\x00\x00\x00\x00\x00\x00",
+			71 => "\xff\xff\xff\xff\xff\xff\xff\xff\xfe\x00\x00\x00\x00\x00\x00\x00",
+			72 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00",
+			73 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\x80\x00\x00\x00\x00\x00\x00",
+			74 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xc0\x00\x00\x00\x00\x00\x00",
+			75 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xe0\x00\x00\x00\x00\x00\x00",
+			76 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xf0\x00\x00\x00\x00\x00\x00",
+			77 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xf8\x00\x00\x00\x00\x00\x00",
+			78 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfc\x00\x00\x00\x00\x00\x00",
+			79 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\x00\x00\x00\x00\x00\x00",
+			80 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00",
+			81 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x80\x00\x00\x00\x00\x00",
+			82 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xc0\x00\x00\x00\x00\x00",
+			83 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xe0\x00\x00\x00\x00\x00",
+			84 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xf0\x00\x00\x00\x00\x00",
+			85 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xf8\x00\x00\x00\x00\x00",
+			86 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfc\x00\x00\x00\x00\x00",
+			87 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\x00\x00\x00\x00\x00",
+			88 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00",
+			89 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x80\x00\x00\x00\x00",
+			90 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xc0\x00\x00\x00\x00",
+			91 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xe0\x00\x00\x00\x00",
+			92 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xf0\x00\x00\x00\x00",
+			93 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xf8\x00\x00\x00\x00",
+			94 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfc\x00\x00\x00\x00",
+			95 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\x00\x00\x00\x00",
+			96 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00",
+			97 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x80\x00\x00\x00",
+			98 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xc0\x00\x00\x00",
+			99 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xe0\x00\x00\x00",
+			100 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xf0\x00\x00\x00",
+			101 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xf8\x00\x00\x00",
+			102 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfc\x00\x00\x00",
+			103 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\x00\x00\x00",
+			104 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00",
+			105 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x80\x00\x00",
+			106 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xc0\x00\x00",
+			107 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xe0\x00\x00",
+			108 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xf0\x00\x00",
+			109 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xf8\x00\x00",
+			110 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfc\x00\x00",
+			111 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\x00\x00",
+			112 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00",
+			113 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x80\x00",
+			114 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xc0\x00",
+			115 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xe0\x00",
+			116 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xf0\x00",
+			117 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xf8\x00",
+			118 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfc\x00",
+			119 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\x00",
+			120 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x00",
+			121 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x80",
+			122 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xc0",
+			123 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xe0",
+			124 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xf0",
+			125 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xf8",
+			126 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfc",
+			127 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe",
+			128 => "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff",
+		);
+		/*
+		 * The above is generated by:
+		 * 
+		   function gen_mask($prefix, $size = 128) {
+				//Workaround to avoid overflow, split into four pieces			
+				$mask_1 = (pow(2, $size / 4) - 1) ^ (pow(2, min($size / 4, max(0, 1 * $size / 4 - $prefix))) - 1);
+				$mask_2 = (pow(2, $size / 4) - 1) ^ (pow(2, min($size / 4, max(0, 2 * $size / 4 - $prefix))) - 1);
+				$mask_3 = (pow(2, $size / 4) - 1) ^ (pow(2, min($size / 4, max(0, 3 * $size / 4 - $prefix))) - 1);
+				$mask_4 = (pow(2, $size / 4) - 1) ^ (pow(2, min($size / 4, max(0, 4 * $size / 4 - $prefix))) - 1);
+				return ($mask_1 ? pack('N', $mask_1) : "\0\0\0\0") . ($mask_2 ? pack('N', $mask_2) : "\0\0\0\0") . ($mask_3 ? pack('N', $mask_3) : "\0\0\0\0") . ($mask_4 ? pack('N', $mask_4) : "\0\0\0\0");
 			}
-
-			// Validate the IPv4 network prefix
-			if ($prefix < 0 || $prefix > 32) {
-				return false;
+			
+			$masks = array();
+			for ($i = 0; $i <= 128; $i++) {
+				$mask = gen_mask($i);
+				$chars = str_split($mask);
+				$masks[] = implode('', array_map(function($c) { return '\\x' . bin2hex($c); }, $chars));
 			}
-
-			// Increase the IPv4 network prefix to work in the IPv6 address space
-			$prefix += 96;
-		} else {
-			// If no prefix was supplied, 128 is implied for IPv6
-			if ($prefix === null) {
-				$prefix = 128;
+			
+			echo 'array(' . "\n";
+			foreach ($masks as $index => $m) {
+				echo "\t{$index} => \"{$m}\",\n";
 			}
-
-			// Validate the IPv6 network prefix
-			if ($prefix < 1 || $prefix > 128) {
-				return false;
+			echo ')';
+		 *
+		 */
+		
+		if (isset($_network_cache[$subnet])) {
+			list($bin_network, $prefix, $masked_network) = $_network_cache[$subnet];
+			$mask = $_masks[$prefix];
+		}
+		else {
+			list($network, $prefix) = array_pad(explode('/', $subnet, 2), 2, null);
+			if (filter_var($network, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+				// If no prefix was supplied, 32 is implied for IPv4
+				if ($prefix === null) {
+					$prefix = 32;
+				}
+				
+				// Validate the IPv4 network prefix
+				if ($prefix < 0 || $prefix > 32) {
+					return false;
+				}
+				
+				// Increase the IPv4 network prefix to work in the IPv6 address space
+				$prefix += 96;
 			}
+			else {
+				// If no prefix was supplied, 128 is implied for IPv6
+				if ($prefix === null) {
+					$prefix = 128;
+				}
+				
+				// Validate the IPv6 network prefix
+				if ($prefix < 1 || $prefix > 128) {
+					return false;
+				}
+			}
+			$mask = $_masks[$prefix];
+			$bin_network = self::inet_pton($network);
+			$masked_network = $bin_network & $mask;
+			$_network_cache[$subnet] = array($bin_network, $prefix, $masked_network);
 		}
 		
-		$bin_network = wfUtils::substr(self::inet_pton($network), 0, ceil($prefix / 8));
-		$bin_ip = wfUtils::substr(self::inet_pton($ip), 0, ceil($prefix / 8));
-		if ($prefix % 8 != 0) { //Adjust the last relevant character to fit the mask length since the character's bits are split over it
-			$pos = intval($prefix / 8);
-			$adjustment = chr(((0xff << (8 - ($prefix % 8))) & 0xff));
-			$bin_network[$pos] = ($bin_network[$pos] & $adjustment);
-			$bin_ip[$pos] = ($bin_ip[$pos] & $adjustment);
+		if (isset($_ip_cache[$ip]) && isset($_ip_cache[$ip][$prefix])) {
+			list($bin_ip, $masked_ip) = $_ip_cache[$ip][$prefix];
+		}
+		else {
+			$bin_ip = self::inet_pton($ip);
+			$masked_ip = $bin_ip & $mask;
+			if (!isset($_ip_cache[$ip])) {
+				$_ip_cache[$ip] = array();
+			}
+			$_ip_cache[$ip][$prefix] = array($bin_ip, $masked_ip);
 		}
 		
-		return ($bin_network === $bin_ip);
+		return ($masked_ip === $masked_network);
 	}
 
 	/**
@@ -523,7 +696,7 @@ class wfUtils {
 	public static function whitelistPresets() {
 		static $_cachedPresets = null;
 		if ($_cachedPresets === null) {
-			include('wfIPWhitelist.php'); /** @var array $wfIPWhitelist */
+			include(dirname(__FILE__) . '/wfIPWhitelist.php'); /** @var array $wfIPWhitelist */
 			$currentPresets = wfConfig::getJSON('whitelistPresets', array());
 			if (is_array($currentPresets)) {
 				$_cachedPresets = array_merge($wfIPWhitelist, $currentPresets);
@@ -991,7 +1164,7 @@ class wfUtils {
 	public static function isValidEmail($email, $strict = false) {
 		//We don't default to strict, full validation because poorly-configured servers can crash due to the regex PHP uses in filter_var($email, FILTER_VALIDATE_EMAIL)
 		if ($strict) {
-			return filter_var($email, FILTER_VALIDATE_EMAIL !== false);
+			return (filter_var($email, FILTER_VALIDATE_EMAIL) !== false);
 		}
 		
 		return preg_match('/^[^@\s]+@[^@\s]+\.[^@\s]+$/i', $email) === 1;
@@ -1018,7 +1191,7 @@ class wfUtils {
 	public static function tmpl($file, $data){
 		extract($data);
 		ob_start();
-		include $file;
+		include dirname(__FILE__) . DIRECTORY_SEPARATOR . $file;
 		return ob_get_contents() . (ob_end_clean() ? "" : "");
 	}
 	public static function bigRandomHex(){
@@ -1027,7 +1200,7 @@ class wfUtils {
 	public static function encrypt($str){
 		$key = wfConfig::get('encKey');
 		if(! $key){
-			wordfence::status(1, 'error', "Wordfence error: No encryption key found!");
+			wordfence::status(1, 'error', __("Wordfence error: No encryption key found!", 'wordfence'));
 			return false;
 		}
 		$db = new wfDB();
@@ -1036,7 +1209,7 @@ class wfUtils {
 	public static function decrypt($str){
 		$key = wfConfig::get('encKey');
 		if(! $key){
-			wordfence::status(1, 'error', "Wordfence error: No encryption key found!");
+			wordfence::status(1, 'error', __("Wordfence error: No encryption key found!", 'wordfence'));
 			return false;
 		}
 		$db = new wfDB();
@@ -1260,6 +1433,7 @@ class wfUtils {
 						$IPLocs[$ip_printable] = false;
 					} else {
 						$row['IP'] = self::inet_ntop($row['IP']);
+						$row['region'] = wfUtils::shouldDisplayRegion($row['countryName']) ? $row['region'] : '';
 						$IPLocs[$ip_printable] = $row;
 					}
 				}
@@ -1297,7 +1471,7 @@ class wfUtils {
 							$IPLocs[$IP] = array(
 								'IP' => $IP,
 								'city' => $value[3],
-								'region' => $value[2],
+								'region' => wfUtils::shouldDisplayRegion($value[1]) ? $value[2] : '',
 								'countryName' => $value[1],
 								'countryCode' => $value[0],
 								'lat' => $value[4],
@@ -1307,7 +1481,7 @@ class wfUtils {
 					}
 				}
 			} catch(Exception $e){
-				wordfence::status(2, 'error', "Call to Wordfence API to resolve IPs failed: " . $e->getMessage());
+				wordfence::status(2, 'error', sprintf(/* translators: Error message. */ __("Call to Wordfence API to resolve IPs failed: %s", 'wordfence'), $e->getMessage()));
 				return array();
 			}
 		}
@@ -1372,6 +1546,7 @@ class wfUtils {
 	}
 	//Note this function may report files that are too big which actually are not too big but are unseekable and throw an error on fseek(). But that's intentional
 	public static function fileTooBig($file){ //Deals with files > 2 gigs on 32 bit systems which are reported with the wrong size due to integer overflow
+		if (!@is_file($file) || !@is_readable($file)) { return false; } //Only apply to readable files
 		wfUtils::errorsOff();
 		$fh = @fopen($file, 'r');
 		wfUtils::errorsOn();
@@ -1403,12 +1578,16 @@ class wfUtils {
 		return $tooBig;
 	}
 	public static function countryCode2Name($code){
-		require('wfBulkCountries.php'); /** @var array $wfBulkCountries */
+		require(dirname(__FILE__) . '/wfBulkCountries.php'); /** @var array $wfBulkCountries */
 		if(isset($wfBulkCountries[$code])){
 			return $wfBulkCountries[$code];
 		} else {
 			return '';
 		}
+	}
+	public static function shouldDisplayRegion($country) {
+		$countries_to_show_for = array('united states', 'canada', 'australia');
+		return in_array(strtolower($country), $countries_to_show_for);
 	}
 	public static function extractBareURI($URL){
 		$URL = preg_replace('/^https?:\/\/[^\/]+/i', '', $URL); //strip of method and host
@@ -1615,6 +1794,18 @@ class wfUtils {
 		}
 		return $CIDRs;
 	}
+	
+	/**
+	 * This is a convenience function for sending a JSON response and ensuring that execution stops after sending
+	 * since wp_die() can be interrupted.
+	 * 
+	 * @param $response
+	 * @param int|null $status_code
+	 */
+	public static function send_json($response, $status_code = null) {
+		wp_send_json($response, $status_code);
+		die();
+	}
 
 	public static function setcookie($name, $value, $expire, $path, $domain, $secure, $httpOnly){
 		if(version_compare(PHP_VERSION, '5.2.0') >= 0){
@@ -1718,7 +1909,7 @@ class wfUtils {
 
 		if (file_exists($readmePath)) {
 			$readmePathInfo = pathinfo($readmePath);
-			require_once ABSPATH . WPINC . '/pluggable.php';
+			require_once(ABSPATH . WPINC . '/pluggable.php');
 			$hiddenReadmeFile = $readmePathInfo['filename'] . '.' . wp_hash('readme') . '.' . $readmePathInfo['extension'];
 			return @rename($readmePath, $readmePathInfo['dirname'] . '/' . $hiddenReadmeFile);
 		}
@@ -1734,7 +1925,7 @@ class wfUtils {
 			$readmePath = ABSPATH . 'readme.html';
 		}
 		$readmePathInfo = pathinfo($readmePath);
-		require_once ABSPATH . WPINC . '/pluggable.php';
+		require_once(ABSPATH . WPINC . '/pluggable.php');
 		$hiddenReadmeFile = $readmePathInfo['dirname'] . '/' . $readmePathInfo['filename'] . '.' . wp_hash('readme') . '.' . $readmePathInfo['extension'];
 		if (file_exists($hiddenReadmeFile)) {
 			return @rename($hiddenReadmeFile, $readmePath);
@@ -1965,6 +2156,7 @@ class wfUtils {
 					's'      => $siteurl,
 					'h'		 => $homeurl,
 					't'		 => microtime(true),
+					'lang'   => get_site_option('WPLANG'),
 				), null, '&'),
 				array(
 					'body'    => json_encode($payload),
@@ -2155,9 +2347,9 @@ class wfUtils {
 		else if (is_multisite()) {
 			$current_network = get_network();
 			if ( 'relative' == $scheme )
-				$url = $current_network->path;
+				$url = rtrim($current_network->path, '/');
 			else
-				$url = 'http://' . $current_network->domain . $current_network->path;
+				$url = 'http://' . rtrim($current_network->domain, '/') . '/' . trim($current_network->path, '/');
 		}
 		
 		if ( ! in_array( $scheme, array( 'http', 'https', 'relative' ) ) ) {
@@ -2187,11 +2379,12 @@ class wfUtils {
 		if (function_exists('get_bloginfo') && empty($homeurl)) {
 			if (is_multisite()) {
 				$homeurl = network_home_url();
-				$homeurl = rtrim($homeurl, '/'); //Because previously we used get_bloginfo and it returns http://example.com without a '/' char.
 			}
 			else {
 				$homeurl = home_url();
 			}
+			
+			$homeurl = rtrim($homeurl, '/'); //Because previously we used get_bloginfo and it returns http://example.com without a '/' char.
 		}
 		
 		if (wfConfig::get('wp_home_url') !== $homeurl) {
@@ -2204,11 +2397,12 @@ class wfUtils {
 		if (function_exists('get_bloginfo') && empty($homeurl)) {
 			if (is_multisite()) {
 				$homeurl = network_home_url($path, $scheme);
-				$homeurl = rtrim($homeurl, '/'); //Because previously we used get_bloginfo and it returns http://example.com without a '/' char.
 			}
 			else {
 				$homeurl = home_url($path, $scheme);
 			}
+			
+			$homeurl = rtrim($homeurl, '/'); //Because previously we used get_bloginfo and it returns http://example.com without a '/' char.
 		}
 		else {
 			$homeurl = set_url_scheme($homeurl, $scheme);
@@ -2238,9 +2432,9 @@ class wfUtils {
 		else if (is_multisite()) {
 			$current_network = get_network();
 			if ( 'relative' == $scheme )
-				$url = $current_network->path;
+				$url = rtrim($current_network->path, '/');
 			else
-				$url = 'http://' . $current_network->domain . $current_network->path;
+				$url = 'http://' . rtrim($current_network->domain, '/') . '/' . trim($current_network->path, '/');
 		}
 		
 		if ( ! in_array( $scheme, array( 'http', 'https', 'relative' ) ) ) {
@@ -2270,11 +2464,12 @@ class wfUtils {
 		if (function_exists('get_bloginfo') && empty($siteurl)) {
 			if (is_multisite()) {
 				$siteurl = network_site_url();
-				$siteurl = rtrim($siteurl, '/'); //Because previously we used get_bloginfo and it returns http://example.com without a '/' char.
 			}
 			else {
 				$siteurl = site_url();
 			}
+			
+			$siteurl = rtrim($siteurl, '/'); //Because previously we used get_bloginfo and it returns http://example.com without a '/' char.
 		}
 		
 		if (wfConfig::get('wp_site_url') !== $siteurl) {
@@ -2299,6 +2494,8 @@ class wfUtils {
 			else {
 				$siteurl = site_url($path, $scheme);
 			}
+			
+			$siteurl = rtrim($siteurl, '/'); //Because previously we used get_bloginfo and it returns http://example.com without a '/' char.
 		}
 		else {
 			$siteurl = set_url_scheme($siteurl, $scheme);
@@ -2337,19 +2534,22 @@ class wfUtils {
 	}
 	
 	public static function wafInstallationType() {
+		$storage = 'file';
+		if (defined('WFWAF_STORAGE_ENGINE')) { $storage = WFWAF_STORAGE_ENGINE; }
+		
 		try {
 			$status = (defined('WFWAF_ENABLED') && !WFWAF_ENABLED) ? 'disabled' : wfWaf::getInstance()->getStorageEngine()->getConfig('wafStatus');
 			if (defined('WFWAF_ENABLED') && !WFWAF_ENABLED) {
-				return "{$status}|const";
+				return "{$status}|const|{$storage}";
 			}
 			else if (defined('WFWAF_SUBDIRECTORY_INSTALL') && WFWAF_SUBDIRECTORY_INSTALL) {
-				return "{$status}|subdir";
+				return "{$status}|subdir|{$storage}";
 			}
 			else if (defined('WFWAF_AUTO_PREPEND') && WFWAF_AUTO_PREPEND) {
-				return "{$status}|extended";
+				return "{$status}|extended|{$storage}";
 			}
 			
-			return "{$status}|basic";
+			return "{$status}|basic|{$storage}";
 		}
 		catch (Exception $e) {
 			//Do nothing
@@ -2403,11 +2603,12 @@ class wfUtils {
 		static $encodings = array();
 		static $overloaded = null;
 		
-		if (is_null($overloaded))
+		if (is_null($overloaded)) {
+			// phpcs:ignore PHPCompatibility.IniDirectives.RemovedIniDirectives.mbstring_func_overloadDeprecated
 			$overloaded = function_exists('mb_internal_encoding') && (ini_get('mbstring.func_overload') & 2);
+		}
 		
-		if (false === $overloaded)
-			return;
+		if (false === $overloaded) { return; }
 		
 		if (!$reset) {
 			$encoding = mb_internal_encoding();
@@ -2847,6 +3048,45 @@ class wfUtils {
 		}
 		return $payload;
 	}
+
+	/**
+	 * Split a path into its components
+	 * @param string $path
+	 */
+	public static function splitPath($path) {
+		return preg_split('/[\\/\\\\]/', $path, -1, PREG_SPLIT_NO_EMPTY);
+	}
+
+	/**
+	 * Convert an absolute path to a path relative to $to
+	 * @param string $absolute the absolute path to convert
+	 * @param string $to the absolute path from which to derive the relative path
+	 * @param bool $leadingSlash if true, prepend the resultant URL with a slash
+	 */
+	public static function relativePath($absolute, $to, $leadingSlash = false) {
+		$trailingSlash = in_array(substr($absolute, -1), array('/', '\\'));
+		$absoluteComponents = self::splitPath($absolute);
+		$toComponents = self::splitPath($to);
+		$relativeComponents = array();
+		do {
+			$currentAbsolute = array_shift($absoluteComponents);
+			$currentTo = array_shift($toComponents);
+		} while($currentAbsolute === $currentTo && $currentAbsolute !== null);
+		while ($currentTo !== null) {
+			array_push($relativeComponents, '..');
+			$currentTo = array_shift($toComponents);
+		}
+		while ($currentAbsolute !== null) {
+			array_push($relativeComponents, $currentAbsolute);
+			$currentAbsolute = array_shift($absoluteComponents);
+		}
+		return implode(array(
+			$leadingSlash ? '/' : '',
+			implode('/', $relativeComponents),
+			($trailingSlash && (count($relativeComponents) > 0 || !$leadingSlash)) ? '/' : ''
+		));
+	}
+
 }
 
 // GeoIP lib uses these as well

@@ -1,6 +1,6 @@
 <?php
 
-require_once 'wfRESTBaseController.php';
+require_once(dirname(__FILE__) . '/wfRESTBaseController.php');
 
 class wfRESTScanController extends wfRESTBaseController {
 
@@ -81,7 +81,7 @@ class wfRESTScanController extends wfRESTBaseController {
 	 * @return mixed|WP_REST_Response
 	 */
 	public function startScan($request) {
-		wordfence::status(1, 'info', sprintf(__('Wordfence scan starting at %s from Wordfence Central', 'wordfence'),
+		wordfence::status(1, 'info', sprintf(/* translators: Localized date. */ __('Wordfence scan starting at %s from Wordfence Central', 'wordfence'),
 			date('l jS \of F Y h:i:s A', current_time('timestamp'))));
 
 		try {

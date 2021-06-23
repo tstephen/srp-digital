@@ -2,7 +2,7 @@
 
 use WordfenceLS\Controller_Settings;
 
-require_once 'wfRESTBaseController.php';
+require_once(dirname(__FILE__) . '/wfRESTBaseController.php');
 
 class wfRESTConfigController extends wfRESTBaseController {
 
@@ -210,7 +210,9 @@ class wfRESTConfigController extends wfRESTBaseController {
 				if ($errors !== true) {
 					if (count($errors) == 1) {
 						return new WP_Error('rest_set_config_error',
-							sprintf(__('An error occurred while saving the configuration: %s', 'wordfence'), $errors[0]['error']),
+							sprintf(
+								/* translators: Error message. */
+								__('An error occurred while saving the configuration: %s', 'wordfence'), $errors[0]['error']),
 							array('status' => 422));
 
 					} else if (count($errors) > 1) {
@@ -219,7 +221,9 @@ class wfRESTConfigController extends wfRESTBaseController {
 							$compoundMessage[] = $e['error'];
 						}
 						return new WP_Error('rest_set_config_error',
-							sprintf(__('Errors occurred while saving the configuration: %s', 'wordfence'), implode(', ', $compoundMessage)),
+							sprintf(
+								/* translators: Error message. */
+								__('Errors occurred while saving the configuration: %s', 'wordfence'), implode(', ', $compoundMessage)),
 							array('status' => 422));
 					}
 
@@ -238,7 +242,9 @@ class wfRESTConfigController extends wfRESTBaseController {
 
 				} catch (Exception $e) {
 					return new WP_Error('rest_save_config_error',
-						sprintf(__('A server error occurred while saving the configuration: %s', 'wordfence'), $e->getMessage()),
+						sprintf(
+						/* translators: Error message. */
+							__('A server error occurred while saving the configuration: %s', 'wordfence'), $e->getMessage()),
 						array('status' => 500));
 				}
 			}
@@ -247,7 +253,9 @@ class wfRESTConfigController extends wfRESTBaseController {
 			if ($errors !== true) {
 				if (count($errors) == 1) {
 					return new WP_Error('rest_set_config_error',
-						sprintf(__('An error occurred while saving the configuration: %s', 'wordfence'), $errors[0]['error']),
+						sprintf(
+						/* translators: Error message. */
+							__('An error occurred while saving the configuration: %s', 'wordfence'), $errors[0]['error']),
 						array('status' => 422));
 
 				} else if (count($errors) > 1) {
@@ -256,7 +264,9 @@ class wfRESTConfigController extends wfRESTBaseController {
 						$compoundMessage[] = $e['error'];
 					}
 					return new WP_Error('rest_set_config_error',
-						sprintf(__('Errors occurred while saving the configuration: %s', 'wordfence'), implode(', ', $compoundMessage)),
+						sprintf(
+						/* translators: Error message. */
+							__('Errors occurred while saving the configuration: %s', 'wordfence'), implode(', ', $compoundMessage)),
 						array('status' => 422));
 				}
 
@@ -273,7 +283,9 @@ class wfRESTConfigController extends wfRESTBaseController {
 
 			} catch (Exception $e) {
 				return new WP_Error('rest_save_config_error',
-					sprintf(__('A server error occurred while saving the configuration: %s', 'wordfence'), $e->getMessage()),
+					sprintf(
+					/* translators: Error message. */
+						__('A server error occurred while saving the configuration: %s', 'wordfence'), $e->getMessage()),
 					array('status' => 500));
 			}
 		}
@@ -299,7 +311,7 @@ class wfRESTConfigController extends wfRESTBaseController {
 	 * @return mixed|WP_REST_Response
 	 */
 	public function premiumConnect($request) {
-		require_once WORDFENCE_PATH . '/crypto/vendor/paragonie/sodium_compat/autoload-fast.php';
+		require_once(WORDFENCE_PATH . '/crypto/vendor/paragonie/sodium_compat/autoload-fast.php');
 
 		// Store values sent by Central.
 		$wordfenceCentralPK = $request['public-key'];
