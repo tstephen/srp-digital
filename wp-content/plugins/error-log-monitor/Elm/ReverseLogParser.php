@@ -7,6 +7,7 @@ class Elm_ReverseLogParser implements OuterIterator {
 	private static $builtinSeverityLevels = array(
 		'fatal error' => true,
 		'catchable fatal error' => true,
+		'recoverable fatal error' => true,
 		'parse error' => true,
 		'warning' => true,
 		'notice' => true,
@@ -55,6 +56,11 @@ class Elm_ReverseLogParser implements OuterIterator {
 	 * @var int The maximum number of lines in a multi-line log entry. This doesn't include stack traces.
 	 */
 	private $maxMessageLines = 32;
+
+	/**
+	 * @var int The maximum length of a log entry (not incl. timestamp and stack). Longer entries will be truncated.
+	 */
+	private $maxMessageLength = 60 * 1024;
 
 	public function __construct(Elm_ReverseLineIterator $lineIterator) {
 		$this->lineIterator = $lineIterator;
@@ -312,6 +318,7 @@ class Elm_ReverseLogParser implements OuterIterator {
 
 		$this->saveState();
 		$messageLines = array($lastLine['message']);
+		$totalLength = strlen($lastLine['message']);
 
 		//The first line of a multi-line message is the only one that has a timestamp.
 		do {
@@ -325,12 +332,16 @@ class Elm_ReverseLogParser implements OuterIterator {
 				if ( !empty($messageLines) ) {
 					$line['message'] .= "\n" . implode("\n", array_reverse($messageLines));
 				}
+				if ( strlen($line['message']) > $this->maxMessageLength ) {
+					$line['message'] = substr($line['message'], 0, $this->maxMessageLength);
+				}
 				$this->complete();
 				return $line;
 			} else {
 				$messageLines[] = $line['message'];
+				$totalLength += strlen($line['message']);
 			}
-		} while (count($messageLines) < $this->maxMessageLines);
+		} while ( (count($messageLines) < $this->maxMessageLines) && ($totalLength < $this->maxMessageLength) );
 
 		$this->backtrack();
 		return $lastLine;

@@ -43,8 +43,12 @@ $widgetTopMargin: 11px;
 		visibility: visible;
 	}
 
-	.elm-ignored-messages {
+	.elm-ignored-messages, .elm-fixed-messages {
 		margin-bottom: 1em;
+	}
+
+	#elm-clear-ignored-messages {
+		margin-bottom: 8px;
 	}
 
 	.dashicons {
@@ -108,7 +112,7 @@ $widgetTopMargin: 11px;
 		}
 
 		//Colored bubbles for different severity levels.
-		.elm-level-fatal-error, .elm-level-catchable-fatal-error, .elm-level-parse-error {
+		.elm-level-fatal-error, .elm-level-catchable-fatal-error, .elm-level-recoverable-fatal-error, .elm-level-parse-error {
 			.elm-severity-bubble {
 				background: orangered;
 			}

@@ -1,6 +1,9 @@
 <?php
 
-$GLOBALS['_scb_data'] = array( 62, __FILE__, array(
+//WSH: The real version number is 61. I increased it because this version of scbFramework
+//has some of my own modifications, like a new method in scbCron, and using the old number
+//would cause conflicts with plugins that use an unmodified copy of scbFramework.
+$GLOBALS['_scb_data'] = array( 561, __FILE__, array(
 	'scbUtil',
 	'scbOptions',
 	'scbForms',

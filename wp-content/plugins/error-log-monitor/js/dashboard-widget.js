@@ -29,8 +29,8 @@ jQuery(function($) {
 		updateEmailOptions();
 	});
 
-	//Handle the "Ignore" link.
-	widget.on('click', '.elm-ignore-message', function() {
+	//Handle the "Ignore" and "Mark as fixed" links.
+	widget.on('click', '.elm-ignore-message, .elm-mark-as-fixed', function() {
 		var row = $(this).closest('.elm-entry'),
 			message = row.data('raw-message');
 
@@ -39,18 +39,66 @@ jQuery(function($) {
 			return $(this).data('raw-message') === message;
 		}).hide().remove();
 
-		AjawV1.getAction('elm-ignore-message').post({ message: message });
+		var action;
+		if ($(this).hasClass('elm-mark-as-fixed')) {
+			action = AjawV1.getAction('elm-mark-as-fixed');
+		} else {
+			action = AjawV1.getAction('elm-ignore-message');
+		}
+		action.post({ message: message });
 
 		return false;
 	});
 
-	//And the "Unignore" link.
-	widget.on('click', '.elm-unignore-message', function() {
+	//And the "Unignore" and "Mark as not fixed" links.
+	widget.on('click', '.elm-unignore-message, .elm-mark-as-not-fixed', function() {
 		var row = $(this).closest('tr'),
 			message = row.data('raw-message');
 
 		row.remove();
-		AjawV1.getAction('elm-unignore-message').post({ message: message });
+
+		var action;
+		if ($(this).hasClass('elm-mark-as-not-fixed')) {
+			action = AjawV1.getAction('elm-mark-as-not-fixed');
+		} else {
+			action = AjawV1.getAction('elm-unignore-message');
+		}
+		action.post({ message: message });
+
+		return false;
+	});
+
+	//Handle the "Clear Ignored Messages" button.
+	widget.find('#elm-clear-ignored-messages').on('click', function () {
+		var button = $(this),
+			actionText = button.text();
+
+		button.prop('disabled', true);
+		button.text(button.data('progressText'));
+
+		//Hide the entire table.
+		var table = widget.find('.elm-ignored-messages');
+		var totalMessages = table.find('tr').length;
+		table.hide();
+
+		var action = AjawV1.getAction('elm-clear-ignored-messages');
+		if (action) {
+			action.post(
+				{total: totalMessages},
+				function () {
+					//Success!
+					table.remove();
+					button.remove();
+					widget.find('#elm-no-ignored-messages-notice').show();
+				},
+				function () {
+					//Something went wrong. Restore the table and the button.
+					button.text(actionText);
+					button.prop('disabled', false)
+					table.show();
+				}
+			);
+		}
 
 		return false;
 	});

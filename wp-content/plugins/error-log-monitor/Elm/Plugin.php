@@ -17,6 +17,11 @@ class Elm_Plugin {
 	 */
 	private $sizeNotificationCronJob = null;
 
+	private $fixedMessageCleanupCronJob;
+
+	private $blacklistChangeBuffer = array();
+	private $isBlacklistFlushCallbackSet = false;
+
 	public function __construct($pluginFile) {
 		$this->pluginFile = $pluginFile;
 
@@ -31,7 +36,7 @@ class Elm_Plugin {
 		add_action('init', array($this, 'initSetupWizard'));
 
 		$this->createDashboardWidget();
-		add_action('elm_settings_changed', array($this, 'updateEmailSchedule'));
+		add_action('elm_settings_changed', array($this, 'onWidgetSettingsChanged'));
 
 		$this->emailCronJob = new scbCron(
 			$pluginFile,
@@ -49,6 +54,14 @@ class Elm_Plugin {
 			array(
 				'interval' => $this->settings->get('log_size_check_interval'),
 				'callback' => array($this, 'checkLogFileSize')
+			)
+		);
+
+		$this->fixedMessageCleanupCronJob = new scbCron(
+			$pluginFile,
+			array(
+				'interval' => defined('MONTH_IN_SECONDS') ? MONTH_IN_SECONDS : (30 * 24 * 3600),
+				'callback' => array($this, 'deleteOldFixedMessages')
 			)
 		);
 	}
@@ -83,6 +96,7 @@ class Elm_Plugin {
 			'email_message_filter_groups' => Elm_SeverityFilter::getAvailableOptions(),
 
 			'ignored_messages' => array(),
+			'fixed_messages' => array(),
 
 			'enable_premium_notice' => true,
 		);
@@ -94,6 +108,14 @@ class Elm_Plugin {
 
 	protected function createDashboardWidget() {
 		Elm_DashboardWidget::getInstance($this->settings, $this);
+	}
+
+	/**
+	 * @param scbOptions $newSettings
+	 */
+	public function onWidgetSettingsChanged($newSettings) {
+		$this->updateEmailSchedule($newSettings);
+		$this->installFixedMessageCleanupJob();
 	}
 
 	/**
@@ -315,10 +337,14 @@ class Elm_Plugin {
 			return $logIterator;
 		}
 
-		$ignoreFilter = new Elm_IgnoredMessageFilter($logIterator, $this->settings->get('ignored_messages'));
+		$ignoreFilter = new Elm_IgnoredMessageFilter(
+			$logIterator,
+			$this->settings->get('ignored_messages'),
+			$this->settings->get('fixed_messages', array()),
+			array($this, 'handleFixedErrorRecurrence')
+		);
 
-		$filteredLog = new Elm_SeverityFilter($ignoreFilter, $includedGroups);
-		return $filteredLog;
+		return new Elm_SeverityFilter($ignoreFilter, $includedGroups);
 	}
 
 	public function getIncludedGroupsForDashboard() {
@@ -334,6 +360,131 @@ class Elm_Plugin {
 			return $this->getIncludedGroupsForDashboard();
 		} else {
 			return $this->settings->get('email_message_filter_groups');
+		}
+	}
+
+	/**
+	 * Handle a situation where an error that has ben marked as fixed happens again.
+	 *
+	 * @param string $message Log entry message.
+	 * @noinspection PhpUnused It is in fact used as a callback for Elm_IgnoredMessageFilter.
+	 */
+	public function handleFixedErrorRecurrence($message) {
+		$this->queueBlacklistRemoval('fixed_messages', $message);
+	}
+
+	/**
+	 * Add a message to one of the internal filter blacklists.
+	 *
+	 * @param string $list
+	 * @param string $message
+	 * @param bool $addToList
+	 * @param mixed $value
+	 * @param string $hookName
+	 * @return array
+	 */
+	public function updateMessageBlacklist($list, $message, $addToList, $value, $hookName) {
+		$this->applyBlacklistChanges(array(
+			array(
+				'list'      => $list,
+				'message'   => $message,
+				'addToList' => $addToList,
+				'value'     => $value,
+				'hookName'  => $hookName,
+			),
+		));
+		return $this->settings->get($list, array());
+	}
+
+	/**
+	 * Queue a message to be removed from one of the internal filter blacklists.
+	 *
+	 * Call @see flushBlacklistChanges to apply any queued changes.
+	 * If the queue isn't explicitly flushed, it will happen on shutdown.
+	 *
+	 * @param string $listName
+	 * @param string $message
+	 * @param string|null $hookName
+	 */
+	public function queueBlacklistRemoval($listName, $message, $hookName = null) {
+		if ( !$this->isBlacklistFlushCallbackSet ) {
+			add_action('shutdown', array($this, 'flushBlacklistChanges'));
+			$this->isBlacklistFlushCallbackSet = true;
+		}
+
+		if ( ($hookName === null) && ($listName === 'fixed_messages') ) {
+			$hookName = 'elm_fixed_status_changed';
+		}
+
+		$this->blacklistChangeBuffer[] = array(
+			'list'      => $listName,
+			'message'   => $message,
+			'addToList' => false,
+			'value'     => null,
+			'hookName'  => $hookName,
+		);
+	}
+
+	/**
+	 * @access protected
+	 */
+	public function flushBlacklistChanges() {
+		if ( empty($this->blacklistChangeBuffer) ) {
+			return;
+		}
+		$this->applyBlacklistChanges($this->blacklistChangeBuffer);
+
+		//Clear the buffer.
+		$this->blacklistChangeBuffer = array();
+	}
+
+	protected function applyBlacklistChanges($changes) {
+		$lists = array();
+		$hooksToCall = array();
+
+		//Avoid race conditions.
+		//Step 1: Use locks.
+		$handle = fopen(__FILE__, 'r');
+		flock($handle, LOCK_EX);
+		//Step 2: Force WP to reload options from the database. Normally this would be
+		//bad for performance, but it's acceptable in a rarely used AJAX handler.
+		wp_cache_delete('alloptions', 'options');
+
+		foreach ($changes as $change) {
+			$listName = $change['list'];
+			$message = $change['message'];
+			$value = $change['value'];
+
+			if ( !isset($lists[$listName]) ) {
+				$lists[$listName] = $this->settings->get($listName, array());
+			}
+
+			if ( $change['addToList'] ) {
+				//Add the message to the list.
+				$lists[$listName][$message] = $value;
+				$isOnTheList = true;
+			} else {
+				//Remove the message from the list.
+				unset($lists[$listName][$message]);
+				$isOnTheList = false;
+			}
+
+			if ( isset($change['hookName']) ) {
+				$hooksToCall[] = array(
+					$change['hookName'],
+					array($message, $isOnTheList, ($isOnTheList ? $value : null)),
+				);
+			}
+		}
+
+		foreach ($lists as $listName => $newValues) {
+			$this->settings->set($listName, $newValues);
+		}
+
+		flock($handle, LOCK_UN);
+
+		foreach ($hooksToCall as $hook) {
+			do_action_ref_array($hook[0], $hook[1]);
 		}
 	}
 
@@ -421,6 +572,33 @@ class Elm_Plugin {
 	}
 
 	/**
+	 * Delete old entries from the "marked as fixed" list.
+	 *
+	 * @noinspection PhpUnused This is actually used as a callback for a cron job.
+	 */
+	public function deleteOldFixedMessages() {
+		static $reallyLongTime = 6 * MONTH_IN_SECONDS;
+
+		$fixedMessages = $this->settings->get('fixed_messages', array());
+		if ( empty($fixedMessages) ) {
+			return; //Nothing to do.
+		}
+
+		$filteredList = array();
+		foreach ($fixedMessages as $message => $details) {
+			$delta = isset($details['fixedOn']) ? abs(time() - $details['fixedOn']) : 0;
+			if ( $delta < $reallyLongTime ) {
+				$filteredList[$message] = $details;
+			}
+		}
+
+		$this->settings->set('fixed_messages', $filteredList);
+
+		//Notice that we don't update the summary table here (for the Pro version).
+		//That is not necessary because old summary entries are deleted automatically anyway.
+	}
+
+	/**
 	 * Convert an amount of data in bytes to a more human-readable format like KiB or MiB.
 	 *
 	 * @link http://www.php.net/manual/en/function.filesize.php#91477
@@ -438,6 +616,12 @@ class Elm_Plugin {
 		$size = $bytes / pow(1024, $pow);
 
 		return round($size, $precision) . ' ' . $units[$pow];
+	}
+
+	public function installFixedMessageCleanupJob() {
+		if ( !$this->fixedMessageCleanupCronJob->is_scheduled() ) {
+			$this->fixedMessageCleanupCronJob->reset();
+		}
 	}
 
 	public function getPluginFile() {

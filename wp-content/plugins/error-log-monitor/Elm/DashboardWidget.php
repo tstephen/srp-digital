@@ -30,6 +30,23 @@ class Elm_DashboardWidget {
 			->requiredCap($this->requiredCapability)
 			->register();
 
+		ajaw_v1_CreateAction('elm-clear-ignored-messages')
+			->handler(array($this, 'ajaxClearAllIgnoredMessages'))
+			->requiredCap($this->requiredCapability)
+			->register();
+
+		ajaw_v1_CreateAction('elm-mark-as-fixed')
+			->handler(array($this, 'ajaxMarkAsFixed'))
+			->requiredParam('message')
+			->requiredCap($this->requiredCapability)
+			->register();
+
+		ajaw_v1_CreateAction('elm-mark-as-not-fixed')
+			->handler(array($this, 'ajaxMarkAsFixed'))
+			->requiredParam('message')
+			->requiredCap($this->requiredCapability)
+			->register();
+
 		ajaw_v1_CreateAction('elm-hide-pro-notice')
 			->handler(array($this, 'ajaxHideUpgradeNotice'))
 			->requiredCap($this->requiredCapability)
@@ -72,14 +89,14 @@ class Elm_DashboardWidget {
 				'elm-dashboard-widget',
 				plugins_url('js/dashboard-widget.js', $this->plugin->getPluginFile()),
 				array('jquery', 'ajaw-v1-ajax-action-wrapper'),
-				'20180801'
+				'20201204'
 			);
 
 			wp_enqueue_style(
 				'elm-dashboard-widget-styles',
 				plugins_url($this->widgetCssPath, $this->plugin->getPluginFile()),
 				array(),
-				'20190125'
+				'20201210'
 			);
 		}
 	}
@@ -222,8 +239,25 @@ class Elm_DashboardWidget {
 	 * @return array
 	 */
 	protected function getItemActionLinks() {
-		$links = array($this->getIgnoreLink());
-		return $links;
+		return array(
+			$this->getMarkAsFixedLink(),
+			$this->getIgnoreLink()
+		);
+	}
+
+	private function getMarkAsFixedLink() {
+		static $html = null;
+		if ( $html === null ) {
+			$html = sprintf(
+				'<a href="#" class="elm-mark-as-fixed" title="%s">%s</a>',
+				esc_attr(__(
+					"Mark the error as fixed and hide it. If this error happens again in the future, it will become visible again.",
+					'error-log-monitor'
+				)),
+				_x('Mark as fixed', 'action link', 'error-log-monitor')
+			);
+		}
+		return $html;
 	}
 
 	private function getIgnoreLink() {
@@ -572,7 +606,8 @@ class Elm_DashboardWidget {
 			echo '<p>';
 			_e(
 				'By default, only fatal errors and warnings will be logged. To also log notices
-                and other messages, enable the <code>WP_DEBUG</code> option by adding this code:'
+                and other messages, enable the <code>WP_DEBUG</code> option by adding this code:',
+                'error-log-monitor'
 			);
 			echo '</p>';
 			$debugCode =
@@ -891,9 +926,25 @@ class Elm_DashboardWidget {
 		printf('<h4>%s</h4>', __('Ignored messages', 'error-log-monitor'));
 
 		$ignoredMessages = $this->settings->get('ignored_messages', array());
-		if ( empty($ignoredMessages) ) {
-			echo '<p>', __('There are no ignored messages.', 'error-log-monitor'), '</p>';
-		} else {
+
+		$noMessagesNotice = sprintf(
+			'<p id="elm-no-ignored-messages-notice" style="%s">%s</p>',
+			!empty($ignoredMessages) ? 'display: none;' : '',
+			__('There are no ignored messages.', 'error-log-monitor')
+		);
+		echo $noMessagesNotice;
+
+		if ( !empty($ignoredMessages) ) {
+			printf(
+				'<button class="button button-small" id="elm-clear-ignored-messages" data-progress-text="%s">%s</button>',
+				esc_attr(_x(
+					'Processing...',
+					'progress text when clearing ignored messages',
+					'error-log-monitor'
+				)),
+				_x('Clear Ignored Messages', 'button title', 'error-log-monitor')
+			);
+
 			echo '<table class="widefat striped elm-ignored-messages">';
 			foreach(array_keys($ignoredMessages) as $message) {
 				printf('<tr data-raw-message="%s">', esc_attr($message));
@@ -901,6 +952,25 @@ class Elm_DashboardWidget {
 				printf(
 					'<td><p class="elm-line-actions"><a href="#" class="elm-unignore-message">%s</a></p></td>',
 					_x('Unignore', 'action link', 'error-log-monitor')
+				);
+				echo '</tr>';
+			}
+			echo '</table>';
+		}
+
+		printf('<h4>%s</h4>', _x('Marked as fixed', 'table heading', 'error-log-monitor'));
+
+		$fixedMessages = $this->settings->get('fixed_messages', array());
+		if ( empty($fixedMessages) ) {
+			echo '<p>', __('No messages have been marked as fixed.', 'error-log-monitor'), '</p>';
+		} else {
+			echo '<table class="widefat striped elm-fixed-messages">';
+			foreach($fixedMessages as $message => $details) {
+				printf('<tr data-raw-message="%s">', esc_attr($message));
+				printf('<td>%s</td>', htmlentities($message));
+				printf(
+					'<td><p class="elm-line-actions"><a href="#" class="elm-mark-as-not-fixed">%s</a></p></td>',
+					_x('Unmark', 'action link: mark an error as not fixed', 'error-log-monitor')
 				);
 				echo '</tr>';
 			}
@@ -1012,32 +1082,38 @@ class Elm_DashboardWidget {
 	 * @return mixed
 	 */
 	public function ajaxIgnoreMessage($params) {
-		//Avoid race conditions.
-		//Step 1: Use locks.
-		$handle = fopen(__FILE__, 'r');
-		flock($handle, LOCK_EX);
-		//Step 2: Force WP to reload options from the database. Normally this would be
-		//bad for performance, but it's acceptable in a rarely used AJAX handler.
-		wp_cache_delete('alloptions', 'options');
+		return $this->plugin->updateMessageBlacklist(
+			'ignored_messages',
+			$params['message'],
+			$params['action'] === 'elm-ignore-message',
+			true,
+			'elm_ignored_status_changed'
+		);
+	}
 
-		$ignoredMessages = $this->settings->get('ignored_messages', array());
+	public function ajaxMarkAsFixed($params) {
+		return $this->plugin->updateMessageBlacklist(
+			'fixed_messages',
+			$params['message'],
+			$params['action'] === 'elm-mark-as-fixed',
+			array('isFixed' => true, 'fixedOn' => time()),
+			'elm_fixed_status_changed'
+		);
+	}
 
-		if ( $params['action'] === 'elm-ignore-message' ) {
-			//Add the message to the list.
-			$ignoredMessages[$params['message']] = true;
-			$isIgnored = true;
-		} else {
-			//Remove the message from the list.
-			unset($ignoredMessages[$params['message']]);
-			$isIgnored = false;
+	public function ajaxClearAllIgnoredMessages() {
+		$items = $this->settings->get('ignored_messages');
+		$total = count($items);
+		foreach(array_keys($items) as $message) {
+			$this->plugin->queueBlacklistRemoval(
+				'ignored_messages',
+				$message,
+				'elm_ignored_status_changed'
+			);
 		}
+		$this->plugin->flushBlacklistChanges();
 
-		$this->settings->set('ignored_messages', $ignoredMessages);
-
-		do_action('elm_ignored_status_changed', $params['message'], $isIgnored);
-
-		flock($handle, LOCK_UN);
-		return $ignoredMessages;
+		return array('removedItems' => $total);
 	}
 
 	public function displayProSection() {

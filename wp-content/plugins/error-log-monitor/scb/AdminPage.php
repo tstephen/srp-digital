@@ -13,7 +13,6 @@ abstract class scbAdminPage {
 	 * $toplevel (string)  If not empty, will create a new top level menu (for expected values see http://codex.wordpress.org/Administration_Menus#Using_add_submenu_page)
 	 * - $icon_url (string)  URL to an icon for the top level menu
 	 * - $position (int)  Position of the toplevel menu (caution!)
-	 * $screen_icon (string)  The icon type to use in the screen header
 	 * $nonce string  (default: $page_slug)
 	 * $action_link (string|bool)  Text of the action link on the Plugins page (default: 'Settings')
 	 * $admin_action_priority int  The priority that the admin_menu action should be executed at (default: 10)
@@ -131,11 +130,9 @@ abstract class scbAdminPage {
 
 		if ( isset( $this->option_name ) ) {
 			add_action( 'admin_init', array( $this, 'option_init' ) );
-			add_action( 'admin_notices', 'settings_errors' );
 		}
 
 		add_action( 'admin_menu', array( $this, 'page_init' ), $this->args['admin_action_priority'] );
-		add_filter( 'contextual_help', array( $this, '_contextual_help' ), 10, 2 );
 
 		if ( $file ) {
 			$this->file = $file;
@@ -509,7 +506,6 @@ abstract class scbAdminPage {
 			'toplevel'              => '',
 			'position'              => null,
 			'icon_url'              => '',
-			'screen_icon'           => '',
 			'parent'                => 'options-general.php',
 			'capability'            => 'manage_options',
 			'menu_title'            => $this->args['page_title'],
@@ -573,6 +569,16 @@ abstract class scbAdminPage {
 	 * @return array
 	 */
 	public function _action_link( $links ) {
+		//WSH: Normally, $links should be an array. Some plugins incorrectly set it to an empty string
+		//instead. It's possible that other plugins could use null/false or something else.
+		if ( !is_array($links) ) {
+			if ( empty($links) ) {
+				$links = array(); //It should be safe to convert empty values to an empty array.
+			} else {
+				return $links; //Unsupported data type.
+			}
+		}
+
 		$url = add_query_arg( 'page', $this->args['page_slug'], admin_url( $this->args['parent'] ) );
 
 		$links[] = html_link( $url, $this->args['action_link'] );

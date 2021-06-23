@@ -12,6 +12,7 @@ class Elm_SeverityFilter extends Elm_LogFilter {
 	private static $severityMap = array(
 		'fatal error' => 'error',
 		'catchable fatal error' => 'error',
+		'recoverable fatal error' => 'error',
 		'parse error' => 'error',
 	);
 

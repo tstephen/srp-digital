@@ -12,8 +12,10 @@
 #ws_php_error_log tr:hover .elm-line-actions,
 #ws_php_error_log .elm-entry:hover .elm-line-actions {
   visibility: visible; }
-#ws_php_error_log .elm-ignored-messages {
+#ws_php_error_log .elm-ignored-messages, #ws_php_error_log .elm-fixed-messages {
   margin-bottom: 1em; }
+#ws_php_error_log #elm-clear-ignored-messages {
+  margin-bottom: 8px; }
 #ws_php_error_log .dashicons {
   color: #82878c; }
 #ws_php_error_log .elm-wide-list {
@@ -50,7 +52,7 @@
     height: 12px;
     width: 12px;
     margin-right: 0.4em; }
-  #ws_php_error_log .elm-wide-list .elm-level-fatal-error .elm-severity-bubble, #ws_php_error_log .elm-wide-list .elm-level-catchable-fatal-error .elm-severity-bubble, #ws_php_error_log .elm-wide-list .elm-level-parse-error .elm-severity-bubble {
+  #ws_php_error_log .elm-wide-list .elm-level-fatal-error .elm-severity-bubble, #ws_php_error_log .elm-wide-list .elm-level-catchable-fatal-error .elm-severity-bubble, #ws_php_error_log .elm-wide-list .elm-level-recoverable-fatal-error .elm-severity-bubble, #ws_php_error_log .elm-wide-list .elm-level-parse-error .elm-severity-bubble {
     background: orangered; }
   #ws_php_error_log .elm-wide-list .elm-level-warning .elm-severity-bubble {
     background: orange; }
