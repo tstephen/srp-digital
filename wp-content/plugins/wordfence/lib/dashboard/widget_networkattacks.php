@@ -1,10 +1,11 @@
+<?php if (!defined('WORDFENCE_VERSION')) { exit; } ?>
 <div class="wf-row">
 	<div class="wf-col-xs-12">
 		<div class="wf-dashboard-item active">
 			<div class="wf-dashboard-item-inner">
 				<div class="wf-dashboard-item-content">
 					<div class="wf-dashboard-item-title">
-						<strong>Total Attacks Blocked - Wordfence Network</strong>
+						<strong><?php esc_html_e('Total Attacks Blocked:', 'wordfence'); ?> </strong><?php esc_html_e('Wordfence Network', 'wordfence'); ?>
 					</div>
 					<div class="wf-dashboard-item-action"><div class="wf-dashboard-item-action-disclosure"></div></div>
 				</div>
@@ -13,14 +14,14 @@
 				<ul class="wf-dashboard-item-list">
 					<li>
 						<?php if ($d->networkBlock24h === null): ?>
-							<div class="wf-dashboard-item-list-text"><p><em>Blocked attack counts not available yet.</em></p></div>
+							<div class="wf-dashboard-item-list-text"><p><em><?php esc_html_e('Blocked attack counts not available yet.', 'wordfence'); ?></em></p></div>
 						<?php else: ?>
 							<div class="wf-dashboard-graph-wrapper">
 								<div class="wf-dashboard-toggle-btns">
 									<ul class="wf-pagination wf-pagination-sm">
-										<li class="wf-active"><a href="#" class="wf-dashboard-graph-attacks" data-grouping="24h">24 Hours</a></li>
+										<li class="wf-active"><a href="#" class="wf-dashboard-graph-attacks" data-grouping="24h"><?php esc_html_e('24 Hours', 'wordfence'); ?></a></li>
 										<!-- <li><a href="#" class="wf-dashboard-graph-attacks" data-grouping="7d">7 Days</a></li> -->
-										<li><a href="#" class="wf-dashboard-graph-attacks" data-grouping="30d">30 Days</a></li>
+										<li><a href="#" class="wf-dashboard-graph-attacks" data-grouping="30d"><?php esc_html_e('30 Days', 'wordfence'); ?></a></li>
 									</ul>
 								</div>
 								<div class="wf-dashboard-network-blocks"><canvas id="wf-dashboard-network-blocks-24h"></canvas></div>
@@ -29,8 +30,9 @@
 							</div>
 							<script type="application/javascript">
 								<?php
+								$totalAttacksString = json_encode(__("Total Attacks", 'wordfence'));
 								$styling = <<<STYLING
-																		label: "Total Attacks",
+																		label: $totalAttacksString,
 																		fill: false,
 																		lineTension: 0.1,
 																		backgroundColor: "rgba(75,192,192,0.4)",
@@ -202,7 +204,9 @@ STYLING;
 						<?php endif; ?>
 					</li>
 				</ul>
-				<p class="wf-dashboard-last-updated">Last Updated: <?php echo esc_html(wfUtils::makeTimeAgo(time() - $d->lastGenerated)); ?> ago</p>
+				<p class="wf-dashboard-last-updated"><?php echo esc_html(sprintf(
+					/* translators: Time since. Example: 1 minute, 2 seconds */
+						__('Last Updated: %s ago', 'wordfence'), wfUtils::makeTimeAgo(time() - $d->lastGenerated))); ?></p>
 			</div>
 		</div>
 	</div>
