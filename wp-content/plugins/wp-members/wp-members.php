@@ -2,18 +2,17 @@
 /*
 Plugin Name: WP-Members
 Plugin URI:  https://rocketgeek.com
-Description: WP access restriction and user registration.  For more information on plugin features, refer to <a href="http://rocketgeek.com/plugins/wp-members/users-guide/">the online Users Guide</a>. A <a href="http://rocketgeek.com/plugins/wp-members/quick-start-guide/">Quick Start Guide</a> is also available. WP-Members(tm) is a trademark of butlerblog.com.
-Version:     3.1.9.3
+Description: WP access restriction and user registration.  For more information on plugin features, refer to <a href="https://rocketgeek.com/plugins/wp-members/docs/">the online Users Guide</a>. A <a href="https://rocketgeek.com/plugins/wp-members/quick-start-guide/">Quick Start Guide</a> is also available. WP-Members(tm) is a trademark of butlerblog.com.
+Version:     3.3.9.2
 Author:      Chad Butler
 Author URI:  http://butlerblog.com/
 Text Domain: wp-members
-Domain Path: /lang
+Domain Path: /i18n/languages/
 License:     GPLv2
 */
 
-
 /*  
-	Copyright (c) 2006-2017  Chad Butler
+	Copyright (c) 2006-2020  Chad Butler
 
 	The name WP-Members(tm) is a trademark of butlerblog.com
 
@@ -33,7 +32,6 @@ License:     GPLv2
 	You may also view the license here:
 	http://www.gnu.org/licenses/gpl.html
 */
-
 
 /*
 	A NOTE ABOUT LICENSE:
@@ -57,7 +55,7 @@ License:     GPLv2
 	INSTALLATION PROCEDURE:
 	
 	For complete installation and usage instructions,
-	visit http://rocketgeek.com
+	visit https://rocketgeek.com
 */
 
 // Exit if accessed directly.
@@ -66,13 +64,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Initialize constants.
-define( 'WPMEM_VERSION', '3.1.9.3' );
-define( 'WPMEM_DEBUG', false );
-define( 'WPMEM_DIR',  plugin_dir_url ( __FILE__ ) );
+define( 'WPMEM_VERSION',    '3.3.9.1' );
+define( 'WPMEM_DB_VERSION', '2.2.1' );
 define( 'WPMEM_PATH', plugin_dir_path( __FILE__ ) );
-
-// Localization.
-add_action( 'init', 'wpmem_load_textdomain' ); //add_action( 'plugins_loaded', 'wpmem_load_textdomain' );
 
 // Initialize the plugin.
 add_action( 'after_setup_theme', 'wpmem_init', 10 );
@@ -112,7 +106,7 @@ function wpmem_init() {
 	/**
 	 * Load the WP_Members class.
 	 */
-	require_once( WPMEM_PATH . 'inc/class-wp-members.php' );
+	require_once( 'includes/class-wp-members.php' );
 	
 	// Invoke the WP_Members class.
 	$wpmem = new WP_Members();
@@ -132,6 +126,7 @@ function wpmem_init() {
  * @since 2.5.2
  */
 function wpmem_admin_options() {
+	global $wpmem;
 	if ( ! is_multisite() || ( is_multisite() && current_user_can( 'edit_theme_options' ) ) ) {
 		$plugin_page = add_options_page ( 'WP-Members', 'WP-Members', 'manage_options', 'wpmem-settings', 'wpmem_admin' );
 	}
@@ -152,22 +147,23 @@ function wpmem_install() {
 	/**
 	 * Load the install file.
 	 */
-	require_once( WPMEM_PATH . 'wp-members-install.php' );
+	require_once( 'includes/install.php' );
 
 	// Multisite requires different install process.
 	if ( is_multisite() ) {
 
 		// If it is multisite, install options for each blog.
 		global $wpdb;
-		$blogs = $wpdb->get_results(
+		$blogs = $wpdb->get_results( $wpdb->prepare( 
 			"SELECT blog_id
 			FROM {$wpdb->blogs}
-			WHERE site_id = '{$wpdb->siteid}'
+			WHERE site_id = %d
 			AND spam = '0'
 			AND deleted = '0'
-			AND archived = '0'"
-		);
-		$original_blog_id = get_current_blog_id();   
+			AND archived = '0'",
+			$wpdb->siteid
+		) );
+		$original_blog_id = get_current_blog_id(); 
 		foreach ( $blogs as $blog_id ) {
 			switch_to_blog( $blog_id->blog_id );
 			wpmem_do_install();
@@ -192,83 +188,30 @@ function wpmem_downgrade() {
 }
 
 
-add_action( 'wpmu_new_blog', 'wpmem_mu_new_site', 10, 6 );
+add_action( 'wp_insert_site', 'wpmem_mu_new_site' );
 /**
  * Install default plugin options for a newly added blog in multisite.
  *
  * @since 2.9.3
+ * @since 3.2.7 Updated to wp_insert_site (wpmu_new_blog is deprecated).
  *
- * @param $blog_id
- * @param $user_id
- * @param $domain
- * @param $path
- * @param $site_id
- * @param $meta
+ * @param $new_site
  */
-function wpmem_mu_new_site( $blog_id, $user_id, $domain, $path, $site_id, $meta ) {
+function wpmem_mu_new_site( $new_site ) {
 
 	/**
 	 * Load the install file.
 	 */
-	require_once( WPMEM_PATH . 'wp-members-install.php' );
+	require_once( 'includes/install.php' );
 
 	// Switch to the new blog.
-	switch_to_blog( $blog_id );
+	switch_to_blog( $new_site->id );
 
 	// Run the WP-Members install.
 	wpmem_do_install();
 
 	// Switch back to the current blog.
 	restore_current_blog();
-}
-
-
-/**
- * Loads translation files.
- *
- * @since 3.0.0
- */
-function wpmem_load_textdomain() {
-	
-	// @see: https://ulrich.pogson.ch/load-theme-plugin-translations for notes on changes.
-	
-	// Plugin textdomain.
-	$domain = 'wp-members';
-	
-	// Wordpress locale.
-	/** This filter is documented in wp-includes/l10n.php */
-	$locale = apply_filters( 'plugin_locale', get_locale(), $domain );
-
-	/**
-	 * Filter translation file.
-	 *
-	 * If the translate.wordpress.org language pack is available, it will
-	 * be /wp-content/languages/plugins/wp-members-{locale}.mo by default.
-	 * You can filter this if you want to load a language pack from a
-	 * different location (or different file name).
-	 *
-	 * @since 3.0.0
-	 *
-	 * @param string $file The translation file to load.
-	 */
-	$file = apply_filters( 'wpmem_localization_file', trailingslashit( WP_LANG_DIR ) . 'plugins/' . $domain . '-' . $locale . '.mo' );
-
-	$loaded = load_textdomain( $domain, $file );
-	if ( $loaded ) {
-		return $loaded;
-	} else {
-		
-		/**
-		 * Filter translation directory.
-		 *
-		 * @since 3.0.3
-		 *
-		 * @param string $dir The translation directory.
-		 */
-		$dir = apply_filters( 'wpmem_localization_dir', dirname( plugin_basename( __FILE__ ) ) . '/lang/' );
-		load_plugin_textdomain( $domain, FALSE, $dir );
-	}
-	return;
 }
 
 // End of file.

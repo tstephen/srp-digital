@@ -1,8 +1,13 @@
 <?php
-require_once('wordfenceConstants.php');
-require_once('wordfenceClass.php');
+require_once(dirname(__FILE__) . '/wordfenceConstants.php');
+require_once(dirname(__FILE__) . '/wordfenceClass.php');
 
 class wfAPI {
+	const KEY_TYPE_FREE = 'free';
+	const KEY_TYPE_PAID_CURRENT = 'paid-current';
+	const KEY_TYPE_PAID_EXPIRED = 'paid-expired';
+	const KEY_TYPE_PAID_DELETED = 'paid-deleted';
+	
 	public $lastHTTPStatus = '';
 	public $lastCurlErrorNo = '';
 	private $curlContent = 0;
@@ -18,20 +23,20 @@ class wfAPI {
 		return $this->getURL(rtrim($this->getAPIURL(), '/') . '/' . ltrim($url, '/'));
 	}
 
-	public function call($action, $getParams = array(), $postParams = array(), $forceSSL = false) {
+	public function call($action, $getParams = array(), $postParams = array(), $forceSSL = false, $timeout = 900) {
 		$apiURL = $this->getAPIURL();
 		//Sanity check. Developer should call wfAPI::SSLEnabled() to check if SSL is enabled before forcing SSL and return a user friendly msg if it's not.
 		if ($forceSSL && (!preg_match('/^https:/i', $apiURL))) {
 			//User's should never see this message unless we aren't calling SSLEnabled() to check if SSL is enabled before using call() with forceSSL
-			throw new Exception("SSL is not supported by your web server and is required to use this function. Please ask your hosting provider or site admin to install cURL with openSSL to use this feature.");
+			throw new wfAPICallSSLUnavailableException(__("SSL is not supported by your web server and is required to use this function. Please ask your hosting provider or site admin to install cURL with openSSL to use this feature.", 'wordfence'));
 		}
 		$json = $this->getURL(rtrim($apiURL, '/') . '/v' . WORDFENCE_API_VERSION . '/?' . $this->makeAPIQueryString() . '&' . self::buildQuery(
 				array_merge(
 					array('action' => $action),
 					$getParams
-				)), $postParams);
+				)), $postParams, $timeout);
 		if (!$json) {
-			throw new Exception("We received an empty data response from the Wordfence scanning servers when calling the '$action' function.");
+			throw new wfAPICallInvalidResponseException(sprintf(/* translators: API call/action/endpoint. */__("We received an empty data response from the Wordfence scanning servers when calling the '%s' function.", 'wordfence'), $action));
 		}
 
 		$dat = json_decode($json, true);
@@ -39,8 +44,25 @@ class wfAPI {
 			wfConfig::set('keyExpDays', $dat['_keyExpDays']);
 			if ($dat['_keyExpDays'] > -1) {
 				wfConfig::set('isPaid', 1);
-			} else if ($dat['_keyExpDays'] < 0) {
+			}
+			else if ($dat['_keyExpDays'] < 0) {
 				wfConfig::set('isPaid', '');
+			}
+			
+			if (!isset($dat['errorMsg'])) {
+				if ($dat['_keyExpDays'] > -1) {
+					wfConfig::set('keyType', self::KEY_TYPE_PAID_CURRENT);
+				}
+				else if ($dat['_keyExpDays'] < 0) {
+					wfConfig::set('keyType', self::KEY_TYPE_PAID_EXPIRED);
+				}
+				
+				if (isset($dat['_autoRenew'])) { wfConfig::set('premiumAutoRenew', wfUtils::truthyToInt($dat['_autoRenew'])); } else { wfConfig::remove('premiumAutoRenew'); }
+				if (isset($dat['_nextRenewAttempt'])) { wfConfig::set('premiumNextRenew', time() + $dat['_nextRenewAttempt'] * 86400); } else { wfConfig::remove('premiumNextRenew'); } 
+				if (isset($dat['_paymentExpiring'])) { wfConfig::set('premiumPaymentExpiring', wfUtils::truthyToInt($dat['_paymentExpiring'])); } else { wfConfig::remove('premiumPaymentExpiring'); }
+				if (isset($dat['_paymentExpired'])) { wfConfig::set('premiumPaymentExpired', wfUtils::truthyToInt($dat['_paymentExpired'])); } else { wfConfig::remove('premiumPaymentExpired'); }
+				if (isset($dat['_paymentMissing'])) { wfConfig::set('premiumPaymentMissing', wfUtils::truthyToInt($dat['_paymentMissing'])); } else { wfConfig::remove('premiumPaymentMissing'); }
+				if (isset($dat['_paymentHold'])) { wfConfig::set('premiumPaymentHold', wfUtils::truthyToInt($dat['_paymentHold'])); } else { wfConfig::remove('premiumPaymentHold'); }
 			}
 		}
 		
@@ -48,11 +70,22 @@ class wfAPI {
 		if (isset($dat['_hasKeyConflict'])) {
 			$hasKeyConflict = ($dat['_hasKeyConflict'] == 1);
 			if ($hasKeyConflict) {
-				new wfNotification(null, wfNotification::PRIORITY_HIGH_CRITICAL, '<a href="' . network_admin_url('admin.php?page=WordfenceSecOpt') . '">The Wordfence API key you\'re using does not match this site\'s address. Premium features are disabled.</a>', 'wfplugin_keyconflict', null, array(array('link' => 'https://www.wordfence.com/manage-wordfence-api-keys/', 'label' => 'Manage Keys')));
+				new wfNotification(null, wfNotification::PRIORITY_HIGH_CRITICAL, '<a href="' . wfUtils::wpAdminURL('admin.php?page=Wordfence&subpage=global_options') . '">' . esc_html__('The Wordfence license you\'re using does not match this site\'s address. Premium features are disabled.', 'wordfence') . '</a>', 'wfplugin_keyconflict', null, array(array('link' => 'https://www.wordfence.com/manage-wordfence-api-keys/', 'label' => 'Manage Keys')));
+				wfConfig::set('hasKeyConflict', 1);
+			}
+		}
+		
+		$keyNoLongerValid = false;
+		if (isset($dat['_keyNoLongerValid'])) {
+			$keyNoLongerValid = ($dat['_keyNoLongerValid'] == 1);
+			if ($keyNoLongerValid) {
+				wfConfig::set('keyType', self::KEY_TYPE_PAID_DELETED);
+				wfConfig::set('isPaid', '');
 			}
 		}
 		
 		if (!$hasKeyConflict) {
+			wfConfig::remove('hasKeyConflict');
 			$n = wfNotification::getNotificationForCategory('wfplugin_keyconflict');
 			if ($n !== null) {
 				wordfence::status(1, 'info', 'Idle');
@@ -60,27 +93,29 @@ class wfAPI {
 			}
 		}
 		
-		wfConfig::set('hasKeyConflict', $hasKeyConflict);
+		if (isset($dat['_touppChanged'])) {
+			wfConfig::set('touppPromptNeeded', wfUtils::truthyToBoolean($dat['_touppChanged']));
+		}
 
 		if (!is_array($dat)) {
-			throw new Exception("We received a data structure that is not the expected array when contacting the Wordfence scanning servers and calling the '$action' function.");
+			throw new wfAPICallInvalidResponseException(sprintf(/* translators: API call/action/endpoint. */ __("We received a data structure that is not the expected array when contacting the Wordfence scanning servers and calling the '%s' function.", 'wordfence'), $action));
 		}
 		if (is_array($dat) && isset($dat['errorMsg'])) {
-			throw new Exception($dat['errorMsg']);
+			throw new wfAPICallErrorResponseException($dat['errorMsg']);
 		}
 		return $dat;
 	}
 
-	protected function getURL($url, $postParams = array()) {
-		wordfence::status(4, 'info', "Calling Wordfence API v" . WORDFENCE_API_VERSION . ":" . $url);
+	protected function getURL($url, $postParams = array(), $timeout = 900) {
+		wordfence::status(4, 'info', sprintf(/* translators: API version. */ __("Calling Wordfence API v%s:", 'wordfence'), WORDFENCE_API_VERSION) . $url);
 
 		if (!function_exists('wp_remote_post')) {
-			require_once ABSPATH . WPINC . 'http.php';
+			require_once(ABSPATH . WPINC . 'http.php');
 		}
 
 		$ssl_verify = (bool) wfConfig::get('ssl_verify');
 		$args = array(
-			'timeout'    => 900,
+			'timeout'    => $timeout,
 			'user-agent' => "Wordfence.com UA " . (defined('WORDFENCE_VERSION') ? WORDFENCE_VERSION : '[Unknown version]'),
 			'body'       => $postParams,
 			'sslverify'  => $ssl_verify,
@@ -97,7 +132,13 @@ class wfAPI {
 
 		if (is_wp_error($response)) {
 			$error_message = $response->get_error_message();
-			throw new Exception("There was an " . ($error_message ? '' : 'unknown ') . "error connecting to the the Wordfence scanning servers" . ($error_message ? ": $error_message" : '.'));
+			if ($error_message) {
+				$apiExceptionMessage = sprintf(/* translators: Error message. */ __('There was an error connecting to the Wordfence scanning servers: %s', 'wordfence'), $error_message);
+			} else {
+				$apiExceptionMessage = __('There was an unknown error connecting to the Wordfence scanning servers.', 'wordfence');
+			}
+
+			throw new wfAPICallFailedException($apiExceptionMessage);
 		}
 		
 		$dateHeader = @$response['headers']['date'];
@@ -119,7 +160,7 @@ class wfAPI {
 		}
 
 		if (200 != $this->lastHTTPStatus) {
-			throw new Exception("The Wordfence scanning servers are currently unavailable. This may be for maintenance or a temporary outage. If this still occurs in an hour, please contact support. [$this->lastHTTPStatus]");
+			throw new wfAPICallFailedException(sprintf(/* translators: HTTP status code. */__("The Wordfence scanning servers are currently unavailable. This may be for maintenance or a temporary outage. If this still occurs in an hour, please contact support. [%s]"), $this->lastHTTPStatus));
 		}
 
 		$content = wp_remote_retrieve_body($response);
@@ -141,15 +182,33 @@ class wfAPI {
 	}
 
 	public function makeAPIQueryString() {
-		$homeurl = wfUtils::wpHomeURL();
+		$cv = null;
+		$cs = null;
+		if (function_exists('curl_version')) {
+			$curl = curl_version();
+			$cv = $curl['version'];
+			$cs = $curl['ssl_version'];
+		}
+		
+		$values = array(
+			'wp' => $this->wordpressVersion,
+			'wf' => WORDFENCE_VERSION,
+			'ms' => (is_multisite() ? get_blog_count() : false),
+			'h' => wfUtils::wpHomeURL(),
+			'sslv' => function_exists('openssl_verify') && defined('OPENSSL_VERSION_NUMBER') ? OPENSSL_VERSION_NUMBER : null,
+			'pv' => phpversion(),
+			'pt' => php_sapi_name(),
+			'cv' => $cv,
+			'cs' => $cs,
+			'sv' => (isset($_SERVER['SERVER_SOFTWARE']) ? $_SERVER['SERVER_SOFTWARE'] : null),
+			'dv' => wfConfig::get('dbVersion', null),
+			'lang' => get_site_option('WPLANG'),
+		);
+		
 		return self::buildQuery(array(
-			'v'         => $this->wordpressVersion,
-			's'         => $homeurl,
-			'k'         => $this->APIKey,
-			'openssl'   => function_exists('openssl_verify') && defined('OPENSSL_VERSION_NUMBER') ? OPENSSL_VERSION_NUMBER : '0.0.0',
-			'phpv'      => phpversion(),
+			'k' => $this->APIKey,
+			's' => wfUtils::base64url_encode(json_encode($values)),
 			'betaFeed'  => (int) wfConfig::get('betaThreatDefenseFeed'),
-			'cacheType' => wfConfig::get('cacheType'),
 		));
 	}
 
@@ -167,10 +226,25 @@ class wfAPI {
 
 	public static function SSLEnabled() {
 		if (!function_exists('wp_http_supports')) {
-			require_once ABSPATH . WPINC . 'http.php';
+			require_once(ABSPATH . WPINC . 'http.php');
 		}
 		return wp_http_supports(array('ssl'));
 	}
+	
+	public function getTextImageURL($text) {
+		$apiURL = $this->getAPIURL();
+		return rtrim($apiURL, '/') . '/v' . WORDFENCE_API_VERSION . '/?' . $this->makeAPIQueryString() . '&' . self::buildQuery(array('action' => 'image', 'txt' => base64_encode($text)));
+	}
 }
 
-?>
+class wfAPICallSSLUnavailableException extends Exception {
+}
+
+class wfAPICallFailedException extends Exception {
+}
+
+class wfAPICallInvalidResponseException extends Exception {
+}
+
+class wfAPICallErrorResponseException extends Exception {
+}

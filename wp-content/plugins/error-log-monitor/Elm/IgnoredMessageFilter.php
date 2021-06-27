@@ -1,11 +1,33 @@
 <?php
-class Elm_IgnoredMessageFilter extends FilterIterator implements Elm_LogFilter {
-	private $skippedEntryCount = 0;
-	private $ignoredMessageIndex = array();
 
-	public function __construct(Iterator $iterator, $ignoredMessages) {
+class Elm_IgnoredMessageFilter extends Elm_LogFilter {
+	/**
+	 * @var array<string, bool>
+	 */
+	private $ignoredMessageIndex;
+	/**
+	 * @var array<string, array>
+	 */
+	private $fixedMessages;
+
+	/**
+	 * @var callable|null
+	 */
+	private $reportUnfixed;
+
+	/**
+	 * Elm_IgnoredMessageFilter constructor.
+	 *
+	 * @param Iterator $iterator
+	 * @param array $ignoredMessages
+	 * @param array $fixedMessages
+	 * @param callable $reportUnfixed
+	 */
+	public function __construct(Iterator $iterator, $ignoredMessages, $fixedMessages = array(), $reportUnfixed = null) {
 		parent::__construct($iterator);
 		$this->ignoredMessageIndex = $ignoredMessages;
+		$this->fixedMessages = $fixedMessages;
+		$this->reportUnfixed = $reportUnfixed;
 	}
 
 	/**
@@ -19,27 +41,28 @@ class Elm_IgnoredMessageFilter extends FilterIterator implements Elm_LogFilter {
 			return true;
 		}
 
+		if ( isset($this->fixedMessages[$entry['message']]) ) {
+			//Let's check the timestamp.
+			$details = $this->fixedMessages[$entry['message']];
+			if ( empty($entry['timestamp']) || ($entry['timestamp'] <= $details['fixedOn']) ) {
+				return false;
+			} else {
+				//This entry was logged after the error was marked as fixed, which means that
+				//it hasn't actually been fixed.
+				if ( $this->reportUnfixed ) {
+					call_user_func($this->reportUnfixed, $entry['message']);
+				}
+				unset($this->fixedMessages[$entry['message']]);
+				//The entry might still be hidden if it is ignored in addition to being
+				//marked as fixed, so we continue on instead of returning from the method.
+			}
+		}
+
 		if ( isset($this->ignoredMessageIndex[$entry['message']]) ) {
 			$this->skippedEntryCount++;
 			return false;
 		} else {
 			return true;
 		}
-	}
-
-	public function getSkippedEntryCount() {
-		$count = $this->skippedEntryCount;
-
-		$inner = $this->getInnerIterator();
-		if ( $inner instanceof Elm_LogFilter ) {
-			$count += $inner->getSkippedEntryCount();
-		}
-
-		return $count;
-	}
-
-	public function rewind() {
-		$this->skippedEntryCount = 0;
-		parent::rewind();
 	}
 }

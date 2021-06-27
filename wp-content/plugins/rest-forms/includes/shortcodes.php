@@ -22,8 +22,9 @@
     if ($a['msg_name']=='') $a['msg_name'] = $form->post_name;
 
     $form_content = $form->post_content;
-    $form_content = apply_filters('the_content', $form_content);
+    //$form_content = apply_filters('the_content', $form_content);
     $form_content = str_replace(']]>', ']]&gt;', $form_content);
+    $form_content = str_replace('<br>', '', $form_content);
 
     $temp_content .= '<script>';
     $temp_content .= '  webshims.setOptions("waitReady", false);';
@@ -50,7 +51,7 @@
       foreach($form_consts as $c) {
         $arr = explode('=',$c);
         //$temp_content .= ('<input id="'.$arr[0].'" value="'.$arr[1].'" type="hidden"/>');
-        $temp_content .= $arr[0].':"'.$arr[1].'",';
+        if (!empty($arr[0])) $temp_content .= $arr[0].':"'.$arr[1].'",';
       }
     }
     $temp_content .= 'ip:"'.$_SERVER["REMOTE_ADDR"].'",';

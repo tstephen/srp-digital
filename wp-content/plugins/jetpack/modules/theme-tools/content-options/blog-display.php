@@ -30,9 +30,25 @@ if ( ! in_array( $blog_display, array( 'content', 'excerpt', 'mixed' ) ) ) {
 
 /**
  * Apply Content filters.
+ *
+ * @since 9.7.0 Deprecated $content parameter.
+ *
+ * @param string $content Post content. Deprecated.
  */
-function jetpack_blog_display_custom_excerpt( $content ) {
+function jetpack_blog_display_custom_excerpt( $content = '' ) {
+	if ( ! empty( $content ) ) {
+		_doing_it_wrong(
+			'jetpack_blog_display_custom_excerpt',
+			esc_html__( 'You do not need to pass a $content parameter anymore.', 'jetpack' ),
+			'jetpack-9.7.0'
+		);
+	}
+
 	$post = get_post();
+	if ( empty( $post ) ) {
+		return '';
+	}
+
 	if ( empty( $post->post_excerpt ) ) {
 		$text = strip_shortcodes( $post->post_content );
 		$text = str_replace( ']]>', ']]&gt;', $text );
@@ -47,14 +63,14 @@ function jetpack_blog_display_custom_excerpt( $content ) {
 		 * enter 'characters_excluding_spaces' or 'characters_including_spaces'. Otherwise, enter 'words'.
 		 * Do not translate into your own language.
 		 */
-		if ( strpos( _x( 'words', 'Word count type. Do not translate!', 'jetpack' ), 'characters' ) === 0 && preg_match( '/^utf\-?8$/i', get_option( 'blog_charset' ) ) ) {
+		if ( strpos( _x( 'words', 'Word count type. Do not translate!' ), 'characters' ) === 0 && preg_match( '/^utf\-?8$/i', get_option( 'blog_charset' ) ) ) {
 			$text = trim( preg_replace( "/[\n\r\t ]+/", ' ', $text ), ' ' );
 			preg_match_all( '/./u', $text, $words );
 			$words = array_slice( $words[0], 0, $excerpt_length + 1 );
-			$sep = '';
+			$sep   = '';
 		} else {
 			$words = preg_split( "/[\n\r\t ]+/", $text, $excerpt_length + 1, PREG_SPLIT_NO_EMPTY );
-			$sep = ' ';
+			$sep   = ' ';
 		}
 
 		if ( count( $words ) > $excerpt_length ) {
@@ -74,34 +90,40 @@ function jetpack_blog_display_custom_excerpt( $content ) {
  * Display Excerpt instead of Content.
  */
 function jetpack_the_content_to_the_excerpt( $content ) {
-	if ( is_home() || is_archive() ) {
+	if ( ( is_home() || is_archive() ) && ! is_post_type_archive( array( 'jetpack-testimonial', 'jetpack-portfolio', 'product' ) ) ) {
 		if ( post_password_required() ) {
-			$content = sprintf( '<p>%s</p>', esc_html__( 'There is no excerpt because this is a protected post.', 'jetpack' ) );
+			$excerpt = sprintf( '<p>%s</p>', esc_html__( 'There is no excerpt because this is a protected post.', 'jetpack' ) );
 		} else {
-			$content = jetpack_blog_display_custom_excerpt( $content );
+			$excerpt = jetpack_blog_display_custom_excerpt();
 		}
 	}
-	return $content;
+	if ( empty( $excerpt ) ) {
+		return $content;
+	} else {
+		return $excerpt;
+	}
 }
 
 /**
  * Display Content instead of Excerpt.
  */
 function jetpack_the_excerpt_to_the_content( $content ) {
-	if ( is_home() || is_archive() ) {
+	if ( ( is_home() || is_archive() ) && ! is_post_type_archive( array( 'jetpack-testimonial', 'jetpack-portfolio', 'product' ) ) ) {
 		ob_start();
-		the_content( sprintf(
-			wp_kses(
-				/* translators: %s: Name of current post. Only visible to screen readers */
-				__( 'Continue reading<span class="screen-reader-text"> "%s"</span>', 'jetpack' ),
-				array(
-					'span' => array(
-						'class' => array(),
-					),
-				)
-			),
-			get_the_title()
-		) );
+		the_content(
+			sprintf(
+				wp_kses(
+					/* translators: %s: Name of current post. Only visible to screen readers */
+					__( 'Continue reading<span class="screen-reader-text"> "%s"</span>', 'jetpack' ),
+					array(
+						'span' => array(
+							'class' => array(),
+						),
+					)
+				),
+				get_the_title()
+			)
+		);
 		$content = ob_get_clean();
 	}
 	return $content;
@@ -112,11 +134,11 @@ function jetpack_the_excerpt_to_the_content( $content ) {
  */
 function jetpack_the_content_customizer( $content ) {
 	$class = jetpack_the_content_customizer_class();
-	if ( is_home() || is_archive() ) {
+	if ( ( is_home() || is_archive() ) && ! is_post_type_archive( array( 'jetpack-testimonial', 'jetpack-portfolio', 'product' ) ) ) {
 		if ( post_password_required() ) {
 			$excerpt = sprintf( '<p>%s</p>', esc_html__( 'There is no excerpt because this is a protected post.', 'jetpack' ) );
 		} else {
-			$excerpt = jetpack_blog_display_custom_excerpt( $content );
+			$excerpt = jetpack_blog_display_custom_excerpt();
 		}
 	}
 	if ( empty( $excerpt ) ) {
@@ -130,20 +152,22 @@ function jetpack_the_content_customizer( $content ) {
  * Display both Content and Excerpt instead of Excerpt in the Customizer so live preview can switch between them.
  */
 function jetpack_the_excerpt_customizer( $excerpt ) {
-	if ( is_home() || is_archive() ) {
+	if ( ( is_home() || is_archive() ) && ! is_post_type_archive( array( 'jetpack-testimonial', 'jetpack-portfolio', 'product' ) ) ) {
 		ob_start();
-		the_content( sprintf(
-			wp_kses(
-				/* translators: %s: Name of current post. Only visible to screen readers */
-				__( 'Continue reading<span class="screen-reader-text"> "%s"</span>', 'jetpack' ),
-				array(
-					'span' => array(
-						'class' => array(),
-					),
-				)
-			),
-			get_the_title()
-		) );
+		the_content(
+			sprintf(
+				wp_kses(
+					/* translators: %s: Name of current post. Only visible to screen readers */
+					__( 'Continue reading<span class="screen-reader-text"> "%s"</span>', 'jetpack' ),
+					array(
+						'span' => array(
+							'class' => array(),
+						),
+					)
+				),
+				get_the_title()
+			)
+		);
 		$content = ob_get_clean();
 	}
 	if ( empty( $content ) ) {
@@ -157,7 +181,7 @@ function jetpack_the_excerpt_customizer( $excerpt ) {
  * Display Content instead of Excerpt in the Customizer when theme uses a 'Mixed' display.
  */
 function jetpack_the_excerpt_mixed_customizer( $content ) {
-	if ( is_home() || is_archive() ) {
+	if ( ( is_home() || is_archive() ) && ! is_post_type_archive( array( 'jetpack-testimonial', 'jetpack-portfolio', 'product' ) ) ) {
 		jetpack_the_content_customizer_class( 'output-the-excerpt' );
 		ob_start();
 		the_content();
@@ -175,10 +199,10 @@ function jetpack_the_content_customizer_class( $new_class = null ) {
 	if ( isset( $new_class ) ) {
 		// Assign a new class and return.
 		$class = $new_class;
-	} else if ( isset( $class ) ) {
+	} elseif ( isset( $class ) ) {
 		// Reset the class after getting value.
 		$prev_class = $class;
-		$class = null;
+		$class      = null;
 		return $prev_class;
 	} else {
 		// Return default class value.

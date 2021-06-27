@@ -311,9 +311,6 @@ body.single .entry-thumbnail {
   height: 25vh !important;
   margin-top: 50px;
 }
-body.single .entry-header {
-  width: 674px;
-}
 
 /*--------------------------------------------------------------
 6.0 Jetpack
@@ -399,6 +396,14 @@ body.single .entry-header {
   }
 }
 
+/*--------------------------------------------------------------
+7.3 x >= 768px
+--------------------------------------------------------------*/
+@media screen and (min-width: 768px) {
+  ol, ul {
+    list-style-position: inside;
+  }
+}
 /*--------------------------------------------------------------
 7.3 x >= 1024px
 --------------------------------------------------------------*/
@@ -562,7 +567,8 @@ footer .slide {
 }
 
 /* 8.0 BOARDWALK OVERRIDES, OMISSIONS */
-input[type="tel"] {
+input[type="tel"],
+select {
   padding: 5px;
   width: 100%;
   background: #f2f2f2;

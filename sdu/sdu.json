@@ -12,9 +12,8 @@
     "stockCategoryImages":false, "stockItemImages":false
   },
   "theme": {
-    "cssUrl": "https://srp.digital/srp/2.0.0/css/srp.css",
-    "logoUrl": "/srp/images/sdu-logo.png",
-    "iconUrl": "/images/icon/sdu-icon-16x16.png",
+    "logoUrl": "/sdu/2.0.0/images/sdu-logo.png",
+    "iconUrl": "/sdu/2.0.0/images/icon/sdu-icon-16x16.png",
     "headingColor":"#0078c1",
     "subHeadingColor":"#666",
     "bodyColor":"#666",
@@ -51,34 +50,34 @@
   "contactFields": [
   ],
   "contactActions": [
-    { "name": "Send email", "ref": "SendMemo", "url": true  },
+    { "name": "Send templated email", "ref": "SendMemo", "url": true  },
     { "name": "Convert to user", "ref": "ConvertContactToUser", "url": false },
     { "name": "Send new password", "ref": "SendNewPassword", "url": false }
   ],
   "toolbar": [
     { "url": "/srp/public/macc-national.html", "icon": "tr-icon-england", "title": "National carbon cost benefit curve", "description": "Latest findings for the Health and Social Care sector in England" },
     { "url": "/srp/public/macc-segmented.html", "icon": "tr-icon-acute-trust", "title": "National organisation type carbon and cost benefit curve", "description": "Latest findings broken down by organisation type" },
-    { "url": "/srp/public/planner.html", "icon": "tr-icon-organization", "title": "Your carbon and cost benefit curve", "description": "A tool to identify the most suitable interventions for individual organisations" },
-    { "url": "/srp/intervention-types.html", "icon": "glyphicon-flash", "role": "analyst", "title": "Intervention Types", "description": "Manage the available intervention types affecting Carbon footprint" },
-    { "url": "/srp/interventions.html", "icon": "glyphicon-flash", "role": "analyst", "title": "Interventions", "description": "Manage the impact data for interventions on each organisation type" },
-    { "url": "/srp/organisation-types.html", "icon": "glyphicon-flash", "role": "admin", "title": "Organisation Types", "description": "Manage the different types of organisations applying interventions" },
+    { "url": "/srp/public/planner.html", "icon": "kp-icon-macc", "title": "Your carbon and cost benefit curve", "description": "A tool to identify the most suitable interventions for individual organisations" },
+    { "url": "/srp/intervention-types.html", "icon": "kp-icon-route", "role": "analyst", "title": "Intervention Types", "description": "Manage the available intervention types affecting Carbon footprint" },
+    { "url": "/srp/interventions.html", "icon": "kp-icon-route", "role": "analyst", "title": "Interventions", "description": "Manage the impact data for interventions on each organisation type" },
+    { "url": "/srp/organisation-types.html", "icon": "tr-icon-organization", "role": "analyst", "title": "Organisation Types", "description": "Manage the different types of organisations applying interventions" },
     { "url": "/srp/return.html", "icon": "glyphicon-open", "role": "user", "title": "SDU Return", "description": "Enter sustainability data for your SDU report" },
     { "url": "/srp/report.html", "icon": "glyphicon-dashboard", "role": "user", "title": "SDU Report", "description": "View SDU report" },
     { "url": "/srp/treasury.html", "icon": "glyphicon-gbp", "role": "user", "title": "Treasury Report", "description": "View Treasury report" },
     { "url": "/srp/explorer.html", "icon": "glyphicon-globe", "role": "analyst", "title": "Data Explorer", "description": "Create arbitrary reports on the SDU report and ERIC data" },
-    { "url": "/srp/parameters.html", "icon": "glyphicon-equalizer", "role": "analyst", "title": "Parameters", "description": "Manage the parameters that change over time to keep calculations up to date" },
-    { "url": "/srp/questions.html", "icon": "glyphicon-question-sign", "role": "analyst", "description": "Manage survey questions", "name": "Survey Questions" },
-    { "url": "/work.html", "icon": "glyphicon-inbox", "description": "View your list of active tasks here", "feature":"workManagement", "name": "Work Management" },
-    { "url": "/accounts.html", "icon": "omny-icon-address-book", "role": "analyst", "description": "Find a particular health or social care provider", "name": "Organisations" },
-    { "url": "/memo.html", "icon": "glyphicon-envelope", "role": "admin", "name": "Templates", "description": "Create and edit your message templates"  },
-    { "url": "/definitions.html", "icon": "omny-icon-process-model", "role": "admin", "description": "View your process definitions here", "name": "Process Definitions" },
-    { "url": "/me.html", "icon": "omny-icon-user", "name": "My Profile", "role": "user", "description": "View and manage your account profile" },
-    { "url": "/admin/users.html", "icon": "omny-icon-user", "name": "User Management", "role": "super_admin", "description": "View and manage user accounts and access" },
-    { "url": "/status.html", "icon": "glyphicon-thumbs-up", "role": "admin", "name": "Status", "description": "Check on the status of the system configuration" }
+    { "url": "/srp/parameters.html", "icon": "glyphicon-wrench", "role": "analyst", "title": "System Parameters", "description": "Manage the parameters that change over time to keep calculations up to date" },
+    { "url": "/srp/cfactors.html", "icon": "glyphicon-wrench", "role": "analyst", "title": "Carbon Factors", "description": "Manage the Carbon intensity facotrs used in calculations" },
+    { "url": "/srp/wfactors.html", "icon": "glyphicon-wrench", "role": "analyst", "title": "Weighting factors", "description": "Manage the weighting of different organisation types' contributions" },
+    { "url": "/srp/questions.html", "icon": "kp-icon-question-sign", "role": "analyst", "description": "Manage survey questions", "name": "Survey Questions" },
+    { "url": "/accounts.html", "icon": "kp-icon-address-book", "role": "analyst", "description": "Find a particular health or social care provider", "name": "Organisations" },
+    { "url": "/memo.html", "icon": "kp-icon-envelope", "role": "admin", "name": "Templates", "description": "Create and edit your message templates"  },
+    { "url": "/definitions.html", "icon": "kp-icon-process-model", "role": "admin", "description": "View your process definitions here", "name": "Process Definitions" },
+    { "url": "/admin/users.html", "icon": "kp-icon-user", "name": "User Management", "role": "super_admin", "description": "View and manage user accounts and access" },
+    { "url": "/status.html", "icon": "kp-icon-thumbs-up", "role": "admin", "name": "Status", "description": "Check on the status of the system configuration" }
   ],
   "partials": [
     { "name": "sduAccountExtension", "url": "/sdu/2.0.0/partials/account-extension.html"},
-    { "name": "sduContactExtension", "url": "/srp/2.0.0/partials/contact-extension.html"},
+    { "name": "sduContactExtension", "url": "/sdu/2.0.0/partials/contact-extension.html"},
     { "name": "sduAcuteTrustExtension", "url": "https://api.srp.digital/partials/account-extension.html"},
     { "name": "sduAcute-LargeExtension", "url": "https://api.srp.digital/partials/account-extension.html"},
     { "name": "sduAcute-MediumExtension", "url": "https://api.srp.digital/partials/account-extension.html"},
@@ -95,6 +94,7 @@
     { "name": "sduMentalHealthExtension", "url": "https://api.srp.digital/partials/account-extension.html"},
     { "name": "sduPublicHealthExtension", "url": "https://api.srp.digital/partials/account-extension.html"},
     { "name": "sduSpecialistExtension", "url": "https://api.srp.digital/partials/account-extension.html"},
+    { "name": "sduSendMail", "url": "/srp/2.0.0/partials/user-mail.html"},
     { "name": "sduSendMemo", "url": "https://api.srp.digital/partials/pick-memo.html"},
     { "name": "sduUserExtension", "url": "/srp/2.0.0/partials/user-extension.html"}
   ],
@@ -115,7 +115,6 @@
     { "name": "Send new password", "ref": "SendNewPassword", "url": "processes/link/omny/support/SendNewPassword.bpmn" },
     { "name": "Send alert", "ref": "SendAlert", "url": "processes/link/omny/alerts/SendAlertEmail.bpmn" },
     { "name": "Update contact", "ref": "UpdateContact", "url": "processes/link/omny/custmgmt/UpdateContact.bpmn" },
-
     { "name": "Restate sustainability return", "ref": "RestateSustainabilityReturn", "url": "processes/digital/srp/returns/RestateSustainabilityReturn.bpmn" },
     { "name": "Submit sustainability return", "ref": "SubmitSustainabilityReturn", "url": "processes/digital/srp/returns/SubmitSustainabilityReturn.bpmn" },
     { "name": "Record abatement plan", "ref": "RecordAbatementPlan", "url": "processes/digital/srp/macc/RecordAbatementPlan.bpmn" },
@@ -135,7 +134,6 @@
     "contactDescriptionHint": "For example, the Head's name etc.",
     "contacts": "Contacts",
     "org": "Organisation",
-    "orgHint": "The organisation you will be reporting on behalf of",
     "phone1": "Phone",
     "stage": "Status"
   },

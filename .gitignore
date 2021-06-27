@@ -6,6 +6,12 @@
 *.sql.gz
 ~*
 
+# Apps overlaid
+*html
+admin/*
+questionnaire/*
+srp/*
+
 .htaccess
 .maintenance
 
@@ -19,6 +25,8 @@ wp-content/upgrade/
 wp-content/backup-db/
 wp-content/cache/
 wp-content/backups/
+wp-content/languages/
+wp-content/plugins/*.zip
 
 wp-content/advanced-cache.php
 wp-content/object-cache.php

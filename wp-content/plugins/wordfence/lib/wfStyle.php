@@ -9,15 +9,6 @@ class wfStyle {
 		if (wfConfig::get('isPaid')) {
 			return 'wf-col-xs-12';
 		}
-		return 'wf-col-xs-12 wf-col-sm-9 wf-col-sm-pull-3';
-	}
-	
-	/**
-	 * Returns the classes for the right rail portion of the page when present.
-	 * 
-	 * @return string
-	 */
-	public static function rightRailClasses() {
-		return 'wf-hidden-xs wf-col-sm-push-9 wf-col-sm-3';
+		return 'wf-col-xs-12';
 	}
 }

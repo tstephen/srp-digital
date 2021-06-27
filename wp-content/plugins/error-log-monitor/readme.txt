@@ -2,8 +2,8 @@
 Contributors: whiteshadow
 Tags: dashboard widget, administration, error reporting, admin, maintenance, php
 Requires at least: 4.5
-Tested up to: 4.9
-Stable tag: 1.5.6
+Tested up to: 5.6
+Stable tag: 1.7
 
 Adds a Dashboard widget that displays the latest messages from your PHP error log. It can also send logged errors to email.
 
@@ -45,6 +45,84 @@ Follow these steps to install the plugin on your site:
 2. Dashboard widget configuration screen.
 
 == Changelog ==
+
+= 1.7 =
+* Added a "mark as fixed" option. Like the "ignore" option, "mark as fixed" hides all existing copies of a specific error. However, if the same error happens again in the future, the plugin will make it visible again.
+* Added a "Clear Ignored Messages" button. It un-ignores all previously ignored messages.
+* Fixed a couple of PHP 8 deprecation warnings about a required parameter following an optional parameter.
+* Tested with WP 5.6.1 and 5.7-beta.
+
+= 1.6.13 = 
+* Fixed "Deprecated: contextual_help is deprecated since version 3.3.0". While this plugin doesn't use the "contextual_help" filter, it includes a copy of scbFramework that can also be used by other active plugins. Some of those plugins could run code in scbFramework that used "contextual_help". This deprecated code has now been removed.
+* Tested with WP 5.5.3.
+
+= 1.6.12 =
+* Fixed recoverable fatal errors being incorrectly presented as an unknown error type.
+* Added text domain to a UI message that was missing it.
+* Updated the Freemius SDK to version 2.4.1.
+* Tested with WP 5.5.1 and 5.6-beta.
+
+= 1.6.11 =
+* Changed the minimum required PHP version to 5.6.
+* Tested up to WP 5.5.
+
+= 1.6.10 =
+* Fixed a bug where the plugin could freeze or crash while trying to parse extremely long log entries (e.g. more than a million characters long).
+* Updated the Freemius SDK to version 2.3.2.
+* Tested up to WP 5.4.1.
+
+= 1.6.9 =
+* Fixed the erorr "call to undefined function get_blog_list()" when trying to access the network admin on a non-Multisite site.
+
+= 1.6.8 =
+* Fixed a conflict with WP-PageNavi, again. The fix included in the previous version was not fully effective.
+
+= 1.6.7 =
+* Fixed a conflict with WP-PageNavi that could cause a fatal error.
+* Updated Freemius SDK to the latest version, which may fix some Freemius-related issues.
+* Tested up to WP 5.3.
+
+= 1.6.6 =
+* Improved the way the plugin displays truncated stack traces. Now it should no longer display the last entry as a very tall and narrow block of text.
+* Added a workaround for conflicts with plugins that use old versions of scbFramework.
+* Tested up to WP 5.2.
+
+= 1.6.5 =
+* Fixed a bug where it wasn't possible to filter out log entries that didn't match any of the standard severity levels (notice, warning, error, etc). Now you can hide uncategorized log entries by unchecking the "Other" option in filter settings.
+* Fixed a security issue.
+* Tested with the final WP 5.1 release.
+
+= 1.6.4 =
+* Changed plugin configuration permissions. Now you need to have the "install_plugins" capability to change the configuration. Previous versions used the "update_core" capability.
+* Fixed a bug where users who couldn't change plugin configuration were still shown a useless "Submit" button.
+* Tested with WP 5.1-alpha.
+
+= 1.6.3 =
+* Added a workaround for a conflict with "Go Fetch Jobs (for WP Job Manager)" 1.4.6.
+* Tested with the final WP 5.0 release.
+
+= 1.6.2 =
+* Added a setup wizard that helps new users create a log file and enable error logging. You can still do it manually you prefer. The setup notice will automatically disappear if logging is already configured.
+* Fixed a bug where activating the plugin on individual sites in a Multisite network could, in some cases, trigger a fatal error.
+* Additional testing with WP 5.0-alpha.
+
+= 1.6.1 =
+* Fixed the "upgrade" link being broken in certain configurations.
+
+= 1.6 =
+* Added a colored dot showing the severity level to each error message. Fatal errors are red, warnings are orange, notices and strict-standards messages are grey, and custom or unrecognized messages are blue.
+* Added a new setting for email notifications: "how often to check the log for new messages". 
+* Added a notice explaining how to configure WordPress to log all types of errors (including PHP notices) instead of just fatal errors and warnings.
+* Added Freemius integration.
+* Added a link to the Pro version to bottom of the widget.
+* Improved parsing of multi-line log entries. Now the plugin will show all of the lines as part of the same message instead of treating every line as an entirely separate error.
+* Improved stack trace formatting.
+* In Multisite, the dashboard widget now also shows up in the network admin dashboard.
+* Changed permissions so that only Super Admins can change plugin settings or clear the log file. Regular administrators can still see the widget.
+
+= 1.5.7 =
+* The widget now displays log timestamps in local time instead of UTC.
+* Fixed a runtime exception "Backtrack buffer overflow" that was thrown when trying to parse very long log entries.
 
 = 1.5.6 =
 * The dashboard widget now shows the log file size and the "Clear Log" button even when all entries are filtered out.
@@ -118,17 +196,3 @@ Follow these steps to install the plugin on your site:
 = 1.2.2 = 
 * Updated Scb Framework to the latest revision.
 * Tested up to WordPress 4.0 beta.
-
-= 1.2.1 = 
-* Tested up to WordPress 3.9.
-
-= 1.2 = 
-* Tested up to WordPress 3.7.1.
-
-= 1.1 = 
-* Fixed plugin homepage URL.
-* Fix: If no email address is specified, simply skip emailing the log instead of throwing an error.
-* Tested with WordPress 3.4.2.
-
-= 1.0 =
-* Initial release.
