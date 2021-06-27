@@ -5,13 +5,13 @@
  * Removes all settings WP-Members added to the WP options table
  * 
  * This file is part of the WP-Members plugin by Chad Butler
- * You can find out more about this plugin at http://rocketgeek.com
- * Copyright (c) 2006-2017  Chad Butler
+ * You can find out more about this plugin at https://rocketgeek.com
+ * Copyright (c) 2006-2020  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @author Chad Butler
- * @copyright 2006-2017
+ * @copyright 2006-2020
  */
 
 // Exit if accessed directly.
@@ -27,7 +27,7 @@ if( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 // Uninstall process removes WP-Members settings from the WordPress database (_options table).
 if ( WP_UNINSTALL_PLUGIN ) {
 
-	if( is_multisite() ) {
+	if ( is_multisite() ) {
 
 		global $wpdb;
 		$blog_ids = $wpdb->get_col( "SELECT blog_id FROM $wpdb->blogs" );
@@ -71,6 +71,7 @@ function wpmem_uninstall_options() {
 	delete_option( 'wpmembers_email_wpfrom'  );
 	delete_option( 'wpmembers_email_wpname'  );
 	delete_option( 'wpmembers_email_getuser' );
+	delete_option( 'wpmembers_email_validated' );
 
 	delete_option( 'widget_wpmemwidget' );
 	
