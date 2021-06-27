@@ -1,19 +1,20 @@
 === Broken Link Checker ===
-Contributors: freediver
-Donate link:
-Tags: links, broken, maintenance, blogroll, custom fields, admin, comments, posts
-Requires at least: 3.2
-Tested up to: 4.8
-Stable tag: 1.11.5
+Contributors: managewp, wpmudev
+Tags: links, broken links, internal link, external link, broken images, seo, test links, check links, bad links
+Requires at least: 4.6
+Tested up to: 5.5
+Stable tag: 1.11.15
+License: GPLv2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-This plugin will check your posts, comments and other content for broken links and missing images, and notify you if any are found.
+Check posts, pages & all content for broken links & missing images to improve SEO. Get notified when bad links are found.
 
 == Description ==
-This plugin will monitor your blog looking for broken links and let you know if any are found.
+Broken Link Checker monitors and tests all internal links & external links on your site looking for broken links. It helps you fix bad links to improve SEO and user experience.
 
 **Features**
 
-* Monitors links in your posts, pages, comments, the blogroll, and custom fields (optional).
+* Monitors external links and internal links in your posts, pages, comments, the blogroll, and custom fields (optional).
 * Detects links that don't work, missing images and redirects.
 * Notifies you either via the Dashboard or by email.
 * Makes broken links display differently in posts (optional).
@@ -39,48 +40,13 @@ There are several actions associated with each link. They show up when you move 
 
 You can also click on the contents of the "Status" or "Link Text" columns to get more info about the status of each link.
 
-**Translations**
-
-* Arabic - Yaser Maadan
-* Belorussian - [M. Comfi](http://www.comfi.com/)
-* Chinese Simplified - Kaijia Feng
-* Chinese Traditional - [YILIN](http://sh2153.com)
-* Czech - [Lelkoun](http://lelkoun.cz/)
-* Danish - [Georg S. Adamsen](http://wordpress.blogos.dk/)
-* Dutch - [Robin Roelofsen](http://www.dreamdesignsolutions.nl/)
-* Finnish - [Jani Alha](http://www.wysiwyg.fi)
-* French - [Whiler](http://blogs.wittwer.fr/whiler/), Luc Capronnier, [Guillaume Boda](http://www.michtoblog.com/)
-* German - [Ivan Graf](http://blog.bildergallery.com/)
-* Hebrew - [Ahrale](http://atar4u.com/), [Eitan Caspi](http://caspi.org.il/)
-* Hindi - [Outshine Solutions](http://outshinesolutions.com/)
-* Hungarian - [Language Connect](http://www.languageconnect.net/)
-* Irish - [Ray Gren](http://letsbefamous.com/)
-* Italian - [Gianni Diurno](http://gidibao.net/index.php/portfolio/) and [Giacomo Ross](http://www.luxemozione.com/) (alternative)
-* Japanese - [Shohei Tanak](http://artisanworkshop.biz/)
-* Korean - [MinHyeong Lim](http://ssamture.net/)
-* Persian - [Omid Sheerkavand](http://qanal.ir/)
-* Polish - [http://positionmaker.pl](http://positionmaker.pl/)
-* Portuguese - [mowster](http://wordpress.mowster.net/)
-* Brazilian Portuguese - [Paulino Michelazzo](http://www.michelazzo.com.br/)
-* Romanian - [Ovidiu](http://www.jibo.ro)
-* Russian - [Anna Ozeritskaya](http://hweia.ru/)
-* Serbo-Croatian - [Borisa Djuraskovic](http://www.webhostinghub.com)
-* Slovakian - [Patrik Žec](http://patwist.com/)
-* Spanish - [Neoshinji](http://blog.tuayudainformatica.com/traducciones-de-plugins-wordpress/)
-* Swedish - mepmepmep
-* Turkish - [Murat Durgun](http://www.lanwifi.net/)
-* Ukrainian - [Stas Mykhajlyuk](http://www.kosivart.com/)
-* Vietnamese - [Biz.O](http://bizover.net/)
-
-*Note: Some translations are not entirely up to date with the latest release, so parts of the interface may appear untranslated.*
-
 **Other Credits**
 
 This plugin uses some icons from the [Font Awesome icon font](http://fortawesome.github.io/Font-Awesome/). Font Awesome is licensed under SIL OFL 1.1.
 
 **Contribute**
 
-Broken Link Checker is now on [GitHub](https://github.com/ManageWP/broken-link-checker). Pull Requests welcome.
+Broken Link Checker is now on [GitHub](https://github.com/wpmudev/broken-link-checker). Pull Requests welcome.
 
 == Installation ==
 
@@ -100,6 +66,65 @@ To upgrade your installation
 1. Reactivate the plugin. Your settings will be retained from the previous version.
 
 == Changelog ==
+= 1.11.15 =
+* Added integration with WP External Links plugin
+
+= 1.11.14 =
+* Added compatibility for WP 5.5.
+
+= 1.11.13 =
+* Added filter for disabling email notifications.
+* Added filter to use GET requests. (Thanks to [Stian Lund](https://github.com/Pathduck))
+* Added option to disable last updated time on post types.
+* Added option to check post excerpts.
+* Added a confirmation box when unlinking.
+* Added basic multisite support.
+* Added proper error messages on YouTube video errors.
+* Fixed bulk recheck option.
+* Fixed minor database errors.
+* Improved performance.
+* Removed default YouTube API key.
+* Removed usage of depricated WP Snoopy.
+
+= 1.11.12 =
+* Added an interface to use personal YouTube API Key
+* Fixed database errors on installation for some hosts.
+* Fixed link editor not working with elementor.
+* Fixed custom field key with multiple keys not rendering.
+* Fixed compatibility issues with Business Directory plugin.
+* Fixed bulk actions not working properly for some actions.
+* Updated the owner on repository.
+
+= 1.11.11 =
+* Fixed SQL errors caused on some hosts.
+* Fixed search filters & pagination.
+* Fixed link table design in mobile devices.
+* Fixed deprecated functions on PHP 7.4
+* Fixed filter_var deprecated notices.
+* Improved code with WPCS.
+* Added a new API key for the YouTube API.
+
+= 1.11.10 =
+* Fixed create_function deprecated notices.
+* Fixed missing license information.
+* Fixed table prefix on delete post action (Thanks to [Guillaume Boudreau](https://github.com/gboudreau))
+* Merges cron schedules into 1 hook (Thanks to [Der Mundschenk & Compagnie](https://github.com/mundschenk-at))
+* Add escaping to search params.
+* Tested up to WordPress 5.3
+* Updated laguage files
+
+= 1.11.9 =
+* Fixed Reflected XSS (Thanks to [Tobias Fink](https://github.com/sbaresearch/advisories/tree/public/2019/SBA-ADV-20190913-02_WordPress_Plugin_Broken_Link_Checker) for the report)
+* Fixed param escaping to avoid possible XSS attack.
+
+= 1.11.8 =
+* Various fixes.
+
+= 1.11.7 =
+* Fixed a PHP 7.2 compatibility issue
+
+= 1.11.6 =
+* Fixed link check not saving
 
 = 1.11.5 =
 * Fixed a PHP 5.2 compatibility issue
@@ -115,11 +140,11 @@ To upgrade your installation
 
 = 1.11.1 =
 * Major performance improvement. Database queries reduced up to 10x in some cases.
-* Feel free to contribute to the plugin on [GitHub](https://github.com/ManageWP/broken-link-checker). Pull requests welcome!
+* Feel free to contribute to the plugin on [GitHub](https://github.com/wpmudev/broken-link-checker). Pull requests welcome!
 
 = 1.10.11 =
 * Fixed the issue with HTTPS (Thanks to [gmcinnes](https://wordpress.org/support/profile/gmcinnes))
-* Broken Link Checker is now on [GitHub](https://github.com/ManageWP/broken-link-checker). Pull Requests welcome.
+* Broken Link Checker is now on [GitHub](https://github.com/wpmudev/broken-link-checker). Pull Requests welcome.
 
 = 1.10.10 =
 * New plugin image that was long overdue.
