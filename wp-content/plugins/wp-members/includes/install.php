@@ -6,12 +6,12 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at https://rocketgeek.com
- * Copyright (c) 2006-2020  Chad Butler
+ * Copyright (c) 2006-2022  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @author Chad Butler
- * @copyright 2006-2020
+ * @copyright 2006-2022
  */
 
 // Exit if accessed directly.
@@ -78,6 +78,11 @@ function wpmem_do_install() {
 		if ( version_compare( $existing_settings['db_version'], '2.2.1', '<' ) ) {
 			wpmem_upgrade_validation_email();
 			wpmem_upgrade_woo_reg();
+		}
+		
+		// Only run this if DB version < 2.3.0
+		if ( version_compare( $existing_settings['db_version'], '2.3.0', '<' ) ) {
+			wpmem_upgrade_hidden_transient();
 		}
 	}
 	
@@ -238,19 +243,12 @@ function wpmem_append_email() {
 
 	// Email for a new registration.
 	$subj = 'Your registration info for [blogname]';
-	$body = 'Thank you for registering for [blogname]
+	$body = 'Thank you for registering for [blogname]!
 
-Your registration information is below.
-You may wish to retain a copy for your records.
+Please confirm your email address by following the link below:
+[confirm_link]
 
-username: [username]
-password: [password]
-
-You may log in here:
-[reglink]
-
-You may change your password here:
-[user-profile]
+Once you have confirmed your email address, you will be able to log in using the credentials you created when you registered.
 ';
 
 	$arr = array(
@@ -312,11 +310,12 @@ You originally registered at:
 
 	// Email for password reset.
 	$subj = 'Your password reset for [blogname]';
-	$body = 'Your password for [blogname] has been reset
+	$body = 'A password reset was requested for [blogname].
 
-Your new password is included below. You may wish to retain a copy for your records.
+Follow the link below to reset your password:
+[reset_link]
 
-password: [password]
+If you did not request a password reset for [blogname], simply ignore this message and the reset key will expire.
 ';
 
 	$arr = array(
@@ -586,7 +585,7 @@ function wpmem_install_dialogs() {
 		'pwdchangerr'      => "Passwords did not match.<br /><br />Please try again.",
 		'pwdchangesuccess' => "Password successfully changed!",
 		'pwdreseterr'      => "Either the username or email address do not exist in our records.",
-		'pwdresetsuccess'  => "Password successfully reset!<br /><br />An email containing a new password has been sent to the email address on file for your account.",
+		'pwdresetsuccess'  => "An email with instructions to update your password has been sent to the email address on file for your account.",
 	);
 	// Insert TOS dialog placeholder.
 	$dummy_tos = "Put your TOS (Terms of Service) text here.  You can use HTML markup.";
@@ -759,5 +758,14 @@ function wpmem_upgrade_woo_reg() {
 		);
 		update_option( 'wpmembers_settings', $wpmem_settings );
 	}
+}
+
+function wpmem_upgrade_hidden_transient() {
+	if ( ! class_exists( 'WP_Members' ) ) {
+		require_once( 'class-wp-members.php' );
+	}
+	$temp_obj = new WP_Members;
+	$temp_obj->update_hidden_posts();
+	delete_transient( '_wpmem_hidden_posts' );
 }
 // End of file.

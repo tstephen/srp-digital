@@ -6,12 +6,12 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at https://rocketgeek.com
- * Copyright (c) 2006-2020  Chad Butler
+ * Copyright (c) 2006-2022  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @author Chad Butler
- * @copyright 2006-2020
+ * @copyright 2006-2022
  *
  * Functions included:
  * - wpmem_a_do_warnings
@@ -75,7 +75,7 @@ function wpmem_a_do_warnings( $did_update ) {
 	}
 
 	// Holding registrations but haven't changed default successful registration message.
-	if ( $warnings_on && $wpmem->mod_reg == 1 && $dialogs['success'] == $wpmem->get_text( 'success' ) ) {
+	if ( $warnings_on && $wpmem->mod_reg == 1 && $dialogs['success'] == wpmem_get_text( 'success' ) ) {
 		wpmem_a_warning_msg( 'success' );
 		$warning_active = true;
 	}

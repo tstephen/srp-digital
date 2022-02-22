@@ -4,29 +4,13 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at https://rocketgeek.com
- * Copyright (c) 2006-2020  Chad Butler
+ * Copyright (c) 2006-2022  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @subpackage WP-Members API Functions
  * @author Chad Butler 
- * @copyright 2006-2020
- *
- * Functions included:
- * - wpmem_redirect_to_login
- * - wpmem_is_blocked
- * - wpmem_login_url
- * - wpmem_register_url
- * - wpmem_profile_url
- * - wpmem_current_url
- * - wpmem_current_post_id
- * - wpmem_gettext
- * - wpmem_use_custom_dialog
- * - wpmem_login_status
- * - wpmem_get
- * - wpmem_is_reg_page
- * - wpmem_loginout
- * - wpmem_display_message
+ * @copyright 2006-2022
  */
 
 // Exit if accessed directly.
@@ -101,6 +85,7 @@ function wpmem_get_block_setting( $post_id ) {
  *
  * @since 3.1.1
  * @since 3.1.2 Added redirect_to parameter.
+ * @since 3.4.0 If no login page is set, return the wp_login_url().
  *
  * @global object $wpmem       The WP_Members object.
  * @param  string $redirect_to URL to return to (optional).
@@ -108,10 +93,12 @@ function wpmem_get_block_setting( $post_id ) {
  */
 function wpmem_login_url( $redirect_to = false ) {
 	global $wpmem;
+	// If no login page is set, get WP login url.
+	$login_url = ( isset( $wpmem->user_pages['login'] ) ) ? $wpmem->user_pages['login'] : wp_login_url();
 	if ( $redirect_to ) {
-		$url = add_query_arg( 'redirect_to', urlencode( $redirect_to ), $wpmem->user_pages['login'] );
+		$url = add_query_arg( 'redirect_to', urlencode( $redirect_to ), $login_url );
 	} else {
-		$url = $wpmem->user_pages['login'];
+		$url = $login_url;
 	}
 	return $url;
 }
@@ -200,20 +187,19 @@ function wpmem_current_post_id() {
 /**
  * Wrapper to return a string from the get_text function.
  *
- * @since 3.1.1
- * @since 3.1.2 Added $echo argument.
+ * @since 3.4.0
  *
  * @global object $wpmem The WP_Members object.
  * @param  string $str   The string to retrieve.
  * @param  bool   $echo  Print the string (default: false).
  * @return string $str   The localized string.
  */
-function wpmem_gettext( $str, $echo = false ) {
+function wpmem_get_text( $str, $echo = false ) {
 	global $wpmem;
 	if ( $echo ) {
-		echo $wpmem->get_text( $str );
+		echo $wpmem->dialogs->get_text( $str );
 	} else {
-		return $wpmem->get_text( $str );
+		return $wpmem->dialogs->get_text( $str );
 	}
 }
 
@@ -238,17 +224,58 @@ function wpmem_use_custom_dialog( $defaults, $tag, $dialogs ) {
  * @since 2.0.0
  * @since 3.1.2 Moved to api.php, no longer pluggable.
  * @since 3.1.6 Dependencies now loaded by object.
+ * @since 3.4.0 Added $tag for id'ing useage, to be passed through filter.
  *
- * @param  boolean $echo   Determines whether function should print result or not (default: true).
- * @return string  $status The user status string produced by wpmem_inc_memberlinks().
+ * @global string  $user_login
+ * @param  boolean $echo       Determines whether function should print result or not (default: true).
+ * @return string  $status     The user status string produced by wpmem_inc_memberlinks().
  */
-function wpmem_login_status( $echo = true ) {
+function wpmem_login_status( $echo = true, $tag = false ) {
+	if ( is_user_logged_in() ) {
+		
+		global $user_login;
+		
+		$args = array(
+			'wrapper_before' => '<p>',
+			'wrapper_after'  => '</p>',
+			'user_login'     => $user_login,
+			'welcome'        => wpmem_gettext( 'status_welcome' ),
+			'logout_text'    => wpmem_gettext( 'status_logout' ),
+			'logout_link'    => '<a href="' . esc_url( wpmem_logout_link() ) . '">%s</a>',
+			'separator'      => ' | ',
+		);
+		/**
+		 * Filter the status message parts.
+		 *
+		 * @since 2.9.9
+		 * @since 3.4.0 Added $tag as a parameter (most often will be false).
+		 *
+		 * @param array $args {
+		 *      The components of the links.
+		 *
+		 *      @type string $wrapper_before The wrapper opening tag (default: <p>).
+		 *      @type string $wrapper_after  The wrapper closing tag (default: </p>).
+		 *      @type string $user_login
+		 *      @type string $welcome
+		 *      @type string $logout_text
+		 *      @type string $logout_link
+		 *      @type string $separator
+		 * }
+		 * @param string $tag
+		 */
+		$args = apply_filters( 'wpmem_status_msg_args', $args, $tag );
 
-	if ( is_user_logged_in() ) { 
-		$status = wpmem_inc_memberlinks( 'status' );
-		if ( $echo ) {
-			echo $status; 
-		}
+		// Assemble the message string.
+		$status = $args['wrapper_before']
+			. sprintf( $args['welcome'], $args['user_login'] )
+			. $args['separator']
+			. sprintf( $args['logout_link'], $args['logout_text'] )
+			. $args['wrapper_after'];
+	}
+	
+	if ( $echo ) {
+		echo $status; 
+	} else {
 		return $status;
 	}
 }
@@ -260,6 +287,7 @@ function wpmem_login_status( $echo = true ) {
  * sanitized or escaped depending on how it is used.
  *
  * @since 3.1.3
+ * @since 3.4.0 Now an alias for rktgk_get().
  *
  * @param  string $tag     The form field or query string.
  * @param  string $default The default value (optional).
@@ -267,17 +295,7 @@ function wpmem_login_status( $echo = true ) {
  * @return string 
  */
 function wpmem_get( $tag, $default = '', $type = 'post' ) {
-	switch ( $type ) {
-		case 'get':
-			return ( isset( $_GET[ $tag ] ) ) ? $_GET[ $tag ] : $default;
-			break;
-		case 'request':
-			return ( isset( $_REQUEST[ $tag ] ) ) ? $_REQUEST[ $tag ] : $default;
-			break;
-		default: // case 'post':
-			return ( isset( $_POST[ $tag ] ) ) ? $_POST[ $tag ] : $default;
-			break;
-	}
+	return rktgk_get( $tag, $default, $type );
 }
 
 /**
@@ -327,18 +345,61 @@ function wpmem_loginout( $args = array(), $echo = false ) {
 }
 
 /**
+ * Gets a logout link.
+ *
+ * @since 3.4.0
+ *
+ * @return string Logout link.
+ */
+function wpmem_logout_link() {
+	/**
+	 * Filter the log out link.
+	 *
+	 * @since 2.8.3
+	 *
+	 * @param string The default logout link.
+	 */
+	return apply_filters( 'wpmem_logout_link', add_query_arg( 'a', 'logout' ) );
+}
+
+/**
+ * Gets requested dialog.
+ *
+ * @since 3.4.0
+ * 
+ * @note It is being relased now as tentative.
+ *       There may be some changes to how this is applied.
+ *
+ * @todo What about wpmem_use_custom_dialog()?
+ *
+ * @global stdClass $wpmem
+ * @param  string   $tag
+ * @param  string   $custom
+ * @return
+ */
+function wpmem_get_display_message( $tag, $custom = false ) {
+	global $wpmem;
+	return $wpmem->dialogs->get_message( $tag, $custom );
+}
+
+/**
  * Dispalays requested dialog.
+ * 
+ * @note It is being relased now as tentative.
+ *       There may be some changes to how this is applied.
  *
  * @since 3.2.0
+ * @since 3.4.0 Now echos the message. Added $custom argument
  *
- * @todo Needs testing and finalization before release.
+ * @todo What about wpmem_use_custom_dialog()?
+ *
+ * @global stdClass $wpmem
+ * @param  string   $tag
+ * @param  string   $custom
+ * @return
  */
-function wpmem_display_message( $tag, $echo = true ) {
-	if ( $echo ) {
-		echo wpmem_inc_regmessage( $tag );
-	} else {
-		return wpmem_inc_regmessage( $tag );
-	}
+function wpmem_display_message( $tag, $custom = false ) {
+	echo wpmem_get_display_message( $tag, $custom );
 }
 
 /**
@@ -415,4 +476,54 @@ function wpmem_is_reg_type( $type ) {
 	return $wpmem->reg_type[ 'is_' . $type ];
 }
 
+/**
+ * Displays the post restricted message.
+ *
+ * @since 3.4.0
+ *
+ * @return string
+ */
+function wpmem_restricted_message() {
+	global $wpmem;
+	return $wpmem->forms->add_restricted_msg();
+}
+
+/**
+ * Checks if requested setting is enabled.
+ * 
+ * @since 3.4.1
+ * 
+ * @param  string  $option
+ * @return boolean
+ */
+function wpmem_is_enabled( $option ) {
+	global $wpmem;
+	return ( 1 == $wpmem->{$option} ) ? true : false;
+}
+
+/**
+ * Gets plugin url.
+ * 
+ * @since 3.4.1
+ * 
+ * @global stdClass $wpmem
+ * @return string   $wpmem->url
+ */
+function wpmem_get_plugin_url() {
+	global $wpmem;
+	return $wpmem->url;
+}
+
+/**
+ * Gets plugin version.
+ * 
+ * @since 3.4.1
+ * 
+ * @global stdClass $wpmem
+ * @return string   $wpmem->version
+ */
+function wpmem_get_plugin_version() {
+	global $wpmem;
+	return $wpmem->version;
+}
 // End of file.

@@ -8,12 +8,12 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at https://rocketgeek.com
- * Copyright (c) 2006-2020  Chad Butler
+ * Copyright (c) 2006-2022  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package   WP-Members
  * @author    Chad Butler 
- * @copyright 2006-2020
+ * @copyright 2006-2022
  */
 
 // Exit if accessed directly.
@@ -57,11 +57,11 @@ function wpmem_inc_status() {
 	
 	global $user_login, $wpmem;
 	
-	/** This filter is documented in wp-members/inc/dialogs.php */
+	/** This filter is defined in /includes/api/api.php */
 	$logout = apply_filters( 'wpmem_logout_link', $url . '/?a=logout' );
 
-	$status = '<p>' . sprintf( $wpmem->get_text( 'sb_login_status' ), $user_login )
-		. ' | <a href="' . $logout . '">' . $wpmem->get_text( 'sb_logout_link' ) . '</a></p>';
+	$status = '<p>' . sprintf( wpmem_get_text( 'sb_login_status' ), $user_login )
+		. ' | <a href="' . $logout . '">' . wpmem_get_text( 'sb_logout_link' ) . '</a></p>';
 
 	return $status;
 }
@@ -134,8 +134,8 @@ function wpmem_reg_securify( $content ) {
 	global $wpmem, $wpmem_themsg;
 	$nonce = wpmem_get( 'reg_nonce', false, 'get' );
 	if ( $nonce && wp_verify_nonce( $nonce, 'register_redirect' ) ) {
-		$content = wpmem_inc_regmessage( 'success', $wpmem_themsg );
-		$content = $content . wpmem_inc_login();
+		$content = wpmem_get_display_message( 'success', $wpmem_themsg );
+		$content = $content . wpmem_login_form();
 	}
 	return $content;
 }
@@ -233,7 +233,7 @@ if ( ! function_exists( 'wpmem_inc_changepassword' ) ):
  * Loads the form for changing password.
  *
  * @since 2.0.0
- * @since 3.2.0 Now a wrapper for $wpmem->forms->do_changepassword_form()
+ * @since 3.2.0 Now an alias for $wpmem->forms->do_changepassword_form()
  * @deprecated 3.3.0 Use wpmem_change_password_form() instead.
  *
  * @global object $wpmem The WP_Members object.
@@ -253,7 +253,7 @@ if ( ! function_exists( 'wpmem_inc_resetpassword' ) ):
  * Loads the form for resetting password.
  *
  * @since 2.1.0
- * @since 3.2.0 Now a wrapper for $wpmem->forms->do_resetpassword_form()
+ * @since 3.2.0 Now an alias for $wpmem->forms->do_resetpassword_form()
  * @deprecated 3.3.0 Use wpmem_reset_password_form() instead.
  *
  * @global object $wpmem The WP_Members object.
@@ -326,18 +326,6 @@ function wpmem_build_rs_captcha() {
 add_action( 'wpmem_after_init', 'wpmem_load_deprecated_constants' );
 function wpmem_load_deprecated_constants() {
 	global $wpmem;
-/*	( ! defined( 'WPMEM_BLOCK_POSTS'  ) ) ? define( 'WPMEM_BLOCK_POSTS',  $wpmem->block['post']  ) : '';             // @todo Can deprecate? Probably 3.3
-	( ! defined( 'WPMEM_BLOCK_PAGES'  ) ) ? define( 'WPMEM_BLOCK_PAGES',  $wpmem->block['page']  ) : '';             // @todo Can deprecate? Probably 3.3
-	( ! defined( 'WPMEM_SHOW_EXCERPT' ) ) ? define( 'WPMEM_SHOW_EXCERPT', $wpmem->show_excerpt['post'] ) : '';       // @todo Can deprecate? Probably 3.3
-	( ! defined( 'WPMEM_NOTIFY_ADMIN' ) ) ? define( 'WPMEM_NOTIFY_ADMIN', $wpmem->notify    ) : '';                  // @todo Can deprecate? Probably 3.3
-	( ! defined( 'WPMEM_MOD_REG'      ) ) ? define( 'WPMEM_MOD_REG',      $wpmem->mod_reg   ) : '';                  // @todo Can deprecate? Probably 3.3
-	( ! defined( 'WPMEM_CAPTCHA'      ) ) ? define( 'WPMEM_CAPTCHA',      $wpmem->captcha   ) : '';                  // @todo Can deprecate? Probably 3.3
-	( ! defined( 'WPMEM_NO_REG'       ) ) ? define( 'WPMEM_NO_REG',       ( -1 * $wpmem->show_reg['post'] ) ) : '';  // @todo Can deprecate? Probably 3.3
-	( ! defined( 'WPMEM_IGNORE_WARN'  ) ) ? define( 'WPMEM_IGNORE_WARN',  $wpmem->warnings  ) : '';                  // @todo Can deprecate? Probably 3.3
-	( ! defined( 'WPMEM_MSURL'  ) ) ? define( 'WPMEM_MSURL',  $wpmem->user_pages['profile']  ) : '';                 // @todo Can deprecate? Probably 3.3
-	( ! defined( 'WPMEM_REGURL' ) ) ? define( 'WPMEM_REGURL', $wpmem->user_pages['register'] ) : '';                 // @todo Can deprecate? Probably 3.3
-	( ! defined( 'WPMEM_LOGURL' ) ) ? define( 'WPMEM_LOGURL', $wpmem->user_pages['login']    ) : '';                 // @todo Can deprecate? Probably 3.3
-	( ! defined( 'WPMEM_DROPIN_DIR' ) ) ? define( 'WPMEM_DROPIN_DIR', WP_PLUGIN_DIR . '/wp-members-dropins/' ) : '';*/
 	( ! defined( 'WPMEM_CSSURL' ) ) ? define( 'WPMEM_CSSURL', $wpmem->cssurl ) : '';
 }
 
@@ -426,7 +414,7 @@ if ( ! function_exists( 'wpmem_inc_login' ) ):
  *
  * @since 1.8
  * @since 3.1.4 Global $wpmem_regchk no longer needed.
- * @since 3.2.0 Now a wrapper for $wpmem->forms->do_login_form().
+ * @since 3.2.0 Now an alias for $wpmem->forms->do_login_form().
  * @deprecated 3.3.0 Use wpmem_login_form() instead.
  *
  * @global object $post         The WordPress Post object.
@@ -437,8 +425,9 @@ if ( ! function_exists( 'wpmem_inc_login' ) ):
  * @return string $str          The generated html for the login form.
  */
 function wpmem_inc_login( $page = "page", $redirect_to = null, $show = 'show' ) {
+	wpmem_write_log( 'wpmem_inc_login() is deprecated as of WP-Members 3.3.0. Use wpmem_login_form() instead.' );
 	global $wpmem;
-	return $wpmem->forms->do_login_form( $page, $redirect_to, $show );
+	return wpmem_login_form( 'login', array( 'redirect_to'=>$redirect_to ) ); //$wpmem->forms->do_login_form( $page, $redirect_to, $show );
 }
 endif;
 
@@ -449,7 +438,7 @@ if ( ! function_exists( 'wpmem_inc_registration' ) ):
  * Outputs the form for new user registration and existing user edits.
  *
  * @since 2.5.1
- * @since 3.1.7 Now a wrapper for $wpmem->forms->register_form()
+ * @since 3.1.7 Now an alias for $wpmem->forms->register_form()
  * @since 3.2.0 Preparing for deprecation, use wpmem_register_form() instead.
  * @deprecated 3.3.0 Use wpmem_register_form() instead.
  *
@@ -459,8 +448,184 @@ if ( ! function_exists( 'wpmem_inc_registration' ) ):
  * @return string $form         The HTML for the entire form as a string.
  */
 function wpmem_inc_registration( $tag = 'new', $heading = '', $redirect_to = null ) {
+	wpmem_write_log( 'wpmem_inc_registration() is deprecated as of WP-Members 3.3.0. Use wpmem_register_form() instead.' );
 	global $wpmem;
 	$args = array( 'tag' => $tag, 'heading' => $heading, 'redirect_to' => $redirect_to );
 	return $wpmem->forms->register_form( $args );
 } // End wpmem_inc_registration.
 endif;
+
+if ( ! function_exists( 'wpmem_inc_loginfailed' ) ):
+/**
+ * Login Failed Dialog.
+ *
+ * Returns the login failed error message.
+ *
+ * @since 1.8
+ * @deprecated 3.4.0 Use $wpmem->dialogs->login_failed().
+ *
+ * @global object $wpmem The WP_Members object.
+ * @return string $str   The generated html for the login failed message.
+ */
+function wpmem_inc_loginfailed() {
+	wpmem_write_log( 'wpmem_inc_loginfailed() is deprecated as of WP-Members 3.4.0. Use $wpmem->dialogs->login_failed() instead.' );
+	global $wpmem;
+	return $wpmem->dialogs->login_failed();
+}
+endif;
+
+
+if ( ! function_exists( 'wpmem_inc_regmessage' ) ):
+/**
+ * Message Dialog.
+ *
+ * Returns various dialogs and error messages.
+ *
+ * @since 1.8
+ * @since 3.3.0 Changed 'toggles' to 'tags'
+ * @deprecated 3.4.0 Use wpmem_get_display_message() instead.
+ *
+ * @global object $wpmem
+ * @param  string $tag Error message tag to look for specific error messages.
+ * @param  string $msg A message that has no tag that is passed directly to the function.
+ * @return string $str The final HTML for the message.
+ */
+function wpmem_inc_regmessage( $tag, $msg = '' ) {
+	wpmem_write_log( "wpmem_inc_regmessage() is deprecated as of WP-Members 3.4.0. Use wpmem_get_display_message() instead." );
+	global $wpmem;
+	return $wpmem->dialogs->get_message( $tag, $msg );
+}
+endif;
+
+
+if ( ! function_exists( 'wpmem_page_pwd_reset' ) ):
+/**
+ * Password reset forms.
+ *
+ * This function creates both password reset and forgotten
+ * password forms for page=password shortcode.
+ *
+ * @since 2.7.6
+ * @since 3.2.6 Added nonce validation.
+ * @deprecated 3.4.0 Use $wpmem->shortcodes->render_pwd_reset() instead.
+ *
+ * @global object $wpmem
+ * @param  string $wpmem_regchk
+ * @param  string $content
+ * @return string $content
+ */
+function wpmem_page_pwd_reset( $wpmem_regchk, $content ) {
+	wpmem_write_log( "wpmem_page_pwd_reset() is deprecated as of WP-Members 3.4.0." );
+	global $wpmem;
+	$content = $wpmem->shortcodes->render_pwd_reset( $wpmem_regchk, $content );
+	return $content;
+
+}
+endif;
+
+
+if ( ! function_exists( 'wpmem_page_user_edit' ) ):
+/**
+ * Creates a user edit page.
+ *
+ * @since 2.7.6
+ * @since 3.3.9 Added $atts
+ * @deprecated 3.4.0 Use $wpmem->shortcodes->render_user_edit() instead.
+ *
+ * @global object $wpmem
+ * @global string $wpmem_a
+ * @global string $wpmem_themsg
+ * @param  string $wpmem_regchk
+ * @param  string $content
+ * @return string $content
+ */
+function wpmem_page_user_edit( $wpmem_regchk, $content, $atts = false ) {
+	wpmem_write_log( "wpmem_page_user_edit() is deprecated as of WP-Members 3.4.0." );
+	global $wpmem, $wpmem_a, $wpmem_themsg;
+	$content = $wpmem->shortcodes->render_user_edit( $wpmem_regchk, $content );
+	return $content;
+}
+endif;
+
+
+/**
+ * Forgot username form.
+ *
+ * This function creates a form for retrieving a forgotten username.
+ *
+ * @since 3.0.8
+ * @deprecated 3.4.0 Use $wpmem->shortcodes->do_forgot_username() instead.
+ *
+ * @param  string $wpmem_regchk
+ * @param  string $content
+ * @return string $content
+ */
+function wpmem_page_forgot_username( $wpmem_regchk, $content ) {
+	wpmem_write_log( "wpmem_page_forgot_username() is deprecated as of WP-Members 3.4.0." );
+	global $wpmem;
+	$content = $wpmem->shortcodes->render_forgot_username( $wpmem_regchk, $content );
+	return $content;
+
+}
+
+if ( ! function_exists( 'wpmem_inc_memberlinks' ) ):
+/**
+ * Member Links Dialog.
+ *
+ * Outputs the links used on the members area.
+ *
+ * @since 2.0
+ * @since 3.4.0 "status" is technically deprecated. Use wpmem_login_status() instead.
+ * @deprecated 3.4.0 Use $wpmem->shortocdes->render_links() instead.
+ *
+ * @gloabl        $user_login
+ * @global object $wpmem
+ * @param  string $page
+ * @return string $str
+ */
+function wpmem_inc_memberlinks( $page = 'member' ) {
+	wpmem_write_log( "wpmem_inc_memberlinks() is deprecated as of WP-Members 3.4.0." );
+	global $wpmem;
+	switch ( $page ) {
+
+		case 'member':
+		case 'register':
+		case 'login':
+			$str = $wpmem->shortcodes->render_links( $page );
+			break;
+		case 'status':
+			$str = wpmem_login_status();
+			break;
+
+	}
+	return $str;
+}
+endif;
+
+/**
+ * Wrapper to return a string from the get_text function.
+ *
+ * @since 3.1.1
+ * @since 3.1.2 Added $echo argument.
+ * @depreacted 3.4.0 Use wpmem_get_text() instead.
+ *
+ * @param  string $str   The string to retrieve.
+ * @param  bool   $echo  Print the string (default: false).
+ * @return string $str   The localized string.
+ */
+function wpmem_gettext( $str, $echo = false ) {
+	return wpmem_get_text( $str, $echo );
+}
+
+/**
+ * Returns http:// or https:// depending on ssl.
+ *
+ * @since 2.9.8
+ * @deprecated 3.2.3 Use wpmem_force_ssl() instead.
+ *
+ * @return string https://|http:// depending on whether ssl is being used.
+ */
+function wpmem_use_ssl() {
+	wpmem_write_log( 'wpmem_use_ssl() is deprecated. Use wpmem_force_ssl() instead' );
+	return ( is_ssl() ) ? 'https://' : 'http://';
+}

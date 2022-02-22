@@ -7,13 +7,13 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at https://rocketgeek.com
- * Copyright (c) 2006-2020  Chad Butler
+ * Copyright (c) 2006-2022  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @subpackage WP_Members_Shortcodes
  * @author Chad Butler 
- * @copyright 2006-2020
+ * @copyright 2006-2022
  */
 
 // Exit if accessed directly.
@@ -91,119 +91,103 @@ class WP_Members_Shortcodes {
 	 * @param  string $tag     The shortcode's tag (wpmem_form).
 	 * @return string          The form HTML (or nested content, if used and the user is logged in).
 	 */
-	function forms( $atts, $content = null, $tag = 'wpmem_form' ) {
+	function forms( $atts, $content, $tag ) {
 
 		global $wpmem, $wpmem_themsg;
 
 		// Defaults.
-		$redirect_to = ( isset( $atts['redirect_to'] ) ) ? $atts['redirect_to'] : null;
-		$texturize   = ( isset( $atts['texturize']   ) ) ? $atts['texturize']   : false;
-		$form_id     = ( isset( $atts['form_id']     ) ) ? $atts['form_id']     : null;
+		$defaults = array(
+			'form'        => '',
+			'redirect_to' => null,
+			'texturize'   => false,
+			'form_id'     => false,
+		);
+		$atts = wp_parse_args( $atts, $defaults );
+		
+		$atts['form'] = ( isset( $atts[0] ) ) ? $atts[0] : 'login';
+		unset( $atts[0] );
 		
 		$customizer = ( is_customize_preview() ) ? get_theme_mod( 'wpmem_show_logged_out_state', false ) : false;
-		
-		/*
-		 * The [wpmem_form] shortcode requires additional tags (login, register, etc) that
-		 * will be in the $atts array. If $atts is not an array, no additional tags were
-		 * given, so there is nothing to render.
-		 */
-		if ( is_array( $atts ) ) {
 
-			// If $atts is an array, get the tag from the array so we know what form to render.
-			switch ( $atts ) {
+		// If $atts is an array, get the tag from the array so we know what form to render.
+		switch ( $atts['form'] ) {
 
-				case in_array( 'wp_login', $atts ):
-					$content = wpmem_wp_login_form( $atts );
-					break;
-					
-				case in_array( 'login', $atts ):
-					if ( is_user_logged_in() && '1' != $customizer ) {
-						/*
-						 * If the user is logged in, return any nested content (if any)
-						 * or the default bullet links if no nested content.
-						 */
-						$content = ( $content ) ? $content : wpmem_inc_memberlinks( 'login' );
-					} else {
-						/*
-						 * If the user is not logged in, return an error message if a login
-						 * error state exists, or return the login form.
-						 */
-						$content = ( $wpmem->regchk == 'loginfailed' || ( is_customize_preview() && get_theme_mod( 'wpmem_show_form_message_dialog', false ) ) ) ? wpmem_inc_loginfailed() : wpmem_inc_login( 'login', $redirect_to );
-					}
-					break;
+			case 'wp_login':
+				$content = wpmem_wp_login_form( $atts );
+				break;
 
-				case in_array( 'register', $atts ):
-					
-					// Set up register form args.
-					$reg_form_args = array( 'tag' => 'new' );
-					if ( isset( $redirect_to ) ) {
-						$reg_form_args['redirect_to'] = $redirect_to;
-					}
-					
-					if ( is_user_logged_in()  && '1' != $customizer ) {
-						/*
-						 * If the user is logged in, return any nested content (if any)
-						 * or the default bullet links if no nested content.
-						 */
-						$content = ( $content ) ? $content : wpmem_inc_memberlinks( 'register' );
-					} elseif ( is_user_logged_in() && is_customize_preview() && get_theme_mod( 'wpmem_show_form_message_dialog', false ) ) {
-						$wpmem_themsg = __( "This is a generic message to display the form message dialog in the Customizer.", 'wp-members' );
-						$content  = wpmem_inc_regmessage( $wpmem->regchk, $wpmem_themsg );
-						$content .= wpmem_register_form( $reg_form_args );
-					} else {
-						if ( $wpmem->regchk == 'loginfailed' ) {
-							$content = wpmem_inc_loginfailed() . wpmem_inc_login( 'login', $redirect_to );
-							break;
-						}
-						// @todo Can this be moved into another function? Should $wpmem get an error message handler?
-						if ( $wpmem->regchk == 'captcha' ) {
-							global $wpmem_captcha_err;
-							$wpmem_themsg = __( 'There was an error with the CAPTCHA form.' ) . '<br /><br />' . $wpmem_captcha_err;
-						}
-						$content  = ( $wpmem_themsg || $wpmem->regchk == 'success' ) ? wpmem_inc_regmessage( $wpmem->regchk, $wpmem_themsg ) : '';
-						$content .= ( $wpmem->regchk == 'success' ) ? wpmem_inc_login( 'login', $redirect_to ) : wpmem_register_form( $reg_form_args );
-					}
-					break;
+			case 'register':
 
-				case in_array( 'password', $atts ):
-					$content = wpmem_page_pwd_reset( $wpmem->regchk, $content );
-					break;
-
-				case in_array( 'user_edit', $atts ):
-					$content = wpmem_page_user_edit( $wpmem->regchk, $content, $atts );
-					break;
-
-				case in_array( 'forgot_username', $atts ):
-					$content = wpmem_page_forgot_username( $wpmem->regchk, $content );
-					break;
-					
-				case in_array( 'customizer_login', $atts ):
-					$content = wpmem_inc_login( 'login', $redirect_to );
-					break;
-					
-				case in_array( 'customizer_register', $atts ):
-					$content = wpmem_register_form( 'new', $redirect_to );
-					break;
-
-			}
-
-			/*
-			 * This is for texturizing. Need to work it into an argument in the function call as to whether the 
-			 * [wpmem_txt] shortcode is even included.  @todo - Is this a temporary solution or is there something
-			 * cleaner that can be worked out?
-			 */
-			if ( 1 == $wpmem->texturize ) {
-				if ( array_key_exists( 'texturize', $atts ) && $atts['texturize'] == 'false' ) { 
-					$content = str_replace( array( '[wpmem_txt]', '[/wpmem_txt]' ), array( '', '' ), $content );
+				// Set up register form args.
+				$reg_form_args = array( 'tag' => 'new' );
+				if ( isset( $redirect_to ) ) {
+					$reg_form_args['redirect_to'] = $redirect_to;
 				}
-				if ( strstr( $content, '[wpmem_txt]' ) ) {
-					// Fixes the wptexturize.
-					remove_filter( 'the_content', 'wpautop' );
-					remove_filter( 'the_content', 'wptexturize' );
-					add_filter( 'the_content', array( 'WP_Members', 'texturize' ), 999 );
+
+				if ( is_user_logged_in()  && '1' != $customizer ) {
+					/*
+					 * If the user is logged in, return any nested content (if any)
+					 * or the default bullet links if no nested content.
+					 */
+					$content = ( $content ) ? $content : $this->render_links( 'register' );
+				} elseif ( is_user_logged_in() && is_customize_preview() && get_theme_mod( 'wpmem_show_form_message_dialog', false ) ) {
+					$wpmem_themsg = __( "This is a generic message to display the form message dialog in the Customizer.", 'wp-members' );
+					$content  = wpmem_get_display_message( $wpmem->regchk, $wpmem_themsg );
+					$content .= wpmem_register_form( $reg_form_args );
+				} else {
+					if ( $wpmem->regchk == 'loginfailed' ) {
+						$content = $wpmem->dialogs->login_failed() . wpmem_login_form();
+						break;
+					}
+					// @todo Can this be moved into another function? Should $wpmem get an error message handler?
+					if ( $wpmem->regchk == 'captcha' ) {
+						global $wpmem_captcha_err;
+						$wpmem_themsg = wpmem_get_text( 'reg_captcha_err' ) . '<br /><br />' . $wpmem_captcha_err;
+					}
+					$content  = ( $wpmem_themsg || $wpmem->regchk == 'success' ) ? wpmem_get_display_message( $wpmem->regchk, $wpmem_themsg ) : '';
+					$content .= ( $wpmem->regchk == 'success' ) ? wpmem_login_form() : wpmem_register_form( $reg_form_args );
 				}
-			} // End texturize functions
+				break;
+
+			case 'password':
+				$content = $this->render_pwd_reset( $wpmem->regchk, $content );
+				break;
+
+			case 'user_edit':
+				$content = $this->render_user_edit( $wpmem->regchk, $content, $atts );
+				break;
+
+			case 'forgot_username':
+				$content = $this->render_forgot_username( $wpmem->regchk, $content );
+				break;
+
+			// @todo Review - is this actually ever triggered?
+			case 'customizer_login':
+				$content = wpmem_login_form();
+				break;
+
+			// @todo Review - is this actually ever triggered?
+			case 'customizer_register':
+				$content = wpmem_register_form( 'new' );
+				break;
+				
+			case 'login':
+			default:
+				if ( is_user_logged_in() && '1' != $customizer ) {
+					// If the user is logged in, return any nested content (if any) or the default bullet links if no nested content.
+					$content = ( $content ) ? $content : $this->render_links( 'login' );
+				} else {
+					$content = '';
+					if ( $wpmem->regchk == 'loginfailed' || ( is_customize_preview() && get_theme_mod( 'wpmem_show_form_message_dialog', false ) ) ) {
+						$content = wpmem_get_display_message( 'loginfailed' );
+					}
+					$form_id = ( $atts['form_id'] ) ? $atts['form_id'] : 'wpmem_login_form';
+					$content .= wpmem_login_form( array( 'redirect_to'=>$atts['redirect_to'], 'form_id'=>$form_id ) );
+				}
+				break;
+
 		}
+
 		return do_shortcode( $content );
 	}
 
@@ -239,7 +223,7 @@ class WP_Members_Shortcodes {
 	 * @param  string $tag     The shortcode's tag (wpmem_logged_in).
 	 * @return string|void     The restricted content to display if the user meets the criteria.
 	 */
-	function logged_in( $atts, $content = null, $tag = 'wpmem_logged_in' ) {
+	function logged_in( $atts, $content, $tag ) {
 
 		global $wpmem;
 
@@ -323,7 +307,7 @@ class WP_Members_Shortcodes {
 							$do_return = true;
 							$settings = array(
 								'wrapper_before' => '<div class="product_restricted_msg">',
-								'msg'            => sprintf( $wpmem->get_text( 'product_restricted' ), $wpmem->membership->products[ $membership ]['title'] ),
+								'msg'            => sprintf( wpmem_get_text( 'product_restricted' ), $wpmem->membership->products[ $membership ]['title'] ),
 								'wrapper_after'  => '</div>',
 							);
 							/**
@@ -363,7 +347,7 @@ class WP_Members_Shortcodes {
 	 * @param  string $tag     The shortcode tab (wpmem_logged_out).
 	 * @return string $content The content, if the user is logged out, otherwise an empty string.
 	 */
-	function logged_out( $atts, $content = null, $tag ) {
+	function logged_out( $atts, $content, $tag ) {
 		return ( ! is_user_logged_in() ) ? do_shortcode( $content ) : '';
 	}
 
@@ -392,7 +376,7 @@ class WP_Members_Shortcodes {
 	 * @param  string $tag     The shortcode's tag (wpmem_show_count).
 	 * @return string $content The user count.
 	 */
-	function user_count( $atts, $content = null, $tag ) {
+	function user_count( $atts, $content, $tag ) {
 		if ( isset( $atts['key'] ) && isset( $atts['value'] ) ) {
 			// If by meta key.
 			global $wpdb;
@@ -443,11 +427,7 @@ class WP_Members_Shortcodes {
 
 		if ( $wpmem->regchk == "captcha" ) {
 			global $wpmem_captcha_err;
-			$wpmem_themsg = $wpmem->get_text( 'reg_captcha_err' ) . '<br /><br />' . $wpmem_captcha_err;
-		}
-
-		if ( $wpmem->regchk == "loginfailed" ) {
-			return wpmem_inc_loginfailed();
+			$wpmem_themsg = wpmem_get_text( 'reg_captcha_err' ) . '<br /><br />' . $wpmem_captcha_err;
 		}
 
 		if ( is_user_logged_in() ) {
@@ -461,18 +441,18 @@ class WP_Members_Shortcodes {
 			case "update":
 				// Determine if there are any errors/empty fields.
 				if ( $wpmem->regchk == "updaterr" || $wpmem->regchk == "email" ) {
-					$content = $content . wpmem_inc_regmessage( $wpmem->regchk, $wpmem_themsg );
+					$content = $content . wpmem_get_display_message( $wpmem->regchk, $wpmem_themsg );
 					$content = $content . wpmem_register_form( 'edit' );
 				} else {
 					//Case "editsuccess".
-					$content = $content . wpmem_inc_regmessage( $wpmem->regchk, $wpmem_themsg );
-					$content = $content . wpmem_inc_memberlinks();
+					$content = $content . wpmem_get_display_message( $wpmem->regchk, $wpmem_themsg );
+					$content = $content . $this->render_links();
 				}
 				break;
 
 			case "pwdchange":
-				$content = wpmem_page_pwd_reset( $wpmem->regchk, $content );
-				$content = ( 'pwdchangesuccess' == $wpmem->regchk ) ? $content . wpmem_inc_memberlinks() : $content;
+				$content = $this->render_pwd_reset( $wpmem->regchk, $content );
+				$content = ( 'pwdchangesuccess' == $wpmem->regchk ) ? $content . $this->render_links() : $content;
 				break;
 
 			case "renew":
@@ -484,38 +464,28 @@ class WP_Members_Shortcodes {
 				break;
 
 			default:
-				$content = wpmem_inc_memberlinks();
+				$content = $this->render_links();
 				break;
 			}
 
 		} else {
 
-			if ( $wpmem->action == 'register' && ! $hide_register ) {
-
-				switch( $wpmem->regchk ) {
-
-				case "success":
-					$content = wpmem_inc_regmessage( $wpmem->regchk, $wpmem_themsg );
-					$content = $content . wpmem_inc_login();
-					break;
-
-				default:
-					$content = wpmem_inc_regmessage( $wpmem->regchk, $wpmem_themsg );
-					$content = $content . wpmem_register_form();
-					break;
-				}
-
+			if (  ( 'login' == $wpmem->action ) || ( 'register' == $wpmem->action && ! $hide_register ) ) {
+				
+ 				$content = wpmem_get_display_message( $wpmem->regchk, $wpmem_themsg );
+				$content.= ( 'loginfailed' == $wpmem->regchk || 'success' == $wpmem->regchk ) ? wpmem_login_form() : wpmem_register_form();
+				
 			} elseif ( $wpmem->action == 'pwdreset' ) {
 
-				$content = wpmem_page_pwd_reset( $wpmem->regchk, $content );
+				$content = $this->render_pwd_reset( $wpmem->regchk, $content );
 
 			} elseif( $wpmem->action == 'getusername' ) {
 
-				$content = wpmem_page_forgot_username( $wpmem->regchk, $content );
+				$content = $this->render_forgot_username( $wpmem->regchk, $content );
 
 			} else {
 
-				$content = $content . wpmem_inc_login( 'members' );
+				$content = $content . wpmem_login_form( 'profile' );
 				$content = ( ! $hide_register ) ? $content . wpmem_register_form() : $content;
 			}
 		}
@@ -591,7 +561,7 @@ class WP_Members_Shortcodes {
 	 * @param  string $tag     The shortcode tag (wpmem_form).
 	 * @return string $content Content to return.
 	 */
-	function fields( $atts, $content = null, $tag ) {
+	function fields( $atts, $content, $tag ) {
 
 		// What field?
 		$field = ( isset( $atts[0] ) ) ? $atts[0] : $atts['field'];
@@ -609,8 +579,8 @@ class WP_Members_Shortcodes {
 
 			global $wpmem;
 			$fields = wpmem_fields();
-			$field_type = ( isset( $fields[ $field ]['type'] ) ) ? $fields[ $field ]['type'] : 'native'; // @todo Is this needed? It seems to set the type to "native" if not set.
-
+			
+			$field_type = ( 'user_login' == $field ) ? 'text' : $fields[ $field ]['type'];
 			$user_info_field = ( isset( $field ) && is_object( $user_info ) ) ? $user_info->{$field} : '';
 			$result = false;
 
@@ -621,7 +591,7 @@ class WP_Members_Shortcodes {
 				case 'select':
 				case 'radio':
 				case 'membership':
-					$result = ( isset( $atts['display'] ) && 'raw' == $atts['display'] ) ? $user_info_field : $fields[ $field ]['options'][ $user_info_field ];
+					$result = ( isset( $atts['display'] ) && 'raw' == $atts['display'] ) ? $user_info_field : wpmem_select_field_display( $field, $user_info_field );
 					break;
 					
 				// Multiple select and multiple checkbox have multiple selections.
@@ -634,7 +604,7 @@ class WP_Members_Shortcodes {
 						$result = ''; $x = 1;
 						foreach ( $saved_vals as $value ) {
 							$result.= ( $x > 1 ) ? ', ' : ''; $x++;
-							$result.= $fields[ $field ]['options'][ $value ];
+							$result.= wpmem_select_field_display( $field, $value );;
 						}
 					}
 					break;
@@ -845,6 +815,344 @@ class WP_Members_Shortcodes {
 		$nonce = ( isset( $atts['form'] ) ) ? $atts['form'] : 'register';
 		$content = wpmem_form_nonce( $nonce, false );
 		return do_shortcode( $content );
+	}
+	
+	/**
+	 * Password reset forms.
+	 *
+	 * This function creates both password reset and forgotten
+	 * password forms for page=password shortcode.
+	 *
+	 * @since 2.7.6
+	 * @since 3.2.6 Added nonce validation.
+	 * @since 3.4.0 Moved to shortcodes as private function, renamed from wpmem_page_pwd_reset().
+	 *
+	 * @global object $wpmem
+	 * @param  string $wpmem_regchk
+	 * @param  string $content
+	 * @return string $content
+	 */
+	function render_pwd_reset( $wpmem_regchk, $content ) {
+
+		global $wpmem;
+
+		if ( is_user_logged_in() ) {
+
+			switch ( $wpmem_regchk ) {
+
+				case "pwdchangesuccess":
+					$content = $content . wpmem_get_display_message( $wpmem_regchk );
+					break;
+
+				default:
+					if ( isset( $wpmem_regchk ) && '' != $wpmem_regchk ) {
+						$content .= wpmem_get_display_message( $wpmem_regchk, wpmem_get_text( $wpmem_regchk ) );
+					}
+					$content = $content . wpmem_change_password_form();
+					break;
+			}
+
+		} else {
+
+			// If the password shortcode page is set as User Profile page.
+			if ( 'getusername' == $wpmem->action ) {
+
+				return wpmem_page_forgot_username( $wpmem_regchk, $content );
+
+			} else {
+
+				switch( $wpmem_regchk ) {
+
+					case "pwdresetsuccess":
+						$content = $content . wpmem_get_display_message( $wpmem_regchk );
+						$wpmem_regchk = ''; // Clear regchk.
+						break;
+
+					default:
+						if ( isset( $wpmem_regchk ) && '' != $wpmem_regchk ) {
+							$content = wpmem_get_display_message( $wpmem_regchk, wpmem_get_text( $wpmem_regchk ) );
+						}
+						$content = $content . wpmem_reset_password_form();
+						break;
+				}
+
+			}
+
+		}
+
+		return $content;
+
+	}
+	
+	/**
+	 * Creates a user edit page.
+	 *
+	 * @since 2.7.6
+	 * @since 3.3.9 Added $atts
+	 * @since 3.4.0 Moved to shortcodes as private function, renamed from wpmem_page_user_edit
+	 *
+	 * @global object $wpmem
+	 * @global string $wpmem_a
+	 * @global string $wpmem_themsg
+	 * @param  string $wpmem_regchk
+	 * @param  string $content
+	 * @return string $content
+	 */
+	function render_user_edit( $wpmem_regchk, $content, $atts = false ) {
+
+		global $wpmem, $wpmem_a, $wpmem_themsg;
+		/**
+		 * Filter the default User Edit heading for shortcode.
+		 *
+		 * @since 2.7.6
+		 *
+		 * @param string The default edit mode heading.
+		 */	
+		$heading = apply_filters( 'wpmem_user_edit_heading', wpmem_get_text( 'profile_heading' ) );
+
+		if ( $wpmem_a == "update") {
+			$content.= wpmem_get_display_message( $wpmem_regchk, $wpmem_themsg );
+		}
+
+		$args['tag'] = 'edit';
+		$args['heading'] = $heading;
+		if ( false !== $atts && isset( $atts['fields'] ) ) {
+			$args['fields'] = $atts['fields'];
+		}
+
+		$content = $content . wpmem_register_form( $args );
+
+		return $content;
+	}
+
+	/**
+	 * Forgot username form.
+	 *
+	 * This function creates a form for retrieving a forgotten username.
+	 *
+	 * @since 3.0.8
+	 * @since 3.4.0 Moved to shortcodes as private function, renamed from wpmem_page_forgot_username().
+	 *
+	 * @param  string $wpmem_regchk
+	 * @param  string $content
+	 * @return string $content
+	 */
+	function render_forgot_username( $wpmem_regchk, $content ) {
+
+		if ( ! is_user_logged_in() ) {
+
+			global $wpmem;
+			switch( $wpmem->regchk ) {
+
+			case "usernamefailed":
+				$msg = wpmem_get_text( 'usernamefailed' );
+				$content = $content
+					. wpmem_get_display_message( 'usernamefailed', $msg ) 
+					. wpmem_forgot_username_form();
+				$wpmem->regchk = ''; // Clear regchk.
+				break;
+
+			case "usernamesuccess":
+				$email = ( isset( $_POST['user_email'] ) ) ? sanitize_email( $_POST['user_email'] ) : '';
+				$msg = sprintf( wpmem_get_text( 'usernamesuccess' ), $email );
+				$content = $content . wpmem_get_display_message( 'usernamesuccess', $msg );
+				$wpmem->regchk = ''; // Clear regchk.
+				break;
+
+			default:
+				$content = $content . wpmem_forgot_username_form();
+				break;
+			}
+
+		}
+
+		return $content;
+
+	}
+
+	/**
+	 * Member Links Dialog.
+	 *
+	 * Outputs the links used on the members area.
+	 *
+	 * @since 2.0
+	 * @since 3.4.0 Replaces wpmem_inc_memberlinks().
+	 *
+	 * @gloabl        $user_login
+	 * @global object $wpmem
+	 * @param  string $page
+	 * @return string $str
+	 */
+	function render_links( $page = 'member' ) {
+
+		global $user_login, $wpmem;
+
+		$logout = wpmem_logout_link();
+
+		switch ( $page ) {
+
+			case 'register':
+
+				$url = ( isset( $wpmem->user_pages['profile'] ) && '' != $wpmem->user_pages['profile'] ) ? $wpmem->user_pages['profile'] : get_option( 'home' );
+
+				// NOTE: DO NOT EDIT THESE. Use the filter below.
+				$arr = array(
+					'before_wrapper' => '<p class="register_status">' . sprintf( wpmem_get_text( 'register_status' ), $user_login ) . '</p>',
+					'wrapper_before' => '<ul class="register_links">',
+					'wrapper_after'  => '</ul>',
+					'rows'           => array(
+						'<li><a href="' . esc_url( $logout ) . '">' . wpmem_get_text( 'register_logout' ) . '</a></li>',
+						'<li><a href="' . esc_url( $url ) . '">' . wpmem_get_text( 'register_continue' ) . '</a></li>',
+					),
+					'after_wrapper'  => '',
+				);
+
+				/**
+				 * Filter the register links array.
+				 *
+				 * @since 3.0.9
+				 * @since 3.1.0 Added after_wrapper
+				 *
+				 * @param array $arr {
+				 *      The components of the links.
+				 *
+				 *      @type string $before_wrapper HTML before the wrapper (default: login status).
+				 *      @type string $wrapper_before The wrapper opening tag (default: <ul>).
+				 *      @type string $wrapper_after  The wrapper closing tag (default: </ul>).
+				 *      @type array  $rows           Row items HTML.
+				 *      @type string $after_wrapper  Anything that comes after the wrapper.
+				 * }
+				 */
+				$arr = apply_filters( "wpmem_{$page}_links_args", $arr );
+
+				$str = $arr['before_wrapper'];
+				$str.= $arr['wrapper_before'];
+				foreach ( $arr['rows'] as $row ) {
+					$str.= $row;
+				}
+				$str.= $arr['wrapper_after'];
+				$str.= $arr['after_wrapper'];
+
+				/**
+				 * Filter the links displayed on the Register page (logged in state).
+				 *
+				 * @since 2.8.3
+				 *
+				 * @param string $str The default links.
+				 */
+				$str = apply_filters( "wpmem_{$page}_links", $str );
+				break;
+
+			case 'login':
+
+				$logout = urldecode( $logout );
+				// NOTE: DO NOT EDIT THESE. Use the filter hook below.
+				$args = array(
+					'wrapper_before' => '<p class="login_status">',
+					'wrapper_after'  => '</p>',
+					'user_login'     => $user_login,
+					'welcome'        => wpmem_get_text( 'login_welcome' ),
+					'logout_text'    => wpmem_get_text( 'login_logout' ),
+					'logout_link'    => '<a href="' . esc_url( $logout ) . '">%s</a>',
+					'separator'      => '<br />',
+				);
+				/**
+				 * Filter the status message parts.
+				 *
+				 * @since 2.9.9
+				 *
+				 * @param array $args {
+				 *      The components of the links.
+				 *
+				 *      @type string $wrapper_before The wrapper opening tag (default: <p>).
+				 *      @type string $wrapper_after  The wrapper closing tag (default: </p>).
+				 *      @type string $user_login
+				 *      @type string $welcome
+				 *      @type string $logout_text
+				 *      @type string $logout_link
+				 *      @type string $separator
+				 * }
+				 */
+				$args = apply_filters( "wpmem_{$page}_links_args", $args );
+
+				// Assemble the message string.
+				$str = $args['wrapper_before']
+					. sprintf( $args['welcome'], $args['user_login'] )
+					. $args['separator']
+					. sprintf( $args['logout_link'], $args['logout_text'] )
+					. $args['wrapper_after'];
+
+				/**
+				 * Filter the links displayed on the Log In page (logged in state).
+				 *
+				 * @since 2.8.3
+				 *
+				 * @param string $str The default links.
+				 */
+				$str = apply_filters( "wpmem_{$page}_links", $str );
+				break;
+			
+			case 'member':
+			default:
+				
+				// NOTE: DO NOT EDIT. Use the filter below.
+				$arr = array(
+					'before_wrapper' => '',
+					'wrapper_before' => '<ul>',
+					'wrapper_after'  => '</ul>',
+					'rows'           => array(
+						'<li><a href="' . esc_url( add_query_arg( 'a', 'edit',      remove_query_arg( 'key' ) ) ) . '">' . wpmem_get_text( 'profile_edit'     ) . '</a></li>',
+						'<li><a href="' . esc_url( add_query_arg( 'a', 'pwdchange', remove_query_arg( 'key' ) ) ) . '">' . wpmem_get_text( 'profile_password' ) . '</a></li>',
+					),
+					'after_wrapper'  => '',
+				);
+
+				if ( defined( 'WPMEM_EXP_MODULE' ) && $wpmem->use_exp == 1 && function_exists( 'wpmem_user_page_detail' ) ) {
+					$arr['rows'][] = wpmem_user_page_detail();
+				}
+
+				/**
+				 * Filter the member links array.
+				 *
+				 * @since 3.0.9
+				 * @since 3.1.0 Added after_wrapper
+				 *
+				 * @param array $arr {
+				 *      The components of the links.
+				 *
+				 *      @type string $before_wrapper Anything that comes before the wrapper.
+				 *      @type string $wrapper_before The wrapper opening tag (default: <ul>).
+				 *      @type string $wrapper_after  The wrapper closing tag (default: </ul>).
+				 *      @type array  $rows           Row items HTML.
+				 *      @type string $after_wrapper  Anything that comes after the wrapper.
+				 * }
+				 */
+				$arr = apply_filters( "wpmem_{$page}_links_args", $arr );
+
+				$str = $arr['before_wrapper'];
+				$str.= $arr['wrapper_before'];
+				foreach ( $arr['rows'] as $row ) {
+					$str.= $row;
+				}
+				$str.= $arr['wrapper_after'];
+				$str.= $arr['after_wrapper'];
+
+				/**
+				 * Filter the links displayed on the User Profile page (logged in state).
+				 *
+				 * @since 2.8.3
+				 *
+				 * @param string $str The default links.
+				 */
+				$str = apply_filters( "wpmem_{$page}_links", $str );
+				break;
+		}
+
+		return $str;
+	}
+	
+	function render_links_filter_args( $page, $args ) {
+		
 	}
 }
 

@@ -253,7 +253,7 @@ class WP_Members_Validation_Link {
 				$msg = '';
 			}
 			
-			$content = wpmem_inc_regmessage( '', $msg ) . $content;
+			$content = wpmem_get_display_message( 'custom', $msg ) . $content;
 		}
 
 		return $content;
@@ -280,8 +280,7 @@ class WP_Members_Validation_Link {
 		} 
 
 		// Validation flag must be confirmed.
-		$validated = get_user_meta( $user->ID, $this->validation_confirm, true ); // @todo Update to use wpmem_is_user_confirmed().
-		if ( false == $validated ) {
+		if ( false == wpmem_is_user_confirmed( $user->ID ) ) {
 			return new WP_Error( 'authentication_failed', __( '<strong>ERROR</strong>: User has not confirmed their account.', 'wp-members' ) );
 		}
 

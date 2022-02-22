@@ -4,13 +4,13 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at https://rocketgeek.com
- * Copyright (c) 2006-2020  Chad Butler
+ * Copyright (c) 2006-2022  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @subpackage WP-Members API Functions
  * @author Chad Butler 
- * @copyright 2006-2020
+ * @copyright 2006-2022
  */
 
 /**
@@ -37,11 +37,13 @@ function wpmem_is_user( $user_id ) {
  * @since 3.3.0
  *
  * @param  int     $user_id
+ * @param  boolean $all     If true, all roles as an array; if false, just the current role.
  * @return mixed   If the user is set and has roles, the current user role, otherwise false.
  */
-function wpmem_get_user_role( $user_id = false ) {
+function wpmem_get_user_role( $user_id = false, $all = false ) {
 	$user = ( $user_id ) ? get_userdata( $user_id ) : wp_get_current_user();
-	return ( $user ) ? current( $user->roles ) : false;
+	$role = ( ! $all   ) ? current( $user->roles  ) : $user->roles;
+	return ( $user ) ? $role : false;
 }
 
 /**
@@ -164,7 +166,7 @@ function wpmem_user_has_meta( $meta, $value = false, $user_id = false ) {
  * Checks if a user is activated.
  *
  * @since 3.1.7
- * @since 3.2.3 Now a wrapper for WP_Members_Users::is_user_activated().
+ * @since 3.2.3 Now an alias for WP_Members_Users::is_user_activated().
  *
  * @global object $wpmem
  * @param  int    $user_id
@@ -197,7 +199,7 @@ function wpmem_user_data( $user_id = false, $all = false ) {
 /**
  * Updates a user's role.
  *
- * This is a wrapper for $wpmem->update_user_role(). It can add a role to a
+ * This is an alias for $wpmem->update_user_role(). It can add a role to a
  * user, change or remove the user's role. If no action is specified it will
  * change the role.
  *
@@ -219,12 +221,13 @@ function wpmem_update_user_role( $user_id, $role, $action = 'set' ) {
  * @since 3.2.0
  * @since 3.2.3 Reversed order of arguments.
  *
- * @param  mixed   $product 
+ * @param  mixed   $product Accepts a single membership slug/meta, or an array of multiple memberships.
  * @param  integer $user_id User ID (optional|default: false).
- * @return boolean $access  If user has access.
+ * @return boolean $access  True if user has access, otherwise false.
  */
 function wpmem_user_has_access( $product, $user_id = false ) {
-	global $wpmem; 
+	global $wpmem;
+	$user_id = ( false == $user_id ) ? get_current_user_id() : $user_id;
 	return $wpmem->user->has_access( $product, $user_id );
 }
 
@@ -233,6 +236,8 @@ function wpmem_user_has_access( $product, $user_id = false ) {
  *
  * Similar to wpmem_user_has_access(), but specifically checks the
  * expiration date for a specified product (must be expiration product).
+ * 
+ * Must be named _user_is_current() as _is_user_current() exists in PayPal extension.
  *
  * @since 3.3.9
  *
@@ -242,7 +247,9 @@ function wpmem_user_has_access( $product, $user_id = false ) {
  */
 function wpmem_user_is_current( $product, $user_id = false ) {
 	global $wpmem;
-	return;
+	$user_id = ( false === $user_id ) ? get_current_user_id() : $user_id;
+	$memberships = wpmem_get_user_products( $user_id );
+	return ( $wpmem->user->is_current( $memberships[ $product ] ) ) ? true : false;
 }
 
 /**
@@ -316,7 +323,7 @@ if ( ! function_exists( 'wpmem_login' ) ):
  * @since 2.5.2 Now uses wp_signon().
  * @since 2.7.7 Sets cookie using wp_set_auth_cookie().
  * @since 3.0.0 Removed wp_set_auth_cookie(), this already happens in wp_signon().
- * @since 3.1.7 Now a wrapper for login() in WP_Members_Users Class.
+ * @since 3.1.7 Now an alias for login() in WP_Members_Users Class.
  * @since 3.2.4 Moved to user API (could be deprecated).
  *
  * @global object $wpmem
@@ -334,7 +341,7 @@ if ( ! function_exists( 'wpmem_logout' ) ):
  *
  * @since 2.0.0
  * @since 3.1.6 Added wp_destroy_current_session(), removed nocache_headers().
- * @since 3.1.7 Now a wrapper for logout() in WP_Members_Users Class.
+ * @since 3.1.7 Now an alias for logout() in WP_Members_Users Class.
  * @since 3.2.4 Moved to user API (could be deprecated).
  *
  * @global object $wpmem
@@ -351,7 +358,7 @@ if ( ! function_exists( 'wpmem_change_password' ) ):
  * Handles user password change (not reset).
  *
  * @since 2.1.0
- * @since 3.1.7 Now a wrapper for password_update() in WP_Members_Users Class.
+ * @since 3.1.7 Now an alias for password_update() in WP_Members_Users Class.
  * @since 3.2.4 Moved to user API (could be deprecated).
  *
  * @global int $user_ID The WordPress user ID.
@@ -369,7 +376,7 @@ if ( ! function_exists( 'wpmem_reset_password' ) ):
  * Resets a forgotten password.
  *
  * @since 2.1.0
- * @since 3.1.7 Now a wrapper for password_update() in WP_Members_Users Class.
+ * @since 3.1.7 Now an alias for password_update() in WP_Members_Users Class.
  * @since 3.2.4 Moved to user API (could be deprecated).
  *
  * @global object $wpmem The WP-Members object class.
@@ -387,7 +394,7 @@ endif;
  *
  * @since 3.0.8
  * @since 3.1.6 Dependencies now loaded by object.
- * @since 3.1.8 Now a wrapper for $wpmem->retrieve_username() in WP_Members_Users Class.
+ * @since 3.1.8 Now an alias for $wpmem->retrieve_username() in WP_Members_Users Class.
  * @since 3.2.4 Moved to user API (could be deprecated).
  *
  * @global object $wpmem The WP-Members object class.
@@ -435,11 +442,12 @@ function wpmem_create_membership_number( $args ) {
  * @since 3.2.4 Renamed from wpmem_a_activate_user().
  * @since 3.3.0 Moved to user API.
  * @since 3.3.5 Added $notify argument.
+ * @since 3.4.0 Added $set_pwd argument.
  *
  * @param int   $user_id
  * @param bool  $notify  Send notification to user (optional, default: true).
  */
-function wpmem_activate_user( $user_id, $notify = true ) {
+function wpmem_activate_user( $user_id, $notify = true, $set_pwd = false ) {
 
 	global $wpmem;
 
@@ -447,7 +455,7 @@ function wpmem_activate_user( $user_id, $notify = true ) {
 	$new_pass = '';
 
 	// If passwords are user defined skip this.
-	if ( ! wpmem_user_sets_password() ) {
+	if ( true == $set_pwd || ! wpmem_user_sets_password() ) {
 		$new_pass = wp_generate_password();
 		wp_set_password( $new_pass, $user_id );
 	}
@@ -541,7 +549,7 @@ function wpmem_set_user_status( $user_id, $status ) {
  * @global string $wpmem_themsg
  * @global array  $userdata
  *
- * @param  string $tag           Identifies 'register' or 'update'.
+ * @param  string $tag Identifies 'register' or 'update'.
  * @return string $wpmem_themsg|success|editsuccess
  */
 function wpmem_user_register( $tag ) {
@@ -653,7 +661,7 @@ function wpmem_user_register( $tag ) {
 					exit();
 				} 
 				if ( in_array( 'user_email', $wpmem->fields ) && ! is_email( $wpmem->user->post_data['user_email']) ) { 
-					$wpmem_themsg = $wpmem->get_text( 'reg_valid_email' );
+					$wpmem_themsg = wpmem_get_text( 'reg_valid_email' );
 					return "updaterr";
 					exit();
 				}
@@ -662,7 +670,7 @@ function wpmem_user_register( $tag ) {
 
 		// If form includes email confirmation, validate that they match.
 		if ( array_key_exists( 'confirm_email', $wpmem->user->post_data ) && $wpmem->user->post_data['confirm_email'] != $wpmem->user->post_data ['user_email'] ) { 
-			$wpmem_themsg = $wpmem->get_text( 'reg_email_match' );
+			$wpmem_themsg = wpmem_get_text( 'reg_email_match' );
 			return "updaterr";
 			exit();
 		}
@@ -765,19 +773,11 @@ function wpmem_user_register( $tag ) {
  * @link https://gist.github.com/pippinsplugins/9641841
  *
  * @since 3.3.0
+ * @since 3.4.0 Now an alias for rktgk_get_user_ip();
  *
  * @return string $ip.
  */
 function wpmem_get_user_ip() {
-	if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
-		//check ip from share internet
-		$ip = $_SERVER['HTTP_CLIENT_IP'];
-	} elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
-		//to check ip is pass from proxy
-		$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-	} else {
-		$ip = $_SERVER['REMOTE_ADDR'];
-	}
 	/**
 	 * Filter the IP result.
 	 *
@@ -785,7 +785,7 @@ function wpmem_get_user_ip() {
 	 *
 	 * @param string $ip
 	 */
-	return apply_filters( 'wpmem_get_ip', $ip );
+	return apply_filters( 'wpmem_get_ip', rktgk_get_user_ip() );
 }
 
 /**
@@ -804,10 +804,10 @@ function wpmem_get_user_ip() {
  * @param array $args
  * @param array $users
  */
-function wpmem_export_users( $args, $users = array() ) {
+function wpmem_export_users( $args = array(), $users = array() ) {
 	global $wpmem;
-	include_once( $wpmem->path . 'includes/admin/class-wp-members-export.php' );
-	WP_Members_Export::export_users( $args, $users );
+	include_once( $wpmem->path . 'includes/admin/class-wp-members-user-export.php' );
+	WP_Members_User_Export::export_users( $args, $users );
 }
 
 /**
@@ -956,5 +956,20 @@ function wpmem_is_user_confirmed( $user_id = false ) {
 	global $wpmem;
 	$user_id = ( false === $user_id ) ? get_current_user_id() : $user_id;
 	return ( get_user_meta( $user_id, $wpmem->act_newreg->validation_confirm, true ) ) ? true : false;
+}
+
+/**
+ * Adds WP-Members custom fields to the WP Add New User form.
+ *
+ * @since 2.9.1
+ * @since 3.4.0 Moved from admin.php
+ *
+ * @global stdClass $wpmem
+ */
+function wpmem_admin_add_new_user() {
+	global $wpmem;
+	// Output the custom registration fields.
+	echo $wpmem->forms->wp_newuser_form();
+	return;
 }
 // End of file.

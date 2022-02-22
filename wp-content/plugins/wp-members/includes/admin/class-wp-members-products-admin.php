@@ -27,12 +27,14 @@ class WP_Members_Products_Admin {
 			add_filter( 'manage_wpmem_product_posts_columns',       array( $this, 'columns_heading' ) );
 			add_action( 'manage_wpmem_product_posts_custom_column', array( $this, 'columns_content' ), 10, 2 );
 			add_action( 'add_meta_boxes',               array( $this, 'meta_boxes' ) );
+			add_action( 'page_attributes_misc_attributes', array( $this, 'membership_attributes' ) );
 			add_action( 'save_post',                    array( $this, 'save_details' ) );
 			add_action( 'wpmem_admin_after_block_meta', array( $this, 'add_product_to_post' ), 10, 2 );
 			add_action( 'wpmem_admin_block_meta_save',  array( $this, 'save_product_to_post' ), 10, 3 );
 			add_action( 'admin_footer',                 array( $this, 'enqueue_select2' ) );
 			add_filter( 'manage_users_columns',         array( $this, 'user_columns' ) );
 			add_filter( 'manage_users_custom_column',   array( $this, 'user_columns_content' ), 10, 3 );
+			add_action( 'admin_head',                   array( $this, 'post_columns_width' ) );
 			add_filter( 'manage_posts_columns',         array( $this, 'post_columns' ) );
 			add_action( 'manage_posts_custom_column',   array( $this, 'post_columns_content' ), 10, 2 );
 			add_filter( 'manage_pages_columns',         array( $this, 'post_columns' ) );
@@ -152,6 +154,21 @@ class WP_Members_Products_Admin {
 			array( $this, 'message_meta_box_detail' ),
 			'wpmem_product'
 		);
+	}
+	
+	/**
+	 * Adds child membership access option to Membership Attributes meta box.
+	 *
+	 * @since 3.4.1
+	 */
+	function membership_attributes( $post ) {
+		if ( 'wpmem_product' == $post->post_type ) {
+			$checked = get_post_meta( $post->ID, 'wpmem_product_child_access', true );
+			echo '<p class="post-attributes-label-wrapper">
+				<input name="wpmem_product_child_access" type="checkbox" value="1" ' .  checked( $checked, 1, false ) . ' />
+				<label>' . __( 'Access by child membership', 'wp-members' ) . '</label><br />
+			</p>';
+		}
 	}
 
 	/**
@@ -355,8 +372,16 @@ class WP_Members_Products_Admin {
 		 * @since 3.3.5
 		 */
 		do_action( 'wpmem_membership_product_message_meta_before' );
-		echo '<label for="product_message">' . __( 'Restricted Message (displays when a user does not have access to a membership)', 'wp-members' ) . '</label>';
-		echo '<textarea name="product_message" id="product_message" rows="3" cols="50" id="" class="large-text code">' . $message . '</textarea>';
+		
+		echo '<p>' . __( 'Restricted Message (displays when a user does not have access to a membership)', 'wp-members' ) . '</p>';
+		
+		$args = array(
+			'media_buttons' => false,
+			'textarea_rows' => 10,
+		);
+
+        wp_editor( $message, 'product_message', $args );
+		
 		/**
 		 * Fires after membership product messate meta box.
 		 *
@@ -414,12 +439,12 @@ class WP_Members_Products_Admin {
 			if ( $fixed_period ) {
 				
 				// Start and end.
-				$period_start = wpmem_get( 'wpmem_product_fixed_period_start' );
-				$period_end   = wpmem_get( 'wpmem_product_fixed_period_end' );
+				$period_start = sanitize_text_field( wpmem_get( 'wpmem_product_fixed_period_start' ) );
+				$period_end   = sanitize_text_field( wpmem_get( 'wpmem_product_fixed_period_end' ) );
 				
 				// Is there an entry grace period?
-				$grace_number = wpmem_get( 'wpmem_product_fixed_period_grace_number', false );
-				$grace_period = wpmem_get( 'wpmem_product_fixed_period_grace_period', false );
+				$grace_number = sanitize_text_field( wpmem_get( 'wpmem_product_fixed_period_grace_number', false ) );
+				$grace_period = sanitize_text_field( wpmem_get( 'wpmem_product_fixed_period_grace_period', false ) );
 				$save_fixed_period = $period_start . '-' . $period_end;
 				if ( $grace_number && $grace_period ) {
 					$save_fixed_period .= '-' . $grace_number . '-' . $grace_period;
@@ -438,7 +463,7 @@ class WP_Members_Products_Admin {
 			}
 		}
 
-		$product_message = wpmem_get( 'product_message', false );
+		$product_message =  wp_kses_post( wpmem_get( 'product_message', false ) );
 		if ( false !== $product_message ) {
 			if ( '' != $product_message ) {
 				update_post_meta( $post_id, 'wpmem_product_message', $product_message );
@@ -446,6 +471,13 @@ class WP_Members_Products_Admin {
 				delete_post_meta( $post_id, 'wpmem_product_message' );
 			}
 		}
+		
+		$child_access = intval( wpmem_get( 'wpmem_product_child_access', 0 ) );
+		if ( 1 == $child_access ) {
+			update_post_meta( $post_id, 'wpmem_product_child_access', $child_access );
+		} else {
+			delete_post_meta( $post_id, 'wpmem_product_child_access' );
+		}		
 	}
 
 	/**
@@ -482,7 +514,7 @@ class WP_Members_Products_Admin {
 		
 		echo wpmem_form_label( array( 
 			'meta_key'=>$wpmem->membership->post_meta,
-			'label'=>__( 'Limit access to:', 'wp-members' ),
+			'label'=>__( 'Restrict access by membership:', 'wp-members' ),
 			'type'=> 'multiselect'
 		) );
 		echo "<br />";
@@ -491,7 +523,7 @@ class WP_Members_Products_Admin {
 			'type' => 'multiselect',
 			'value' => $values,
 			'compare' => $product,
-			'class' => 'wpmem-product-select2',
+			'class' => 'wpmem-product-select2 populate placeholder',
 		) );
 	}
 
@@ -505,7 +537,7 @@ class WP_Members_Products_Admin {
 	 */
 	function save_product_to_post( $post ) {
 		global $wpmem;
-		$products = wpmem_get( $wpmem->membership->post_meta );
+		$products = wpmem_sanitize_array( wpmem_get( $wpmem->membership->post_meta ) );
 		$products = ( $products ) ? $products : array();
 		if ( empty( $products ) || ( 1 == count( $products ) && '' == $products[0] ) ) {
 			delete_post_meta( $post->ID, $wpmem->membership->post_meta );
@@ -532,10 +564,21 @@ class WP_Members_Products_Admin {
 			<script language="javascript">
 				(function($) {
 					$(document).ready(function() {
-						$('.wpmem-product-select2').select2();
+						$('.wpmem-product-select2').select2({width:"100%"});
 					});
 				})(jQuery);
 			</script><?php
+		}
+	}
+	
+	/**
+	 * Styles the width for membership post column.
+	 *
+	 * @since 3.4.0
+	 */
+	function post_columns_width() {
+		if ( isset( $_REQUEST['post_type'] ) ) {
+			echo '<style>.column-wpmem_product{ min-width:140px; width: 12%;}</style>';
 		}
 	}
 	
@@ -613,6 +656,20 @@ class WP_Members_Products_Admin {
 	 * @return array  $display
 	 */
 	function user_columns_content( $val, $column_name, $user_id ) {
+		/**
+		 * Filter the users > all users screen membership column default html.
+		 * 
+		 * @since 3.4.0
+		 * 
+		 * @param  array  $defaults
+		 * @param  array  $val
+		 * @param  array  $column_name
+		 * @param  array  $user_id
+		 */
+		$defaults = apply_filters( 'wpmem_user_columns_membership_defaults', array(
+			'item_wrap_before' => '<div class="wpmem-user-table-membership">',
+			'item_wrap_after'  => '</div>',
+		), $val, $column_name, $user_id );
 		if ( 'wpmem_product' == $column_name ) {
 			global $wpmem;
 			$display = array();
@@ -620,8 +677,8 @@ class WP_Members_Products_Admin {
 			if ( $user_products ) {
 				foreach ( $user_products as $meta => $value ) {
 					if ( isset( $wpmem->membership->products[ $meta ]['title'] ) ) {
-						$expires = ( $user_products[ $meta ] > 1 ) ? ' expires: ' . date_i18n( get_option( 'date_format' ), $user_products[ $meta ] ) : '';
-						$display[] = $wpmem->membership->products[ $meta ]['title'] . $expires;
+						$expires = ( $user_products[ $meta ] > 1 ) ? '<br />' . __( 'expires:', 'wp-members' ) . ' ' . date_i18n( get_option( 'date_format' ), $user_products[ $meta ] ) : '';
+						$display[] = $defaults['item_wrap_before'] . $wpmem->membership->products[ $meta ]['title'] . $expires . $defaults['item_wrap_after'];
 					}
 				}
 			}
@@ -635,7 +692,7 @@ class WP_Members_Products_Admin {
 			 * @param int    $user_id
 			 * @param array  $user_products
 			 */
-			return apply_filters( 'wpmem_user_columns_membership_value', implode( "<br />", $display ), $display, $user_id, $user_products );
+			return apply_filters( 'wpmem_user_columns_membership_value', implode( " ", $display ), $display, $user_id, $user_products );
 		}
 		return $val;
 	}
@@ -675,58 +732,68 @@ class WP_Members_Products_Admin {
 			 * logged in when checking profiles.
 			 */
 			$user_id = ( 'profile' == $pagenow && current_user_can( 'edit_users' ) ) ? get_current_user_id() : sanitize_text_field( wpmem_get( 'user_id', false, 'get' ) );
-			$user_products = $wpmem->user->get_user_products( $user_id );
-			echo '<h3>' . __( 'Product Access', 'wp-members' ) . '</h3>';
-			echo '<table>
-				<tr>
-					<th>' . __( 'Status',     'wp-members' ) . '</th>
-					<th>' . __( 'Membership', 'wp-members' ) . '</th>
-					<th>' . __( 'Enabled?',   'wp-members' ) . '</th>
-					<th>' . __( 'Expires',    'wp-members' ) . '</th>
-				</tr>'; ?>	
-			<?php
-			foreach ( $wpmem->membership->products as $key => $value ) {
-				$checked = ( $user_products && array_key_exists( $key, $user_products ) ) ? "checked" : "";
-				echo "<tr>";
-				echo '<td style="padding:5px 5px;">
-				<select name="_wpmem_membership_product[' . $key . ']">
-					<option value="">----</option>
-					<option value="enable">'  . __( 'Enable', 'wp-members'  ) . '</option>
-					<option value="disable">' . __( 'Disable', 'wp-members' ) . '</option>
-				</select></td><td style="padding:0px 0px;">' . $value['title'] . '</td>';
+			$user_products = wpmem_get_user_products( $user_id );
+			echo '<h3>' . __( 'Membership Access', 'wp-members' ) . '</h3>';
+			if ( ! empty( $wpmem->membership->products ) ) {
+				$expires_heading = "&nbsp;";
+				foreach( $wpmem->membership->products as $key => $value ) {
+					$expires_heading = ( ! empty( $value['expires'] ) ) ? __( 'Expires', 'wp-members' ) : $expires_heading;
+				}
+				echo '<table>
+					<tr>
+						<th>' . __( 'Action',     'wp-members' ) . '</th>
+						<th>' . __( 'Membership', 'wp-members' ) . '</th>
+						<th>' . __( 'Enabled?',   'wp-members' ) . '</th>
+						<th>' . $expires_heading . '</th>
+					</tr>'; ?>	
+				<?php
 
-				// If user has date, display that; otherwise placeholder
-				$date_value  = ( isset( $user_products[ $key ] ) && 1 != $user_products[ $key ] && 0 != $user_products[ $key ] && '' != $user_products[ $key ] ) ? date( 'Y-m-d', $user_products[ $key ] ) : "";
-				$placeholder = ( ! isset( $user_products[ $key ] ) ) ? 'placeholder="' . __( 'Expiration date (optional)', 'wp-members' ) . '" ' : '';
-				$product_date_field = ' <input type="text" name="_wpmem_membership_expiration_' . $key . '" value="' . $date_value . '" class="wpmem_datepicker" ' . $placeholder . ' />';
+				foreach ( $wpmem->membership->products as $key => $value ) {
+					$checked = ( $user_products && array_key_exists( $key, $user_products ) ) ? "checked" : "";
+					echo "<tr>";
+					echo '<td style="padding:5px 5px;">
+					<select name="_wpmem_membership_product[' . $key . ']">
+						<option value="">----</option>
+						<option value="enable">'  . __( 'Enable',  'wp-members' ) . '</option>
+						<option value="disable">' . __( 'Disable', 'wp-members' ) . '</option>
+						<option value="enable">'  . __( 'Update',  'wp-members' ) . '</option>
+					</select></td><td style="padding:0px 0px;">' . $value['title'] . '</td>';
 
-				if ( isset( $user_products[ $key ] ) ) {
-					echo '<td align="center"><span id="wpmem_product_enabled" class="dashicons dashicons-yes"></span></td>';
-					if ( $user_products[ $key ] != 1 ) {
-						echo '<td>' . $product_date_field . '</td>';
+					// If user has date, display that; otherwise placeholder
+					$date_value  = ( isset( $user_products[ $key ] ) && 1 != $user_products[ $key ] && 0 != $user_products[ $key ] && '' != $user_products[ $key ] ) ? date( 'Y-m-d', $user_products[ $key ] ) : "";
+					$placeholder = ( ! isset( $user_products[ $key ] ) ) ? 'placeholder="' . __( 'Expiration date (optional)', 'wp-members' ) . '" ' : '';
+					$product_date_field = ' <input type="text" name="_wpmem_membership_expiration_' . $key . '" value="' . $date_value . '" class="wpmem_datepicker" ' . $placeholder . ' />';
+
+					if ( isset( $user_products[ $key ] ) ) {
+						echo '<td align="center"><span id="wpmem_product_enabled" class="dashicons dashicons-yes"></span></td>';
+						if ( $user_products[ $key ] != 1 ) {
+							echo '<td>' . $product_date_field . '</td>';
+						} else {
+							echo '<td>&nbsp;</td>';
+						}
 					} else {
-						echo '<td>&nbsp;</td>';
-					}
-				} else {
-					if ( isset( $value['expires'] ) && ! empty( $value['expires'] ) ) {
-						echo '<td><span id="wpmem_product_enabled" class="dashicons"></span></td>';
-						echo '<td>' . $product_date_field . '</td>';
-					} else {
-						echo '<td>&nbsp;</td>';
-					}
-				}				
-				echo '</tr>';
-			}
+						if ( isset( $value['expires'] ) && ! empty( $value['expires'] ) ) {
+							echo '<td><span id="wpmem_product_enabled" class="dashicons"></span></td>';
+							echo '<td>' . $product_date_field . '</td>';
+						} else {
+							echo '<td>&nbsp;</td>';
+						}
+					}				
+					echo '</tr>';
+				}
 
-				?></table>
-			<script>
-			jQuery(function() {
-				jQuery( ".wpmem_datepicker" ).datepicker({
-					dateFormat : "yy-mm-dd"
+					?></table>
+				<script>
+				jQuery(function() {
+					jQuery( ".wpmem_datepicker" ).datepicker({
+						dateFormat : "yy-mm-dd"
+					});
 				});
-			});
-			</script>
-			<?php
+				</script>
+				<?php
+			} else {
+				echo '<p>' . sprintf( __( 'No memberships have been created. %sCreate new memberships here%s', 'wp-members' ), '<a href="' . admin_url() . 'edit.php?post_type=wpmem_product">', '</a>' );
+			}
 		}
 	}
 

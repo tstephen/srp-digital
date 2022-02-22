@@ -6,12 +6,12 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at https://rocketgeek.com
- * Copyright (c) 2006-2020  Chad Butler
+ * Copyright (c) 2006-2022  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @author Chad Butler
- * @copyright 2006-2020
+ * @copyright 2006-2022
  */
 
 // Exit if accessed directly.
@@ -97,7 +97,7 @@ class WP_Members_Admin_Tab_Captcha {
 											$captcha[] = __( 'reCAPTCHA v3', 'wp-members' ) . '|4';
 											$captcha[] = __( 'Really Simple CAPTCHA', 'wp-members' ) . '|2';
 											$captcha[] = __( 'hCaptcha', 'wp-members' ) . '|5';
-											echo wpmem_create_formfield( 'wpmem_settings_captcha', 'select', $captcha, $wpmem->captcha ); ?>
+											echo wpmem_form_field( 'wpmem_settings_captcha', 'select', $captcha, $wpmem->captcha ); ?>
 										</td>
 									</tr>
 									<?php if ( isset( $updated_captcha_type ) ) { ?>

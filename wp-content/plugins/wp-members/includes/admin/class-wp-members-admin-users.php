@@ -56,8 +56,7 @@ class WP_Members_Admin_Users {
 		if ( $user_object->ID != get_current_user_id() ) {
 			
 			if ( 1 == $wpmem->act_link ) {
-				$is_user_confirmed = wpmem_is_user_confirmed( $user_object->ID );
-				if ( false === $is_user_confirmed ) {
+				if ( false === wpmem_is_user_confirmed( $user_object->ID ) ) {
 					$action = 'confirm';
 					$term   = __( 'Confirm', 'wp-members' );
 				} else {
@@ -107,9 +106,9 @@ class WP_Members_Admin_Users {
 		}
 
 		// If exporting all users, do it, then exit.
-		if ( wpmem_get( 'export_all', false, 'request' ) ) {
+		if ( current_user_can( 'list_users' ) && wpmem_get( 'export_all', false, 'request' ) ) {
 			$today = date( "Y-m-d" ); 
-			wpmem_export_users( array( 'export'=>'all', 'filename'=>'user-export-' . $today . '.csv' ) );
+			wpmem_export_users();
 			exit();
 		}
 
@@ -286,8 +285,8 @@ class WP_Members_Admin_Users {
 		// check to see if data was successfully retrieved from the cache
 		if ( false === $user_counts ) {
 
-			// @todo For now, 30 seconds.  We'll see how things go.
-			$transient_expires = 30; // Value in seconds, 1 day: ( 60 * 60 * 24 );
+			// @todo For now, 5 minutes.  We'll see how things go.
+			$transient_expires = 300; // Value in seconds, 1 day: ( 60 * 60 * 24 );
 
 			global $wpdb;
 

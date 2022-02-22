@@ -43,24 +43,34 @@ class WP_Members_User {
 	 * @param object $settings The WP_Members Object
 	 */
 	function __construct( $settings ) {
+		
+		add_action( 'wpmem_after_init', array( $this, 'load_user_products' ) );
+		
 		add_action( 'user_register', array( $this, 'set_reg_type'            ), 1 );
-		add_action( 'user_register', array( $this, 'register_finalize'       ), 5 ); // @todo This needs rigorous testing, especially front end processing such as WC.
+		add_action( 'user_register', array( $this, 'register_finalize'       ), 5 );
 		add_action( 'user_register', array( $this, 'post_register_data'      ), 9 ); // Changed this to 9 so custom user meta is saved before the default (10) priority.
 		add_action( 'user_register', array( $this, 'set_user_exp'            ), 25 );
-		add_action( 'user_register', array( $this, 'register_email_to_user'  ), 25 ); // @todo This needs rigorous testing for integration with WC or WP native.
-		add_action( 'user_register', array( $this, 'register_email_to_admin' ), 25 ); // @todo This needs rigorous testing for integration with WC or WP native.register_email_to_admin
+		add_action( 'user_register', array( $this, 'register_email_to_user'  ), 25 );
+		add_action( 'user_register', array( $this, 'register_email_to_admin' ), 25 );
 		
 		add_action( 'wpmem_register_redirect', array( $this, 'register_redirect' ), 20 ); // Adds a nonce to the redirect if there is a "redirect_to" attribute in the reg form.
 		
-		add_filter( 'registration_errors',       array( $this, 'wp_register_validate' ), 10, 3 );  // native registration validation
+		add_filter( 'registration_errors', array( $this, 'wp_register_validate' ), 10, 3 );  // native registration validation
 	
 		// Load anything the user as access to.
 		if ( 1 == $settings->enable_products ) {
 			add_action( 'user_register', array( $this, 'set_default_product' ), 6 );
-			
-			if ( is_user_logged_in() ) {
-				$this->access = $this->get_user_products( false, $settings );
-			}
+		}
+	}
+	
+	/**
+	 * Loads the current user's membership products on init.
+	 *
+	 * @since 3.4.0
+	 */
+	function load_user_products() {
+		if ( is_user_logged_in() ) {
+			$this->access = wpmem_get_user_products( get_current_user_id() );
 		}
 	}
 	
@@ -128,10 +138,15 @@ class WP_Members_User {
 	 *
 	 * @since 3.1.7
 	 * @since 3.2.0 Added logout_redirect filter
+	 * @since 3.4.0 Added $user_id for wp_logout action (to match WP, which added this in 5.5.0).
 	 *
 	 * @param string $redirect_to URL to redirect the user to (default: false).
 	 */
 	function logout( $redirect_to = false ) {
+		
+		// Get the user ID for when the action is fired.
+		$user_id = get_current_user_id();
+		
 		// Default redirect URL.
 		$redirect_to = ( $redirect_to ) ? $redirect_to : home_url();
 
@@ -142,16 +157,18 @@ class WP_Members_User {
 		 *
 		 * @since 2.7.1
 		 * @since 3.1.7 Moved to WP_Members_Users Class.
+		 * @since 3.4.0 Added $user_id param.
 		 *
 		 * @param string The blog home page.
 		 */
-		$redirect_to = apply_filters( 'wpmem_logout_redirect', $redirect_to );
+		$redirect_to = apply_filters( 'wpmem_logout_redirect', $redirect_to, $user_id );
 
 		wp_destroy_current_session();
 		wp_clear_auth_cookie();
+		wp_set_current_user( 0 );
 
 		/** This action is defined in /wp-includes/pluggable.php. */
-		do_action( 'wp_logout' );
+		do_action( 'wp_logout', $user_id );
 
 		wp_safe_redirect( $redirect_to );
 		exit();
@@ -193,7 +210,7 @@ class WP_Members_User {
 		
 		// Check the nonce.
 		if ( empty( $_POST ) || ! wp_verify_nonce( $_REQUEST[ '_wpmem_' . $tag . '_nonce' ], 'wpmem_longform_nonce' ) ) {
-			$wpmem_themsg = __( 'There was an error processing the form.', 'wp-members' );
+			$wpmem_themsg = wpmem_get_text( 'reg_generic' );
 			return;
 		}
 
@@ -234,6 +251,9 @@ class WP_Members_User {
 						case 'textarea':
 							$this->post_data[ $meta_key ] = sanitize_textarea_field( $_POST[ $meta_key ] );
 							break;
+						case 'email':
+							$this->post_data[ $meta_key ] = sanitize_email( $_POST[ $meta_key ] );
+							break;
 						default:
 							$this->post_data[ $meta_key ] = sanitize_text_field( $_POST[ $meta_key ] );
 							break;
@@ -244,7 +264,7 @@ class WP_Members_User {
 				} else {
 					// We do have password as part of the registration form.
 					if ( isset( $_POST['password'] ) ) {
-						$this->post_data['password'] = $_POST['password'];
+						$this->post_data['password'] = $_POST['password']; // wp_insert_user() hashes this, so sanitizing is unnessary (and undesirable).
 					}
 					if ( isset( $_POST['confirm_password'] ) ) {
 						$this->post_data['confirm_password'] = $_POST['confirm_password'];
@@ -265,6 +285,17 @@ class WP_Members_User {
 		 */
 		$this->post_data = apply_filters( 'wpmem_pre_validate_form', $this->post_data, $tag );
 
+		// Adds integration for custom error codes triggered by "register_post" or contained in "registration_errors"
+		// @todo This will move towards integrating all WP-Members registration errors into the "registration_errors" filter
+		//       and allow for more standardized custom validation.
+		/* $errors = new WP_Error();
+		do_action( 'register_post', $sanitized_user_login, $user_email, $errors );
+		$errors = apply_filters( 'registration_errors', $errors, $this->post_data['username'], $this->post_data['user_email'] );
+		if ( count( $errors->get_error_messages() ) > 0 ) {
+			$wpmem_themsg = $errors->get_error_message();
+			return;
+		} */
+
 		if ( 'update' == $tag ) {
 			$pass_arr = array( 'username', 'password', 'confirm_password', 'password_confirm' );
 			foreach ( $pass_arr as $pass ) {
@@ -281,14 +312,14 @@ class WP_Members_User {
 					if ( 'register' == $tag ) {
 						// If the required field is a file type.
 						if ( empty( $_FILES[ $meta_key ]['name'] ) ) {
-							$wpmem_themsg = sprintf( $wpmem->get_text( 'reg_empty_field' ), __( $field['label'], 'wp-members' ) );
+							$wpmem_themsg = sprintf( wpmem_get_text( 'reg_empty_field' ), __( $field['label'], 'wp-members' ) );
 						}
 					}
 				} else {
 					// If the required field is any other field type.
 					if ( ( 'register' == $tag && true == $field['register'] ) || ( 'update' == $tag && true == $field['profile'] ) ) {
 						if ( null == $this->post_data[ $meta_key ] ) {
-							$wpmem_themsg = sprintf( $wpmem->get_text( 'reg_empty_field' ), __( $field['label'], 'wp-members' ) );
+							$wpmem_themsg = sprintf( wpmem_get_text( 'reg_empty_field' ), __( $field['label'], 'wp-members' ) );
 						}
 					}
 				}
@@ -304,7 +335,7 @@ class WP_Members_User {
 				if ( ! empty( $_FILES[ $meta_key ]['name'] ) ) {
 					$extension = pathinfo( $_FILES[ $meta_key ]['name'], PATHINFO_EXTENSION );
 					if ( ! in_array( $extension, $allowed_file_types ) ) {
-						$wpmem_themsg = sprintf( $wpmem->get_text( 'reg_file_type' ), __( $field['label'], 'wp-members' ), str_replace( '|', ',', $msg_types ) );
+						$wpmem_themsg = sprintf( wpmem_get_text( 'reg_file_type' ), __( $field['label'], 'wp-members' ), str_replace( '|', ',', $msg_types ) );
 					}
 				}
 			}
@@ -325,9 +356,9 @@ class WP_Members_User {
 				// Validate username and email fields.
 				$wpmem_themsg = ( email_exists( $this->post_data['user_email'] ) ) ? "email" : $wpmem_themsg;
 				$wpmem_themsg = ( username_exists( $this->post_data['username'] ) ) ? "user" : $wpmem_themsg;
-				$wpmem_themsg = ( ! is_email( $this->post_data['user_email']) ) ? $wpmem->get_text( 'reg_valid_email' ) : $wpmem_themsg;
-				$wpmem_themsg = ( ! validate_username( $this->post_data['username'] ) ) ? $wpmem->get_text( 'reg_non_alphanumeric' ) : $wpmem_themsg;
-				$wpmem_themsg = ( ! $this->post_data['username'] ) ? $wpmem->get_text( 'reg_empty_username' ) : $wpmem_themsg;
+				$wpmem_themsg = ( ! is_email( $this->post_data['user_email']) ) ? wpmem_get_text( 'reg_valid_email' ) : $wpmem_themsg;
+				$wpmem_themsg = ( ! validate_username( $this->post_data['username'] ) ) ? wpmem_get_text( 'reg_non_alphanumeric' ) : $wpmem_themsg;
+				$wpmem_themsg = ( ! $this->post_data['username'] ) ? wpmem_get_text( 'reg_empty_username' ) : $wpmem_themsg;
 
 				// If there is an error from username, email, or required field validation, stop registration and return the error.
 				if ( $wpmem_themsg ) {
@@ -338,10 +369,10 @@ class WP_Members_User {
 
 			// If form contains password and email confirmation, validate that they match.
 			if ( array_key_exists( 'confirm_password', $this->post_data ) && $this->post_data['confirm_password'] != $this->post_data ['password'] ) { 
-				$wpmem_themsg = $wpmem->get_text( 'reg_password_match' );
+				$wpmem_themsg = wpmem_get_text( 'reg_password_match' );
 			}
 			if ( array_key_exists( 'confirm_email', $this->post_data ) && $this->post_data['confirm_email'] != $this->post_data ['user_email'] ) { 
-				$wpmem_themsg = $wpmem->get_text( 'reg_email_match' ); 
+				$wpmem_themsg = wpmem_get_text( 'reg_email_match' ); 
 			}
 
 			// Process CAPTCHA.
@@ -402,7 +433,7 @@ class WP_Members_User {
 					$is_error = true;
 				}
 				if ( $is_error ) {
-					$errors->add( 'wpmem_error', sprintf( $wpmem->get_text( 'reg_empty_field' ), __( $field['label'], 'wp-members' ) ) ); 
+					$errors->add( 'wpmem_error', sprintf( wpmem_get_text( 'reg_empty_field' ), __( $field['label'], 'wp-members' ) ) ); 
 				}
 			}
 		}
@@ -411,7 +442,7 @@ class WP_Members_User {
 		if ( $wpmem->captcha > 0 ) {
 			$check_captcha = WP_Members_Captcha::validate();
 			if ( false === $check_captcha ) {
-				$errors->add( 'wpmem_captcha_error', sprintf( $wpmem->get_text( 'reg_captcha_err' ), __( $field['label'], 'wp-members' ) ) ); 
+				$errors->add( 'wpmem_captcha_error', sprintf( wpmem_get_text( 'reg_captcha_err' ), __( $field['label'], 'wp-members' ) ) ); 
 			}
 		}
 
@@ -498,21 +529,19 @@ class WP_Members_User {
 	 *
 	 * @since 3.3.2
 	 *
-	 * @global stdClass $wpmem
-	 * @param  int      $user_id
+	 * @param  int  $user_id
 	 */
 	function post_register_data( $user_id ) {
-		global $wpmem;
-		$wpmem->user->post_data['ID'] = $user_id;
+		$this->post_data['ID'] = $user_id;
 		/**
 		 * Fires after user insertion but before email.
 		 *
 		 * @since 2.7.2
 		 * @since 3.3.2 Hooked to user_register.
 		 *
-		 * @param array $wpmem->user->post_data The user's submitted registration data.
+		 * @param array $this->post_data The user's submitted registration data.
 		 */
-		do_action( 'wpmem_post_register_data', $wpmem->user->post_data );
+		do_action( 'wpmem_post_register_data', $this->post_data );
 	}
 	
 	/**
@@ -848,7 +877,7 @@ class WP_Members_User {
 	function set_as_logged_in( $user_id ) {
 		$user = get_user_by( 'id', $user_id );
 		wp_set_current_user( $user_id, $user->user_login );
-		wp_set_auth_cookie( $user_id );
+		wp_set_auth_cookie( $user_id, wpmem_get( 'rememberme', false, 'request' ) );
 	}
 	
 	/**
@@ -861,28 +890,30 @@ class WP_Members_User {
 	 *       product). Maybe add role checking to the expiration block if both exist.
 	 *
 	 * @global object $wpmem
-	 * @param  mixed  $product
+	 * @param  mixed  $product Accepts a single membership slug/meta, or an array of multiple memberships.
 	 * @param  int    $user_id (optional)
 	 * @return bool   $access
 	 */
 	function has_access( $product, $user_id = false ) {
 		global $wpmem;
-		if ( false === $user_id && ! is_user_logged_in() ) {
+		if ( ! is_user_logged_in() ) {
 			return false;
 		}
 		
 		// Product must be an array.
 		$product_array = ( ! is_array( $product ) ) ? array( $product ) : $product;
-		
-		// Load user memberships array.
-		$memberships = ( false == $user_id ) ? $this->access : wpmem_get_user_products( $user_id );
+
+		$product_array = $this->get_membership_stack( $product_array );
 
 		// Current user or requested user.
 		$user_id = ( ! $user_id ) ? get_current_user_id() : $user_id;
 		
+		// Load user memberships array.
+		$memberships = ( false == $user_id ) ? $this->access : wpmem_get_user_products( $user_id );
+
 		// Start by assuming no access.
 		$access  = false;
-		
+
 		foreach ( $product_array as $prod ) {
 			$expiration_product = false;
 			$role_product = false;
@@ -930,6 +961,48 @@ class WP_Members_User {
 	}
 	
 	/**
+	 * Gets membership hierarchy (if any).
+	 *
+	 * Replaces original get_product_children() from 3.4.0 which was not as scalable.
+	 *
+	 * @since 3.4.1
+	 *
+	 * @global stdClass $wpmem
+	 * @param  array    $product_array
+	 * $return array    $product_array Product array with child products added.
+	 */
+	function get_membership_stack( $product_array ) {
+
+		global $wpmem;
+		$membership_ids = wpmem_get_memberships_ids();
+		foreach ( $product_array as $product ) {
+			// Do we need child access?
+			$child_access = get_post_meta( $membership_ids[ $product ], 'wpmem_product_child_access', true );
+			if ( 1 == $child_access ) {
+				$args = array(
+					'post_type'   => $wpmem->membership->post_type,
+					'post_parent' => $membership_ids[ $product ], // Current post's ID
+				);
+				$children = get_children( $args );
+				if ( ! empty( $children ) ) {
+					foreach ( $children as $child ) {
+						$product_array[] = $child->post_name;
+					}
+				}
+			} 
+			// Ancestor access is by default.
+			$ancestors = get_post_ancestors( $membership_ids[ $product ] );
+			if ( ! empty( $ancestors ) ) {
+				foreach ( $ancestors as $ancestor ) {
+					$product_array[] = get_post_field( 'post_name', $ancestor );;
+				}
+			}
+		}
+		
+		return $product_array;		
+	}
+	
+	/**
 	 * Loads anything the user has access to.
 	 *
 	 * @since 3.2.0
@@ -965,7 +1038,7 @@ class WP_Members_User {
 	 * @since 3.2.0
 	 * @since 3.2.6 Added $date to set a specific expiration date.
 	 * @since 3.3.0 Updated to new single meta, keeps legacy array for rollback.
-	 * @since 3.3.1 Added no gap renewal option, @todo Needs some possible condensing.
+	 * @since 3.3.1 Added no gap renewal option.
 	 *
 	 * @param string $product
 	 * @param int    $user_id
@@ -1169,5 +1242,4 @@ class WP_Members_User {
 			wpmem_set_user_product( $product, $user_id );
 		}
 	}
-
 }

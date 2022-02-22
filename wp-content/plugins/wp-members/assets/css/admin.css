@@ -5,12 +5,12 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at https://rocketgeek.com
- * Copyright (c) 2006-2020 Chad Butler
+ * Copyright (c) 2006-2022 Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @author Chad Butler 
- * @copyright 2006-2020
+ * @copyright 2006-2022
  */
 
 
@@ -53,7 +53,7 @@
 	color: #f00;
 }
 
-#the-list {
+.settings_page_wpmem-settings #the-list {
 	cursor: move;
 }
 #sort, #edit {
@@ -111,7 +111,7 @@
 }
 #wpmem_user_profile_tabs .ui-state-active {
 	border: 1px solid #006799; 
-	background: #008ec2;
+	background: #135e96;
 }
 #wpmem_user_profile_tabs .ui-state-active a {
 	color: #fff;
@@ -130,4 +130,13 @@
 }
 updatesettings a:hover {
 	color: black;
+}
+
+#adduser .form-field input[type="checkbox"],
+#createuser .form-field input[type="checkbox"] {
+	width: initial;
+}
+
+.wpmem-user-table-membership {
+	border-bottom:1px solid #999;
 }

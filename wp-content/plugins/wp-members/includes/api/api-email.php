@@ -4,13 +4,13 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at https://rocketgeek.com
- * Copyright (c) 2006-2020  Chad Butler
+ * Copyright (c) 2006-2022  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @subpackage WP-Members API Functions
  * @author Chad Butler 
- * @copyright 2006-2020
+ * @copyright 2006-2022
  */
 
 /**
@@ -40,6 +40,25 @@ function wpmem_mail_from_name() {
 	global $wpmem;
 	return $wpmem->email->from_name;
 }
+
+/** 
+ * Returns the wp_mail content type (if set).
+ *
+ * @since 3.4.0
+ *
+ * @global object $wpmem
+ * @return string $wpmem_mail_content_type
+ *
+ * @note Currently checks for existing function. Advanced Options set up for
+ *       backward compatibility could potentially load first if wp-members directory
+ *       is named something other than "wp-members".
+ */
+if ( ! function_exists( 'wpmem_mail_content_type' ) ):
+function wpmem_mail_content_type() {
+	global $wpmem;
+	return $wpmem->email->content_type();
+}
+endif;
 
 /**
  * Builds emails for the user.
@@ -81,11 +100,11 @@ function wpmem_email_to_user( $args, $password = null, $tag = null, $wpmem_field
 	global $wpmem;
 	if ( is_array( $args ) ) {
 		$user_id      = $args['user_id'];
-		$password     = $args['password'];
 		$tag          = $args['tag'];
-		$wpmem_fields = $args['wpmem_fields'];
-		$field_data   = $args['field_data'];
-		$custom       = $args['custom'];
+		$password     = ( isset( $args['password']     ) ) ? $args['password']     : '';
+		$wpmem_fields = ( isset( $args['wpmem_fields'] ) ) ? $args['wpmem_fields'] : '';
+		$field_data   = ( isset( $args['field_data']   ) ) ? $args['field_data']   : '';
+		$custom       = ( isset( $args['custom']       ) ) ? $args['custom']       : '';
 	} else {
 		$user_id = $args;
 	}

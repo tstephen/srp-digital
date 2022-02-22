@@ -142,7 +142,7 @@ class WP_Members_User_Profile {
 								$input = ( $attachment_url ) ? $attachment_url : $empty_file;
 							}
 						}
-						$input.= '<br />' . $wpmem->get_text( 'profile_upload' ) . '<br />';
+						$input.= '<br />' . wpmem_get_text( 'profile_upload' ) . '<br />';
 						$input.= wpmem_form_field( array(
 							'name'    => $meta, 
 							'type'    => $field['type'], 
@@ -163,6 +163,7 @@ class WP_Members_User_Profile {
 								'value'    => $val,
 								'compare'  => $valtochk,
 								'required' => $field['required'],
+								'class'    => 'regular-text',
 								'placeholder' => ( isset( $field['placeholder'] ) ) ? $field['placeholder'] : '',
 								'pattern'     => ( isset( $field['pattern']     ) ) ? $field['pattern']     : false,
 								'title'       => ( isset( $field['title']       ) ) ? $field['title']       : false,
@@ -584,13 +585,14 @@ class WP_Members_User_Profile {
 			 */
 			$tabs = apply_filters( 'wpmem_user_profile_tabs', array() ); 
 
-			if ( ! empty( $tabs ) ) { ?>
-				<script>
-					jQuery(document).ready(function($){
-						$("#wpmem_user_profile_tabs").tabs();
-					});
-				</script>
-				<?php
+			if ( ! empty( $tabs ) ) { 
+?>
+<script>
+	jQuery(document).ready(function($){
+		$("#wpmem_user_profile_tabs").tabs();
+	});
+</script>
+<?php
 				echo '<div id="wpmem_user_profile_tabs">';
 				echo '<ul>';
 				foreach ( $tabs as $key => $value ) {

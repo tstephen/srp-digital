@@ -4,12 +4,12 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at https://rocketgeek.com
- * Copyright (c) 2006-2020  Chad Butler
+ * Copyright (c) 2006-2022  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @author Chad Butler
- * @copyright 2006-2020
+ * @copyright 2006-2022
  *
  * Functions included:
  * - wpmem_add_custom_email
@@ -105,7 +105,7 @@ function wpmem_wp_reserved_terms() {
  * @param  string  $option  Name of the option to update.
  * @param  string  $key     Which key to update. Update a subkey as primary_key/subkey.
  * @param  string  $value   New value.
- * @return void
+ * @return bool             True if the value was updated, otherwise false.
  */
 function wpmem_update_option( $option, $key, $value ) {
 	$settings = get_option( $option );
@@ -115,5 +115,5 @@ function wpmem_update_option( $option, $key, $value ) {
 	} else {
 		$settings[ $key ] = $value;
 	}
-	update_option( $option, $settings );
+	return update_option( $option, $settings );
 }

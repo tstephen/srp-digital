@@ -95,8 +95,8 @@ class WP_Members_Products {
 		$this->load_products();
 		
 		add_filter( 'wpmem_securify',               array( $this, 'product_access' ) );
-		add_filter( 'wpmem_product_restricted_msg', array( $this, 'access_message' ) );
-		add_filter( 'wpmem_restricted_msg',         array( $this, 'access_message' ) );
+		add_filter( 'wpmem_product_restricted_msg', array( $this, 'apply_custom_access_message' ) );
+		add_filter( 'wpmem_restricted_msg',         array( $this, 'apply_custom_access_message' ) );
 	}
 	
 	/**
@@ -211,29 +211,7 @@ class WP_Members_Products {
 			// Only produce the product restricted message if access is false.
 			if ( false === $access ) {
 
-				// Singular message if post only has one membership, otherwise multiple.
-				if ( 1 == count( $post_products ) ) {
-					$message = $wpmem->get_text( 'product_restricted_single' )
-						. "<br />" . $this->products[ $post_products[0] ]['title'];
-				} else {
-					$message = $wpmem->get_text( 'product_restricted_multiple' ) . "<br />";
-					foreach ( $post_products as $post_product ) {
-						$message .= $this->products[ $post_product ]['title'] . "<br />";
-					}
-				}
-				/**
-				 * Filter the product restricted message.
-				 *
-				 * @since 3.2.3
-				 *
-				 * @param string                The message.
-				 * @param array  $post_products {
-				 *     Membership product slugs the post is restricted to.
-				 *
-				 *     @type string $slug
-				 * }
-				 */
-				$message = apply_filters( 'wpmem_product_restricted_msg', $message, $post_products );
+				$message = wpmem_get_access_message( $post_products );
 
 				/**
 				 * Filter the product restricted message HTML.
@@ -253,8 +231,8 @@ class WP_Members_Products {
 				 * }
 				 */
 				$product_restricted = apply_filters( 'wpmem_product_restricted_args', array(
-					'wrapper_before' => '<div class="wpmem_msg" align="center">',
-					'message'        => '<p>' . $message . '</p>',
+					'wrapper_before' => '<div class="wpmem_msg">',
+					'message'        => $message,
 					'wrapper_after'  => '</div>',
 				), $post_products );
 				
@@ -270,24 +248,60 @@ class WP_Members_Products {
 	}
 
 	/**
+	 * Gets the access message if user does not have required membership.
+	 *
+	 * @since 3.4.0
+	 *
+	 * @param  array  $post_products
+	 * @return string $message
+	 */
+	function get_access_message( $post_products ) {
+		// Singular message if post only has one membership, otherwise multiple.
+		if ( 1 == count( $post_products ) ) {
+			$message = wpmem_get_text( 'product_restricted_single' )
+				. "<br />" . $this->products[ $post_products[0] ]['title'];
+		} else {
+			$message = wpmem_get_text( 'product_restricted_multiple' ) . "<br />";
+			foreach ( $post_products as $post_product ) {
+				$message .= $this->products[ $post_product ]['title'] . "<br />";
+			}
+		}
+		/**
+		 * Filter the product restricted message.
+		 *
+		 * @since 3.2.3
+		 *
+		 * @param string                The message.
+		 * @param array  $post_products {
+		 *     Membership product slugs the post is restricted to.
+		 *
+		 *     @type string $slug
+		 * }
+		 */
+		$message = apply_filters( 'wpmem_product_restricted_msg', $message, $post_products );
+		return $message;
+	}
+	
+	/**
 	 * Filters the access message if the user does not have
 	 * access to this membership.
 	 *
 	 * @since 3.3.4
+	 * @since 3.4.0 Renamed from access_message().
 	 *
 	 * @global stdClass $post
 	 * @param  string   $msg
 	 * @return string   $msg
 	 */
-	function access_message( $msg ) {
+	function apply_custom_access_message( $msg ) {
 		global $post;
 		$post_products = $this->get_post_products( $post->ID );
 		if ( $post_products ) {
 			foreach( $post_products as $post_product ) {
 				$membership_id = array_search( $post_product, $this->product_by_id );
-				$message = get_post_meta( $membership_id, 'wpmem_product_message', true );
+				$message = wpautop( get_post_meta( $membership_id, 'wpmem_product_message', true ) );
 				if ( $message ) {
-					$product_message = ( isset( $product_message ) ) ? $product_message . '<p>' . $message . '</p>' : '<p>' . $message . '</p>';
+					$product_message = ( isset( $product_message ) ) ? $product_message . $message : $message;
 				}
 			}
 			if ( isset( $product_message ) ) {
@@ -318,8 +332,8 @@ class WP_Members_Products {
 		 */
 		$args = apply_filters( 'wpmem_membership_cpt_args', $args );
 		
-		$singular = __( 'Product', 'wp-members' );
-		$plural   = __( 'Products', 'wp-members' );
+		$singular = __( 'Membership', 'wp-members' );
+		$plural   = __( 'Memberships', 'wp-members' );
 
 		$labels = array(
 			'name'                  => $plural,
@@ -338,6 +352,7 @@ class WP_Members_Products {
 			'not_found_in_trash'    => __( 'Not found in Trash', 'wp-members' ),
 			'insert_into_item'      => __( 'Insert into item', 'wp-members' ),
 			'publish'               => sprintf( __( 'Save %s Details', 'wp-members' ), $singular ),
+			'attributes'            => __( 'Membership Attributes', 'wp-members' ),
 		);
 		$args = array(
 			'label'                 => __( 'Membership Product', 'wp-members' ),

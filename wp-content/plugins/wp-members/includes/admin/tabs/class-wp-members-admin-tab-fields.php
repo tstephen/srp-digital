@@ -6,12 +6,12 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at https://rocketgeek.com
- * Copyright (c) 2006-2020  Chad Butler
+ * Copyright (c) 2006-2022  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @author Chad Butler
- * @copyright 2006-2020
+ * @copyright 2006-2022
  */
 
 // Exit if accessed directly.
@@ -87,7 +87,7 @@ class WP_Members_Admin_Tab_Fields {
 
 		if ( 'delete' == $delete_action ) {
 
-			$delete_fields = wpmem_get( 'delete' ); ?>
+			$delete_fields = wpmem_sanitize_array( wpmem_get( 'delete' ) );?>
 
 			<?php if ( empty( $delete_fields ) ) { ?>
 				<p><?php _e( 'No fields selected for deletion', 'wp-members' ); ?></p>
@@ -156,6 +156,8 @@ class WP_Members_Admin_Tab_Fields {
 		$fields = wpmem_fields();
 		if ( $mode == 'edit' ) {
 			$field = $fields[ $meta_key ];	
+		} else {
+			$field['checkbox_label'] = ''; // fixes unset variable at 308/309 since $field would not be set.
 		}
 		$form_action = ( $mode == 'edit' ) ? 'editfieldform' : 'addfieldform'; 
 		$span_optional = '<span class="description">' . __( '(optional)', 'wp-members' ) . '</span>';
@@ -395,7 +397,7 @@ Last Row|last_row<?php } } ?></textarea>
 				} ?>
 			<input type="hidden" name="add_order_id" value="<?php echo $field_order_id; ?>" />
 			<input type="hidden" name="wpmem_admin_a" value="<?php echo ( $mode == 'edit' ) ? 'edit_field' : 'add_field'; ?>" />
-			<?php $text = ( $mode == 'edit' ) ? __( 'Edit Field', 'wp-members' ) : __( 'Add Field', 'wp-members' ); ?>
+			<?php $text = ( $mode == 'edit' ) ? __( 'Save Changes', 'wp-members' ) : __( 'Add Field', 'wp-members' ); ?>
 			<?php submit_button( $text ); ?>
 			<p><a href="<?php echo add_query_arg( array( 'page' => 'wpmem-settings', 'tab' => 'fields' ), get_admin_url() . 'options-general.php' ); ?>">&laquo; <?php _e( 'Return to Fields Table', 'wp-members' ); ?></a></p>
 		</form><?php
@@ -438,11 +440,11 @@ Last Row|last_row<?php } } ?></textarea>
 					'label'    => $field[1],
 					'meta'     => $meta,
 					'type'     => $field[3],
-					'display'  => ( 'user_email' != $meta && 'username' != $meta ) ? wpmem_create_formfield( $meta . "_display",  'checkbox', 'y', $field[4] ) : '',
-					'req'      => ( 'user_email' != $meta && 'username' != $meta ) ? wpmem_create_formfield( $meta . "_required", 'checkbox', 'y', $field[5] ) : '',
-					'profile'  => ( 'user_email' != $meta && 'username' != $meta ) ? wpmem_create_formfield( $meta . "_profile",  'checkbox', 'y', $profile ) : '',
-					'userscrn' => ( ! in_array( $meta, $wpmem_ut_fields_skip ) ) ? wpmem_create_formfield( 'ut_fields[' . $meta . ']', 'checkbox', $field[1], $ut_checked ) : '',
-					'usearch'  => ( ! in_array( $meta, $wpmem_us_fields_skip ) ) ? wpmem_create_formfield( 'us_fields[' . $meta . ']', 'checkbox', $field[1], $us_checked ) : '',
+					'display'  => ( 'user_email' != $meta && 'username' != $meta ) ? wpmem_form_field( $meta . "_display",  'checkbox', 'y', $field[4] ) : '',
+					'req'      => ( 'user_email' != $meta && 'username' != $meta ) ? wpmem_form_field( $meta . "_required", 'checkbox', 'y', $field[5] ) : '',
+					'profile'  => ( 'user_email' != $meta && 'username' != $meta ) ? wpmem_form_field( $meta . "_profile",  'checkbox', 'y', $profile ) : '',
+					'userscrn' => ( ! in_array( $meta, $wpmem_ut_fields_skip ) ) ? wpmem_form_field( 'ut_fields[' . $meta . ']', 'checkbox', $field[1], $ut_checked ) : '',
+					'usearch'  => ( ! in_array( $meta, $wpmem_us_fields_skip ) ) ? wpmem_form_field( 'us_fields[' . $meta . ']', 'checkbox', $field[1], $us_checked ) : '',
 					'edit'     => self::do_edit_link( $meta ),
 					'sort'     => '<span class="dashicons dashicons-sort" title="' . __( 'Drag and drop to reorder fields', 'wp-members' ) . '"></span>',
 				);
@@ -468,7 +470,7 @@ Last Row|last_row<?php } } ?></textarea>
 				|| ( 'active' == $key && 1 == $wpmem->mod_reg ) 
 				|| defined( 'WPMEM_EXP_MODULE' ) && $wpmem->use_exp == 1 && ( 'exp_type' == $key || 'expires' == $key ) ) {
 				$user_screen_items[ $key ] = array( 'label' => __( $item, 'wp-members' ), 'meta' => $key,
-					'userscrn' => wpmem_create_formfield( "ut_fields[{$key}]", 'checkbox', $item, $ut_checked ),
+					'userscrn' => wpmem_form_field( "ut_fields[{$key}]", 'checkbox', $item, $ut_checked ),
 				);
 			}
 		}

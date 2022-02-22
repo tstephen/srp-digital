@@ -155,14 +155,14 @@ class WP_Members_Pwd_Reset {
 				
 				// Verify nonce.
 				if ( ! wp_verify_nonce( $_REQUEST['_wpmem_pwdchange_nonce'], 'wpmem_shortform_nonce' ) ) {
-					$errors->add( 'reg_generic', $wpmem->get_text( 'reg_generic' ) );
+					$errors->add( 'reg_generic', wpmem_get_text( 'reg_generic' ) );
 				}
 				
 				// Make sure submitted passwords match.
 				if ( $pass1 !== $pass2 ) {
 					// Legacy WP-Members error.
 					$result = 'pwdchangerr';
-					$msg = wpmem_inc_regmessage( 'pwdchangerr' );
+					$msg = wpmem_get_display_message( 'pwdchangerr' );
 					// WP Error.
 					$errors->add( 'password_reset_mismatch', __( 'The passwords do not match.' ) );
 				}
@@ -172,7 +172,7 @@ class WP_Members_Pwd_Reset {
 
 				if ( ( ! $errors->has_errors() ) && isset( $pass1 ) && ! empty( $pass1 ) ) {			
 					reset_password( $user, $pass1 );
-					$msg = wpmem_inc_regmessage( 'pwdchangesuccess' ) . $wpmem->forms->do_login_form( 'pwdreset' );
+					$msg = wpmem_get_display_message( 'pwdchangesuccess' ) . wpmem_login_form( 'pwdreset' );
 					$result = 'pwdchangesuccess';
 				}
 			}
@@ -182,7 +182,7 @@ class WP_Members_Pwd_Reset {
 				if ( 'invalid_key' == $user->get_error_code() ) {
 					// If somehow the form was submitted but the key not found.
 					$pwd_reset_link = wpmem_profile_url( 'pwdreset' );
-					$msg = wpmem_inc_regmessage( 'invalid_key', $this->form_submitted_key_not_found . '<br /><a href="' . $pwd_reset_link . '">Request a new reset key.</a>' );
+					$msg = wpmem_get_display_message( 'invalid_key', $this->form_submitted_key_not_found . '<br /><a href="' . $pwd_reset_link . '">Request a new reset key.</a>' );
 					$form = '';
 				} else {
 					$form = wpmem_change_password_form();
@@ -207,8 +207,8 @@ class WP_Members_Pwd_Reset {
 	function add_hidden_form_field( $hidden_fields, $action ) {
 		if ( $this->form_action == wpmem_get( 'a', false, 'request' ) ) {
 			$hidden_fields = str_replace( 'pwdchange', $this->form_action, $hidden_fields );
-			$hidden_fields.= wpmem_create_formfield( 'key',   'hidden', wpmem_get( 'key',   null, 'request' ) );
-			$hidden_fields.= wpmem_create_formfield( 'login', 'hidden', wpmem_get( 'login', null, 'request' ) );
+			$hidden_fields.= wpmem_form_field( array( 'name' => 'key',   'type' => 'hidden', 'value' => sanitize_text_field( wpmem_get( 'key',   null, 'request' ) ) ) );
+			$hidden_fields.= wpmem_form_field( array( 'name' => 'login', 'type' => 'hidden', 'value' => sanitize_user( wpmem_get( 'login', null, 'request' ) ) ) );
 		}
 		return $hidden_fields;
 	}
@@ -249,7 +249,6 @@ class WP_Members_Pwd_Reset {
 			/** This action is documented in /includes/class-wp-members-user.php */
 			do_action( 'wpmem_pwd_reset', $user->ID, $new_pass );
 			$wpmem->action = 'pwdreset_link';
-			global $wpmem_regchk;
 			$wpmem->regchk = 'pwdresetsuccess';
 			return "pwdresetsuccess";
 		}
@@ -282,7 +281,7 @@ class WP_Members_Pwd_Reset {
 	 */
 	function reset_password_form( $args ) {
 		global $wpmem;
-		$args['inputs'][0]['name'] = $wpmem->get_text( 'login_username' );
+		$args['inputs'][0]['name'] = wpmem_get_text( 'login_username' );
 		unset( $args['inputs'][1] );
 		return $args;
 	}
@@ -290,7 +289,7 @@ class WP_Members_Pwd_Reset {
 	/**
 	 * Sets and gets the password reset key.
 	 *
-	 * This function is a wrapper for the WP function get_password_reset_key().
+	 * This function is an alias for the WP function get_password_reset_key().
 	 *
 	 * @since 3.3.8
 	 *

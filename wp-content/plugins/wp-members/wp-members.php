@@ -3,21 +3,21 @@
 Plugin Name: WP-Members
 Plugin URI:  https://rocketgeek.com
 Description: WP access restriction and user registration.  For more information on plugin features, refer to <a href="https://rocketgeek.com/plugins/wp-members/docs/">the online Users Guide</a>. A <a href="https://rocketgeek.com/plugins/wp-members/quick-start-guide/">Quick Start Guide</a> is also available. WP-Members(tm) is a trademark of butlerblog.com.
-Version:     3.3.9.2
+Version:     3.4.1.2
 Author:      Chad Butler
-Author URI:  http://butlerblog.com/
+Author URI:  https://butlerblog.com/
 Text Domain: wp-members
 Domain Path: /i18n/languages/
-License:     GPLv2
+License:     GPLv3
 */
 
 /*  
-	Copyright (c) 2006-2020  Chad Butler
+	Copyright (c) 2006-2022  Chad Butler
 
 	The name WP-Members(tm) is a trademark of butlerblog.com
 
 	This program is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License, version 2, as
+	it under the terms of the GNU General Public License, version 3, as
 	published by the Free Software Foundation.
 
 	This program is distributed in the hope that it will be useful,
@@ -36,13 +36,13 @@ License:     GPLv2
 /*
 	A NOTE ABOUT LICENSE:
 
-	While this plugin is freely available and open-source under the GPL2
+	While this plugin is freely available and open-source under the GPL3
 	license, that does not mean it is "public domain." You are free to modify
 	and redistribute as long as you comply with the license. Any derivative 
 	work MUST be GPL licensed and available as open source.  You also MUST give 
 	proper attribution to the original author, copyright holder, and trademark
 	owner.  This means you cannot change two lines of code and claim copyright 
-	of the entire work as your own.  The GPL2 license requires that if you
+	of the entire work as your own.  The GPL3 license requires that if you
 	modify this code, you must clearly indicate what section(s) you have
 	modified and you may only claim copyright of your modifications and not
 	the body of work.  If you are unsure or have questions about how a 
@@ -50,12 +50,6 @@ License:     GPLv2
 	trademark, or if you do not understand the difference between
 	open source and public domain, contact the original author at:
 	https://rocketgeek.com/contact/.
-
-
-	INSTALLATION PROCEDURE:
-	
-	For complete installation and usage instructions,
-	visit https://rocketgeek.com
 */
 
 // Exit if accessed directly.
@@ -64,8 +58,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Initialize constants.
-define( 'WPMEM_VERSION',    '3.3.9.1' );
-define( 'WPMEM_DB_VERSION', '2.2.1' );
+define( 'WPMEM_VERSION',    '3.4.1.2' );
+define( 'WPMEM_DB_VERSION', '2.3.0' );
 define( 'WPMEM_PATH', plugin_dir_path( __FILE__ ) );
 
 // Initialize the plugin.
@@ -128,7 +122,7 @@ function wpmem_init() {
 function wpmem_admin_options() {
 	global $wpmem;
 	if ( ! is_multisite() || ( is_multisite() && current_user_can( 'edit_theme_options' ) ) ) {
-		$plugin_page = add_options_page ( 'WP-Members', 'WP-Members', 'manage_options', 'wpmem-settings', 'wpmem_admin' );
+		$plugin_page = add_options_page( 'WP-Members', 'WP-Members', 'manage_options', 'wpmem-settings', 'wpmem_admin' );
 	}
 }
 

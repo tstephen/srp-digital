@@ -7,13 +7,13 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at https://rocketgeek.com
- * Copyright (c) 2006-2020  Chad Butler
+ * Copyright (c) 2006-2022  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @subpackage WP_Members_Shortcodes
  * @author Chad Butler 
- * @copyright 2006-2020
+ * @copyright 2006-2022
  */
 
 // Exit if accessed directly.
@@ -51,13 +51,32 @@ class WP_Members_Email {
 	public $settings;
 	
 	/**
+	 * Setting for HTML email.
+	 *
+	 * @since  3.4.0
+	 * @access public
+	 * @var    string
+	 */
+	public $html = 0;
+	
+	/**
 	 * Load custom from address.
 	 *
 	 * @since 3.3.0
 	 */
-	function load_from() {
+	public function load_from() {
 		$this->from      = get_option( 'wpmembers_email_wpfrom', '' );
 		$this->from_name = get_option( 'wpmembers_email_wpname', '' );
+		$this->html      = get_option( 'wpmembers_email_html',   '' );
+	}
+	
+	/**
+	 * Load plugin HTML email setting.
+	 *
+	 * @since 3.4.0
+	 */
+	private function load_format() {
+		$this->html = get_option( 'wpmembers_email_html', 0 );
 	}
 	
 	/**
@@ -83,12 +102,13 @@ class WP_Members_Email {
 	 * @param  array  $fields               Array of the registration data (defaults to null).
 	 * @param  array  $custom               Array of custom email information (defaults to null).
 	 */
-	function to_user( $user_id, $password, $tag, $wpmem_fields = null, $field_data = null, $custom = null ) {
+	public function to_user( $user_id, $password, $tag, $wpmem_fields = null, $field_data = null, $custom = null ) {
 
 		global $wpmem;
 		
-		// Load from address.
+		// Load settings.
 		$this->load_from();
+		$this->load_format();
 
 		// Handle backward compatibility for customizations that may call the email function directly.
 		$wpmem_fields = wpmem_fields();
@@ -116,6 +136,11 @@ class WP_Members_Email {
 				$this->settings['tag']  = ( isset( $custom['tag'] ) ) ? $custom['tag'] : '';
 				break;
 		}
+		
+		// wpautop() the content if we are doing HTML email.
+		if ( 1 == $this->html ) {
+			$this->settings['body'] = wpautop( $this->settings['body'] );
+		}
 
 		// Get the user ID.
 		$user = new WP_User( $user_id );
@@ -133,7 +158,7 @@ class WP_Members_Email {
 		$this->settings['reg_link']      = esc_url( get_user_meta( $user_id, 'wpmem_reg_url', true ) );
 		$this->settings['do_shortcodes'] = true;
 		$this->settings['add_footer']    = true;
-		$this->settings['footer']        = get_option( 'wpmembers_email_footer' );
+		$this->settings['footer']        = ( 1 == $this->html ) ? wpautop( get_option( 'wpmembers_email_footer' ) ) : get_option( 'wpmembers_email_footer' );
 		$this->settings['disable']       = false;
 		$this->settings['toggle']        = $this->settings['tag']; // Deprecated since 3.2.0, but remains in the array for legacy reasons.
 		$this->settings['reset_link']    = esc_url_raw( add_query_arg( array( 'a' => 'pwdreset', 'key' => $password, 'id' => $user_id ), wpmem_profile_url() ) );
@@ -151,6 +176,16 @@ class WP_Members_Email {
 		 * @param string $this->settings['tag'] Tag to determine what email is being generated (newreg|newmod|appmod|repass|admin).
 		 */
 		$this->settings['headers'] = apply_filters( 'wpmem_email_headers', $default_header, $this->settings['tag'] );
+
+		/**
+		 * Filters attachments.
+		 * 
+		 * @since 3.4.1
+		 * 
+		 * @param  mixed  $attachments           Any file attachments as a string or array. (default per wp_mail() documentation is empty array).
+		 * @param  string $this->settings['tag'] Tag to determine what email is being generated (newreg|newmod|appmod|repass|admin).
+		 */
+		$this->settings['attachments'] = apply_filters( 'wpmem_email_attachments', array(), $this->settings['tag'] );
 
 		/**
 		 * Filter the email.
@@ -283,7 +318,7 @@ class WP_Members_Email {
 	 * @param  array  $wpmem_fields         Array of the WP-Members fields (defaults to null).
 	 * @param  array  $field_data           Array of the registration data (defaults to null).
 	 */
-	function notify_admin( $user_id, $wpmem_fields = null, $field_data = null ) {
+	public function notify_admin( $user_id, $wpmem_fields = null, $field_data = null ) {
 
 		global $wpmem;
 
@@ -342,7 +377,6 @@ class WP_Members_Email {
 						} else {
 							$val = ( is_array( $field_data ) ) ? esc_html( $field_data[ $meta_key ] ) : esc_html( get_user_meta( $user_id, $meta_key, true ) );
 						}
-						// $field_arr[ $field['label'] ] = $val; // @todo Consider (1) if this should be implemented, and (2) if it should be done here or location "B".
 						$field_arr[ __( $field['label'], 'wp-members' ) ] = $val;
 					}
 				}
@@ -355,6 +389,9 @@ class WP_Members_Email {
 
 		/** This filter is documented in class-wp-members-email.php */
 		$this->settings['headers'] = apply_filters( 'wpmem_email_headers', $default_header, 'admin' );
+
+		/** This filter is documented in class-wp-members-email.php */
+		$this->settings['attachments'] = apply_filters( 'wpmem_email_attachments', array(), 'admin' );
 
 		/**
 		 * Filters the address the admin notification is sent to.
@@ -377,7 +414,7 @@ class WP_Members_Email {
 		 * @since 2.9.8
 		 * @since 3.3.9 Added $user param.
 		 *
-		 * @param array $this->settings P
+		 * @param array $this->settings
 		 *     An array containing email body, subject, user id, and additional settings.
 		 *
 		 *     @type string  $subj
@@ -412,8 +449,6 @@ class WP_Members_Email {
 			$field_str = '';
 			foreach ( $this->settings['field_arr'] as $key => $val ) {
 				$field_str.= $key . ': ' . $val . "\r\n"; 
-				// @todo Location "B" to to label translation. Could be as follows:
-				// $field_str.= __( $key, 'wp-members' ) . ": " . $val . "\r\n";
 			}
 
 			// Get the email footer if needed.
@@ -478,12 +513,6 @@ class WP_Members_Email {
 			/**
 			 * Filters the admin notification email.
 			 *
-			 * This is the last chance to filter the message body. At this point
-			 * it is just the text that will be in the message.
-			 * @todo Consider deprecating this filter as it could be accomplished
-			 *       by the wp_mail filter, or a universal filter could be added
-			 *       to the new email send function.
-			 *
 			 * @since 2.8.2
 			 *
 			 * @param string $this->settings['body'] The admin notification email body.
@@ -502,13 +531,10 @@ class WP_Members_Email {
 	 * @since 3.1.0 Converted to use email var in object.
 	 * @since 3.2.0 Moved to WP_Members_Email::from().
 	 *
-	 * @global object $wpmem
-	 *
 	 * @param  string $email
 	 * @return string $wpmem_mail_from|$email
 	 */
-	function from( $email ) {
-		global $wpmem;
+	public function from( $email ) {
 		return ( $this->from ) ? $this->from : $email;
 	}
 
@@ -519,14 +545,22 @@ class WP_Members_Email {
 	 * @since 3.1.0 Converted to use email var in object.
 	 * @since 3.2.0 Moved to WP_Members_Email::from_name().
 	 *
-	 * @global object $wpmem
-	 *
 	 * @param  string $name
 	 * @return string $wpmem_mail_from_name|$name
 	 */
-	function from_name( $name ) {
-		global $wpmem;
+	public function from_name( $name ) {
 		return ( $this->from_name ) ? stripslashes( $this->from_name ) : stripslashes( $name );
+	}
+	
+	/**
+	 * Returns HTML content type for email.
+	 *
+	 * @since 3.4.0
+	 *
+	 * @return string Always returns "text/html"
+	 */
+	public function content_type( $content_type ) {
+		return ( 1 == $this->html ) ? 'text/html' : $content_type;
 	}
 
 	/**
@@ -537,12 +571,13 @@ class WP_Members_Email {
 	 * @param  string  $to
 	 * @return bool    $result
 	 */
-	function send( $to ) {
+	private function send( $to ) {
 		$args['to'] = ( 'user' == $to ) ? $this->settings['user_email'] : $this->settings['admin_email'];
-		$args['subject'] = $this->settings['subj'];
-		$args['message'] = $this->settings['body'];
-		$args['headers'] = $this->settings['headers'];
-		// @todo Add attachments to arguments and email send (and probably in the original function).
+		$args['subject']     = $this->settings['subj'];
+		$args['message']     = $this->settings['body'];
+		$args['headers']     = $this->settings['headers'];
+		$args['attachments'] = $this->settings['attachments'];
+
 		/**
 		 * Filter email send arguments.
 		 *
@@ -553,10 +588,21 @@ class WP_Members_Email {
 		 * @param array  $this->settings
 		 */
 		$args = apply_filters( 'wpmem_email_send_args', $args, $to, $this->settings );
-		// Apply WP's "from" and "from name" email filters.
-		add_filter( 'wp_mail_from',      array( $this, 'from'      ) );
-		add_filter( 'wp_mail_from_name', array( $this, 'from_name' ) );
-		$result = wp_mail( $args['to'], stripslashes( $args['subject'] ), stripslashes( $args['message'] ), $args['headers'] );
+		
+		// Apply filters.
+		add_filter( 'wp_mail_from',         array( $this, 'from'      ) );
+		add_filter( 'wp_mail_from_name',    array( $this, 'from_name' ) );
+		add_filter( 'wp_mail_content_type', array( $this, 'content_type' ) );
+		
+		// Send message.
+		$result = wp_mail( $args['to'], stripslashes( $args['subject'] ), stripslashes( $args['message'] ), $args['headers'], $args['attachments'] );
+		
+		// Remove customizations.
+		remove_filter( 'wp_mail_from',         array( $this, 'from'      ) );
+		remove_filter( 'wp_mail_from_name',    array( $this, 'from_name' ) );
+		remove_filter( 'wp_mail_content_type', array( $this, 'content_type' ) );
+		
+		// Return result (does not necessarily indicate message was sent).
 		return $result;
 	}
 }

@@ -5,12 +5,12 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at https://rocketgeek.com
- * Copyright (c) 2006-2020  Chad Butler
+ * Copyright (c) 2006-2022  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @author Chad Butler 
- * @copyright 2006-2020
+ * @copyright 2006-2022
  */
  
  
@@ -222,6 +222,36 @@
 				$("#wpmem_post_icon_1").hide();
 				$("#wpmem_post_icon_2").show();
 			}
+		});
+	});
+})(jQuery);
+
+/**
+ * Shows the WP-Members settings.
+ */
+(function($) {
+	$(document).ready(function($){
+		var close_button = wpmem_get_settings_vars.close_btn;
+		$("#dialog-message" ).dialog({
+			autoOpen: false,
+			modal: true,
+			height: "auto",
+			width: 600,
+			buttons: {
+				Close : function() {
+					$( this ).dialog( "close" );
+				}
+			}
+		});
+		$( "#opener" ).on( "click", function() {
+			$( "#dialog-message" ).dialog( "open" );
+		});
+		$("#select_all").click(function(){
+			$("textarea").select();
+			document.execCommand('copy');
+		});
+		$(window).resize(function() {
+			$("#dialog-message").dialog("option", "position", {my: "center", at: "center", of: window});
 		});
 	});
 })(jQuery);

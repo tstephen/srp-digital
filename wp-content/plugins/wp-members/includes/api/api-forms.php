@@ -4,13 +4,13 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at https://rocketgeek.com
- * Copyright (c) 2006-2020  Chad Butler
+ * Copyright (c) 2006-2022  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package    WP-Members
  * @subpackage WP-Members API Functions
  * @author     Chad Butler 
- * @copyright  2006-2020
+ * @copyright  2006-2022
  */
 
 if ( ! function_exists( 'wpmem_login_form' ) ):
@@ -24,8 +24,9 @@ if ( ! function_exists( 'wpmem_login_form' ) ):
  * to the current function documentation.
  *
  * @since 2.5.1
- * @since 3.1.7 Now a wrapper for $wpmem->forms->login_form()
+ * @since 3.1.7 Now an alias for $wpmem->forms->login_form()
  * @since 3.3.0 Added to API.
+ * @since 3.4.0 Main API function for displaying login form.
  *
  * @global object $wpmem
  * @param  array  $args {
@@ -59,16 +60,22 @@ if ( ! function_exists( 'wpmem_login_form' ) ):
  * }
  * @return string $form  The HTML for the form as a string.
  */
-function wpmem_login_form( $args, $arr = false ) {
+function wpmem_login_form( $args = array(), $arr = false ) {
 	global $wpmem;
+	
+	/*
 	// Convert legacy values.
-	if ( ! is_array( $args ) && is_array( $arr ) ) {
+	if ( ( ! is_array( $args ) && is_array( $arr ) ) || ( is_array( $args ) && empty( $args ) ) ) {
 		$page = $args;
 		$args = $arr;
 		$args['page'] = $page;
 	}
+	$args['form'] = ( isset( $args['form'] ) ) ? $args['form'] : 'login';
 	// @todo Work on making this $wpmem->forms->do_login_form( $args );
 	return $wpmem->forms->login_form( $args );
+	*/
+	
+	return $wpmem->forms->do_shortform( 'login', $args );
 }
 endif;
 
@@ -194,7 +201,7 @@ function wpmem_woo_register_form() {
 }
 
 /**
- * Wrapper for $wpmem->create_form_field().
+ * Alias for $wpmem->create_form_field().
  *
  * @since 3.1.2
  * @since 3.2.0 Accepts wpmem_create_formfield() arguments.
@@ -306,6 +313,7 @@ function wpmem_fields( $tag = '', $form = 'default' ) {
  * This is an API wrapper for WP_Members_Forms::sanitize_class().
  *
  * @since 3.2.9
+ * @since 3.4.0 Now an alias for rktgk_sanitize_class().
  *
  * @global  object $wpmem
  *
@@ -313,8 +321,7 @@ function wpmem_fields( $tag = '', $form = 'default' ) {
  * @return	string sanitized_class
  */
 function wpmem_sanitize_class( $class ) {
-	global $wpmem;
-	return $wpmem->forms->sanitize_class( $class );
+	return rktgk_sanitize_class( $class );
 }
 
 /**
@@ -324,6 +331,7 @@ function wpmem_sanitize_class( $class ) {
  *
  * @since 3.2.9
  * @since 3.3.7 Added optional $type
+ * @since 3.4.0 Now an alias for rktgk_sanitize_array().
  *
  * @global  object $wpmem
  *
@@ -332,8 +340,7 @@ function wpmem_sanitize_class( $class ) {
  * @return array  $data
  */
 function wpmem_sanitize_array( $data, $type = false ) {
-	global $wpmem;
-	return $wpmem->forms->sanitize_array( $data, $type );
+	return rktgk_sanitize_array( $data, $type );
 }
 
 /**
@@ -348,8 +355,7 @@ function wpmem_sanitize_array( $data, $type = false ) {
  * @return  string  $sanitized_data
  */
 function wpmem_sanitize_field( $data, $type = 'text' ) {
-	global $wpmem;
-	return $wpmem->forms->sanitize_field( $data, $type );
+	return rktgk_sanitize_field( $data, $type );
 }
 
 /**
@@ -580,4 +586,49 @@ function wpmem_woo_reg_validate( $username, $email, $errors ) {
 		}
 	}
 	return $errors;
+}
+
+function wpmem_is_reg_form_showing() {
+	global $wpmem;
+	return ( isset( $wpmem->reg_form_showing ) && true == $wpmem->reg_form_showing ) ? true : false;
+}
+
+function wpmem_field_display_value( $field, $type, $value, $echo = false ) {
+	$fields = wpmem_fields();
+	/**
+	 * Filter the value.
+	 *
+	 * @since 3.4.0
+	 *
+	 * @param  string  $display_value
+	 * @param  string  $field
+	 * @param  string  $type
+	 */
+	$display_value = apply_filters( 'wpmem_' . $type . '_field_display', $fields[ $field ]['options'][ $value ], $field, $type );
+	if ( $echo ) {
+		echo $display_value;
+	} else {
+		return $display_value;
+	}
+}
+
+function wpmem_checkbox_field_display( $field, $value, $echo = false ) {
+	wpmem_field_display_value( $field, 'checkbox', $value, $echo );
+}
+
+function wpmem_select_field_display( $field, $value, $echo = false ) {
+	wpmem_field_display_value( $field, 'select', $value, $echo );
+}
+
+function wpmem_get_user_meta_select( $user_id, $field ) {
+	$value = wpmem_get_user_meta( $user_id, $field );
+	return wpmem_select_field_display( $field, $value );
+}
+
+function wpmem_get_user_meta_radio( $user_id, $field ) {
+	return wpmem_get_user_meta_select( $user_id, $field );
+}
+
+function wpmem_get_user_meta_multi( $user_id, $field ) {
+	
 }

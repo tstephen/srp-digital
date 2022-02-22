@@ -6,12 +6,12 @@
  * 
  * This file is part of the WP-Members plugin by Chad Butler
  * You can find out more about this plugin at https://rocketgeek.com
- * Copyright (c) 2006-2020  Chad Butler
+ * Copyright (c) 2006-2022  Chad Butler
  * WP-Members(tm) is a trademark of butlerblog.com
  *
  * @package WP-Members
  * @author Chad Butler
- * @copyright 2006-2020
+ * @copyright 2006-2022
  *
  * Functions included:
  * - wpmem_admin
@@ -110,21 +110,6 @@ function wpmem_admin_action( $action ) {
 	}
 
 	return $did_update;
-}
-
-
-/**
- * Adds WP-Members custom fields to the WP Add New User form.
- *
- * @since 2.9.1
- *
- * @global stdClass $wpmem
- */
-function wpmem_admin_add_new_user() {
-	global $wpmem;
-	// Output the custom registration fields.
-	echo $wpmem->forms->wp_newuser_form();
-	return;
 }
 
 /**

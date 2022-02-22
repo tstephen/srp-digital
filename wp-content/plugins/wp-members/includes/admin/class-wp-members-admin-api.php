@@ -116,8 +116,9 @@ class WP_Members_Admin_API {
 		global $wpmem;
 		
 		add_action( 'admin_enqueue_scripts',          array( $this, 'dashboard_enqueue_scripts' ) );
-		add_action( 'user_new_form',                  'wpmem_admin_add_new_user' );
 		add_filter( 'plugin_action_links',            array( $this, 'plugin_links' ), 10, 2 );
+		
+		add_action( 'user_new_form',                  array( $wpmem->forms, 'wp_newuser_form' ) );
 		// add_filter( 'wpmem_admin_tabs',              'wpmem_add_about_tab'       );
 		
 		add_action( 'wp_ajax_wpmem_do_field_reorder',  array( 'WP_Members_Admin_Tab_Fields', 'do_field_reorder' ) );
@@ -236,44 +237,6 @@ class WP_Members_Admin_API {
 	}
 
 	/**
-	 * Adds custom email dialog to the Emails tab.
-	 *
-	 * @since 3.1.0
-	 *
-	 * @param array $args Settings array for the email.
-	 */
-	function do_email_input( $args ) { ?>
-        <tr valign="top"><td colspan="2"><strong><?php echo esc_html( $args['heading'] ); ?></strong></td></tr>
-        <tr valign="top">
-            <th scope="row"><?php echo esc_html( $args['subject_label'] ); ?></th>
-            <td><input type="text" name="<?php echo esc_attr( $args['subject_input'] ); ?>" size="80" value="<?php echo esc_attr( wp_unslash( $args['subject_value'] ) ); ?>"></td> 
-        </tr>
-        <tr valign="top">
-            <th scope="row"><?php echo esc_html( $args['body_label'] ); ?></th>
-            <td><textarea name="<?php echo esc_attr( $args['body_input'] ); ?>" rows="12" cols="50" id="" class="large-text code"><?php echo esc_textarea( wp_unslash( $args['body_value'] ) ); ?></textarea></td>
-        </tr>
-        <tr><td colspan="2"><hr /></td></tr><?php
-	}
-
-	/**
-	 * Saves custom email settings.
-	 *
-	 * @since 3.1.0
-	 *
-	 * @param array $args Settings array for the email.
-	 */
-	function email_update( $args ) {
-		$settings = array(
-			'subj' => sanitize_text_field( wpmem_get( $args['subject_input'] ) ),
-			'body' => wp_kses( wpmem_get( $args['body_input'] ), 'post' ),
-		);
-		update_option( $args['name'], $settings, true );
-		$this->emails[ $args['name'] ]['subject_value'] = $settings['subj'];
-		$this->emails[ $args['name'] ]['body_value']    = $settings['body'];
-		return;
-	}
-
-	/**
 	 * Handles custom email settings.
 	 *
 	 * @since 3.1.0
@@ -353,7 +316,7 @@ class WP_Members_Admin_API {
 				'label' => $args['label'],
 				//'input' => $args['name'] . '_dialog',
 				'value' => $args['value'],
-				//'value' => ( $args['value'] ) ? $args['value'] : $wpmem->get_text( $key ),
+				//'value' => ( $args['value'] ) ? $args['value'] : wpmem_get_text( $key ),
 			);
 
 			// Merge args with settings.
@@ -564,58 +527,51 @@ class WP_Members_Admin_API {
 	 * @since 3.3.0 Everything loads from /assets/ folder.
 	 *
 	 * @global object $current_screen
-	 * @global object $wpmem
 	 * @param  string $hook The admin screen hook being loaded.
 	 */
 	function dashboard_enqueue_scripts( $hook ) {
-		global $current_screen, $wpmem;
-		if ( 'edit.php' == $hook || 'settings_page_wpmem-settings' == $hook || 'post.php' == $hook || 'post-new.php' == $hook || 'user-edit.php' == $hook || 'profile.php' == $hook ) {
-			wp_enqueue_style( 'wpmem-admin', $wpmem->url . 'assets/css/admin' . wpmem_get_suffix() . '.css', '', $wpmem->version );
+		global $current_screen;
+		if ( 'edit.php'       == $hook 
+		   || 'post.php'      == $hook 
+		   || 'post-new.php'  == $hook
+		   || 'user-new.php'  == $hook
+		   || 'user-edit.php' == $hook
+		   || 'profile.php'   == $hook 
+		   || 'users.php'     == $hook
+		   || 'settings_page_wpmem-settings' == $hook ) {
+			wp_enqueue_style( 'wpmem-admin', wpmem_get_plugin_url() . 'assets/css/admin' . wpmem_get_suffix() . '.css', '', wpmem_get_plugin_version() );
 		} 
 		if ( 'settings_page_wpmem-settings' == $hook || 'post.php' == $hook || 'post-new.php' == $hook  ) {
-			wp_enqueue_script( 'wpmem-admin', $wpmem->url . 'assets/js/admin' . wpmem_get_suffix() . '.js', '', $wpmem->version );
+			wp_enqueue_script( 'jquery-ui-dialog' ); // enqueue jQuery UI Dialog dependency
+			wp_register_script( 'wpmem-admin', wpmem_get_plugin_url() . 'assets/js/admin' . wpmem_get_suffix() . '.js', 'jquery', wpmem_get_plugin_version(), true );
+			$translation_array = array(
+				'close_btn' => __( 'Close', 'wp-members' ),
+			);
+			wp_localize_script( 'wpmem-admin', 'wpmem_get_settings_vars', $translation_array );
+			wp_enqueue_script( 'wpmem-admin' );
 		}
-		if ( ( 'post.php' == $hook || 'post-new.php' == $hook ) && 1 == $wpmem->enable_products ) {
+		if ( ( ( 'post.php' == $hook || 'post-new.php' == $hook ) && wpmem_is_enabled( 'enable_products' ) ) 
+		   || ( 'wpmem_product' == get_post_type() )
+		   || ( 'user-edit' == $current_screen->id || 'profile' == $current_screen->id )
+		   || ( 'settings_page_wpmem-settings' == $hook ) ) {
+			wp_enqueue_script( 'jquery' );
+			wp_enqueue_script( 'jquery-ui-core' );       // enqueue jQuery UI Core
+			wp_enqueue_script( 'jquery-ui-datepicker' ); // enqueue jQuery UI Datepicker
+			if ( ! wp_style_is( 'jquery-ui-style', 'enqueued' ) ) {
+				wp_register_style( 'jquery-ui-style', wpmem_get_plugin_url() . 'includes/vendor/jquery-ui/css/jquery-ui' . wpmem_get_suffix() . '.css' );
+			}
+			wp_enqueue_style( 'jquery-ui-style' ); 
+		}
+		if ( ( 'post.php' == $hook || 'post-new.php' == $hook ) && wpmem_is_enabled( 'enable_products' ) ) {
 			if ( ! wp_script_is( 'select2', 'enqueued' ) ) {
-				wp_register_style( 'select2-style', $wpmem->url . 'assets/css/select2' . wpmem_get_suffix() . '.css', false, '4.0.5', 'all' );
-				wp_register_script( 'select2',   $wpmem->url . 'assets/js/select2' . wpmem_get_suffix() . '.js', array( 'jquery' ), '4.0.5', true );
+				wp_register_style( 'select2-style', wpmem_get_plugin_url() . 'includes/vendor/select2/css/select2' . wpmem_get_suffix() . '.css', false, '4.0.5', 'all' );
+				wp_register_script( 'select2',   wpmem_get_plugin_url() . 'includes/vendor/select2/js/select2' . wpmem_get_suffix() . '.js', array( 'jquery' ), '4.0.5', true );
 				wp_enqueue_style( 'select2-style' );
 				wp_enqueue_script( 'select2' );
 			}
-			
-			//if ( ( 'post-new.php' == $hook && isset( $_GET['post_type'] ) && 'wpmem_product' == $_GET['post_type'] ) ||  )
-			if ( 'wpmem_product' == get_post_type() ) {
-				wp_enqueue_script( 'jquery' );
-				wp_enqueue_script( 'jquery-ui-core' );// enqueue jQuery UI Core
-				wp_enqueue_script( 'jquery-ui-datepicker' ); // enqueue jQuery UI Datepicker
-				if ( ! wp_style_is( 'jquery-ui-style', 'enqueued' ) ) {
-					wp_register_style( 'jquery-ui-style', $wpmem->url . 'assets/css/jquery-ui' . wpmem_get_suffix() . '.css' );
-				}
-				wp_enqueue_style( 'jquery-ui-style' ); 
-			}
 		}
 		if ( 'user-edit' == $current_screen->id || 'profile' == $current_screen->id ) {
-			wp_enqueue_script( 'jquery' );
-			wp_enqueue_script( 'jquery-ui-core' ); // enqueue jQuery UI Core
 			wp_enqueue_script( 'jquery-ui-tabs' ); // enqueue jQuery UI Tabs
-			wp_enqueue_script( 'jquery-ui-datepicker' ); // enqueue jQuery UI Datepicker
-
-			if ( ! wp_style_is( 'jquery-ui-style', 'enqueued' ) ) {
-				wp_register_style( 'jquery-ui-style', $wpmem->url . 'assets/css/jquery-ui' . wpmem_get_suffix() . '.css' );
-			}
-			wp_enqueue_style( 'jquery-ui-style' ); 
-		}
-		if ( 'settings_page_wpmem-settings' == $hook ) {
-			wp_enqueue_script( 'jquery' );
-			wp_enqueue_script( 'jquery-ui-core' );// enqueue jQuery UI Core
-			wp_enqueue_script( 'jquery-ui-dialog' );
-			wp_enqueue_script( 'jquery-ui-datepicker' ); // enqueue jQuery UI Datepicker
-			
-			if ( ! wp_style_is( 'jquery-ui-style', 'enqueued' ) ) {
-				wp_register_style( 'jquery-ui-style', $wpmem->url . 'assets/css/jquery-ui' . wpmem_get_suffix() . '.css' );
-			}
-			wp_enqueue_style( 'jquery-ui-style' ); 
-			 
 		}
 	}
 
@@ -670,7 +626,7 @@ class WP_Members_Admin_API {
 	function settings( $which ) {
 		switch ( $which ) {
 			case 'content':
-				return array( 'block' => 'Content Blocking', 'show_excerpt' => 'Show Excerpts', 'show_login' => 'Show Login Form', 'show_reg' => 'Show Registration Form', 'autoex' => 'Auto Excerpt' );
+				return array( 'block' => 'Content Restriction', 'show_excerpt' => 'Show Excerpts', 'show_login' => 'Show Login Form', 'show_reg' => 'Show Registration Form', 'autoex' => 'Auto Excerpt' );
 				break;
 			case 'options':
 				return array( 'notify' => 'Notify admin', 'mod_reg' => 'Moderate registration', 'captcha' => 'Enable registration CAPTCHA', 'warnings' => 'Ignore warning messages', 'dropins' => 'Enable dropins', 'enable_products' => 'Enable membership products', 'clone_menus' => 'Clone menus' );
