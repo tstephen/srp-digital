@@ -3,8 +3,8 @@ Contributors: emrevona
 Donate link: http://profiles.wordpress.org/emrevona/
 Tags: cache, caching, performance, wp-cache, total cache, super cache, cdn
 Requires at least: 3.3
-Tested up to: 5.7
-Stable tag: 0.9.1.9
+Tested up to: 5.8
+Stable tag: 0.9.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -124,6 +124,39 @@ The free version is enough to speed up your site but in the premium version ther
 18. Database Cleanup
 
 == Changelog ==
+
+= 0.9.8 =
+* to clear cache after updating Elementor Website Builder plugin
+* to clear cache after theme or plugin update by custom settings [<a target="_blank" href="https://www.wpfastestcache.com/features/clear-cache-after-theme-or-plugin-update/">Details</a>]
+* to enable Auto Cache Panel for the classic editor which is enabled via add_filter()
+
+= 0.9.7 =
+* to clear cache after theme or plugin update by default [<a target="_blank" href="https://www.wpfastestcache.com/features/clear-cache-after-theme-or-plugin-update/">Details</a>]
+
+= 0.9.6 =
+* refactoring of serving non-exists minified files
+* to fix htaccess rule for Polylang plugin
+* to fix condition of clear cache after plugin update
+
+= 0.9.5 =
+* to prevent generating cache when DONOTCACHEPAGE is defined as true for Divi theme
+* to add nonce security system for cdn saving 
+
+= 0.9.4 =
+* to make compatible the Auto Cache feature with the Disable Gutenberg plugin
+* refactoring of rewrite rule of HTTP_USER_AGENT
+* to check that resources have been successfully optimized
+
+= 0.9.3 =
+* to prevent removing "/" for exclude rules
+* <strong>[FEATURE]</strong> to add "pause" feature for cdn [<a target="_blank" href="https://www.wpfastestcache.com/features/temporarily-disable-cdn/">Details</a>]
+* to add wpfc_clear_all_site_cache() for clearing cache of all sites [<a target="_blank" href="https://www.wpfastestcache.com/tutorial/delete-the-cache-by-calling-the-function/">Details</a>]
+* to add spinner for the buttons on the cdn wizard
+* refactroing of excluding "There has been a critical error on this website" page
+
+= 0.9.2 =
+* <strong>[FEATURE]</strong> to create cache after publishing new post or updating a post [<a target="_blank" href="https://www.wpfastestcache.com/features/automatic-cache/">Details</a>]
+* <strong>[FEATURE]</strong> Clear cache after activate/deactivate plugin [<a target="_blank" href="https://www.wpfastestcache.com/features/clear-cache-after-activate-deactivate-a-plugin/">Details</a>]
 
 = 0.9.1.9 =
 * <strong>[FEATURE]</strong> Clear cache after switch theme [<a target="_blank" href="https://www.wpfastestcache.com/features/clear-cache-after-switch-theme/">Details</a>]
