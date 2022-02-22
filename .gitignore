@@ -8,8 +8,15 @@
 
 # Apps overlaid
 *html
+keycloak.json
+manifest.json
+srp-ui-*.jar
 admin/*
+faq/*
+images/*
 questionnaire/*
+sdat/*
+sdu/*
 srp/*
 
 .htaccess
