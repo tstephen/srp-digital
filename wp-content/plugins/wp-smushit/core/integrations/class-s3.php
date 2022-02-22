@@ -15,6 +15,7 @@ namespace Smush\Core\Integrations;
 
 use Amazon_S3_And_CloudFront;
 use DeliciousBrains\WP_Offload_Media\Items\Media_Library_Item;
+use Smush\App\Admin;
 use Smush\Core\Settings;
 use WP_Smush;
 
@@ -89,7 +90,7 @@ class S3 extends Abstract_Integration {
 		$settings[ $this->module ] = array(
 			'label'       => __( 'Enable Amazon S3 support', 'wp-smushit' ),
 			'short_label' => __( 'Amazon S3', 'wp-smushit' ),
-			'desc'        => sprintf(
+			'desc'        => sprintf( /* translators: %1$s - <a>, %2$s - </a> */
 				esc_html__(
 					"Storing your image on S3 buckets using %1\$sWP Offload Media%2\$s? Smush can detect
 				and smush those assets for you, including when you're removing files from your host server.",
@@ -188,14 +189,7 @@ class S3 extends Abstract_Integration {
 		// Do not display the notice on Bulk Smush Screen.
 		global $current_screen;
 
-		$allowed_pages = array(
-			'toplevel_page_smush',
-			'gallery_page_wp-smush-nextgen-bulk',
-			'nextgen-gallery_page_wp-smush-nextgen-bulk', // Different since NextGen 3.3.6.
-			'toplevel_page_smush-network',
-		);
-
-		if ( ! empty( $current_screen->base ) && ! in_array( $current_screen->base, $allowed_pages, true ) ) {
+		if ( ! empty( $current_screen->id ) && ! in_array( $current_screen->id, Admin::$plugin_pages, true ) && false === strpos( $current_screen->id, 'page_smush' ) ) {
 			return;
 		}
 
@@ -211,8 +205,8 @@ class S3 extends Abstract_Integration {
 
 		// Settings link.
 		$settings_link = is_multisite() && is_network_admin()
-			? network_admin_url( 'admin.php?page=smush' )
-			: menu_page_url( 'smush', false );
+			? network_admin_url( 'admin.php?page=smush-integrations' )
+			: menu_page_url( 'smush-integrations', false );
 
 		if ( WP_Smush::is_pro() ) {
 			/**
@@ -226,7 +220,7 @@ class S3 extends Abstract_Integration {
 				),
 				'<strong>',
 				'</strong>',
-				"<a href='{$settings_link}&view=integrations'><strong>",
+				"<a href='{$settings_link}'><strong>",
 				'</strong></a>'
 			);
 		} else {
@@ -282,8 +276,7 @@ class S3 extends Abstract_Integration {
 		} elseif ( ! method_exists( $as3cf, 'is_plugin_setup' ) ) {
 			// Check if in case for some reason, we couldn't find the required function.
 			$class   = ' sui-notice-warning';
-			$message = sprintf(
-				/* translators: %1$s: opening a tag, %2$s: closing a tag */
+			$message = sprintf( /* translators: %1$s: opening a tag, %2$s: closing a tag */
 				esc_html__(
 					'We are having trouble interacting with WP Offload Media, make sure the plugin is activated. Or you can %1$sreport a bug%2$s.',
 					'wp-smushit'
@@ -294,8 +287,7 @@ class S3 extends Abstract_Integration {
 		} elseif ( ! $as3cf->is_plugin_setup() ) {
 			// Plugin is not setup, or some information is missing.
 			$class   = ' sui-notice-warning';
-			$message = sprintf(
-				/* translators: %1$s: opening a tag, %2$s: closing a tag */
+			$message = sprintf( /* translators: %1$s: opening a tag, %2$s: closing a tag */
 				esc_html__(
 					'It seems you haven’t finished setting up WP Offload Media yet. %1$sConfigure it now%2$s to enable Amazon S3 support.',
 					'wp-smushit'

@@ -280,7 +280,11 @@ class Stats extends NextGen {
 					$status_txt .= '</div>';
 				}
 			} elseif ( ! empty( $percent ) && ! empty( $bytes_readable ) ) {
-				$status_txt  = sprintf( __( 'Reduced by %1$s (%2$01.1f%%)', 'wp-smushit' ), $bytes_readable, number_format_i18n( $percent, 2 ) );
+				$status_txt  = sprintf( /* translators: %1$s: reduced by bytes, %2$s: size format */
+					__( 'Reduced by %1$s (%2$01.1f%%)', 'wp-smushit' ),
+					$bytes_readable,
+					number_format_i18n( $percent, 2 )
+				);
 				$status_txt .= '<div class="sui-smush-media smush-status-links">';
 
 				$show_resmush = $this->show_resmush( $show_resmush, $wp_smush_data );
@@ -796,7 +800,7 @@ class Stats extends NextGen {
 		if ( empty( $stats['bytes'] ) && ! empty( $stats['size_before'] ) ) {
 			$stats['bytes'] = $stats['size_before'] - $stats['size_after'];
 		}
-		$stats['human'] = size_format( $stats['bytes'] );
+		$stats['human'] = size_format( ! empty( $stats['bytes'] ) ? $stats['bytes'] : 0 );
 		if ( ! empty( $stats['size_before'] ) ) {
 			$stats['percent'] = ( $stats['bytes'] / $stats['size_before'] ) * 100;
 			$stats['percent'] = round( $stats['percent'], 2 );

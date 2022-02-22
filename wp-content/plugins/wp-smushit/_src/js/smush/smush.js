@@ -232,7 +232,7 @@ class Smush {
 		jQuery('.wp-smush-all').prop('disabled', false);
 		// For bulk process, enable other buttons.
 		jQuery(
-			'button.wp-smush-scan, a.wp-smush-lossy-enable, button.wp-smush-resize-enable, button#wp-smush-save-settings'
+			'button.wp-smush-scan, a.wp-smush-lossy-enable, button.wp-smush-resize-enable, button#save-settings-button'
 		).prop('disabled', false);
 	}
 
@@ -633,6 +633,9 @@ class Smush {
 					.getElementById('wp-smush-pending-to-smush-text')
 					.classList.add('sui-hidden');
 			}
+
+			// Reset the progress when we finish so the next smushing starts from zero.
+			this._updateProgress(0, 0);
 		} else {
 			// Show loader.
 			statusIcon
@@ -878,6 +881,15 @@ class Smush {
 					( ( this.smushed + this.errors.length ) / this.total ) *
 					100;
 			}
+		}
+
+		// Reset the lossless images count in case of pending images for resmush ( Nextgen only ).
+		if (
+			'nextgen' === this.smush_type  &&
+			wp_smushit_data.resmush.length > 0 && 
+			(this.smushed + this.errors.length <= 1)
+		) {
+			wp_smushit_data.count_images -= (wp_smushit_data.resmush.length + 1);
 		}
 
 		// No more images left. Show bulk wrapper and Smush notice.

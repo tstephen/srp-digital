@@ -26,6 +26,7 @@
 @import "~@wpmudev/shared-ui/scss/radio-checkbox";
 @import "~@wpmudev/shared-ui/scss/tabs";;
 @import "~@wpmudev/shared-ui/scss/sidenav";
+@import "~@wpmudev/shared-ui/scss/dropdowns";
 @import "~@wpmudev/shared-ui/scss/scores";
 @import "~@wpmudev/shared-ui/scss/footer";
 @import "~@wpmudev/shared-ui/scss/progress-bars";
@@ -33,6 +34,7 @@
 @import "~@wpmudev/shared-ui/scss/utility";
 @import "~@wpmudev/shared-ui/scss/wp-admin-notices";
 @import "~@wpmudev/shared-ui/scss/tables";
+@import "~@wpmudev/shared-ui/scss/accordions";
 // Used on lazy loading page (since 3.2.2).
 @import "~@wpmudev/shared-ui/scss/box-selectors";
 @import "~@wpmudev/shared-ui/scss/upload";
@@ -40,8 +42,10 @@
 // Upgrade page (since 3.2.3).
 @import "~@wpmudev/shared-ui/scss/upgrade-page";
 @import "~@wpmudev/shared-ui/scss/reviews";
-// Used on WebP page ( since 3.8.0 )
+// Used on WebP page (since 3.8.0).
 @import "~@wpmudev/shared-ui/scss/_code-snippet.scss";
+// Upsells (since 3.9.1).
+@import "~@wpmudev/shared-ui/scss/upsells";
 
 // App styles
 @import "modules/admin";

@@ -32,14 +32,15 @@ if ( ! String.prototype.includes ) {
 
 require( './modules/helpers' );
 require( './modules/admin' );
+require( './modules/admin-common' );
 require( './modules/bulk-smush' );
 require( './modules/onboarding' );
 require( './modules/directory-smush' );
 require( './smush/cdn' );
-require( './smush/tutorials' );
 require( './smush/webp' );
 require( './smush/lazy-load' );
 require( './modules/bulk-restore' );
+require( './smush/settings' );
 
 /**
  * Notice scripts.
